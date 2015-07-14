@@ -1,2 +1,8 @@
-vendor
+vendor/
 wp-content
+/twig_cache/*
+/bower_components/
+/node_modules/
+/css/bootstrap.css
+/js/bower.js
+/js/bower.min.js
