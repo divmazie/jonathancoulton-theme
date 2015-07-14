@@ -6,3 +6,4 @@ wp-content
 /css/bootstrap.css
 /js/bower.js
 /js/bower.min.js
+.idea/
