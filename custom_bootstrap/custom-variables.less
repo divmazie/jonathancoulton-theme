@@ -2,12 +2,6 @@
 // Variables
 // --------------------------------------------------
 
-// JOCO COLORS
-
-@joco_offwhite:         #f5f5eb;
-@joco_beige:            #d0c4af;
-@joco_blue:             #1a5d83;
-@joco_darkblue:         #063953;
 
 //== Colors
 //
@@ -20,9 +14,9 @@
 @gray-light:             lighten(@gray-base, 46.7%); // #777
 @gray-lighter:           lighten(@gray-base, 93.5%); // #eee
 
-@brand-primary:         @joco_blue;
+@brand-primary:         darken(#428bca, 6.5%); // #337ab7
 @brand-success:         #5cb85c;
-@brand-info:            #6e96ab;
+@brand-info:            #5bc0de;
 @brand-warning:         #f0ad4e;
 @brand-danger:          #d9534f;
 
@@ -32,14 +26,14 @@
 //## Settings for some of the most global styles.
 
 //** Background color for `<body>`.
-@body-bg:               @joco_offwhite;
+@body-bg:               #fff;
 //** Global text color on `<body>`.
-@text-color:            @joco_darkblue;
+@text-color:            @gray-dark;
 
 //** Global textual link color.
-@link-color:            @joco_darkblue;
+@link-color:            @brand-primary;
 //** Link hover color set via `darken()` function.
-@link-hover-color:      lighten(@joco_darkblue, 15%);
+@link-hover-color:      darken(@link-color, 15%);
 //** Link hover decoration.
 @link-hover-decoration: underline;
 
@@ -48,33 +42,13 @@
 //
 //## Font, line-height, and color for body text, headings, and more.
 
-/* surveyor */
-@font-face {
-    font-family: surveyorBook;
-    src: url(../fonts/SurveyorText-Book-Pro.otf);
-}
-@font-face {
-    font-family: surveyorBookBold;
-    src: url(../fonts/SurveyorText-Bold-Pro.otf);
-    font-weight: bold;
-}
-@font-face {
-    font-family: surveyorBookItalic;
-    src: url(../fonts/SurveyorDisplay-BookItalic-Pro.otf);
-}
-/* gotham */
-@font-face {
-    font-family: gothamBook;
-    src: url(../fonts/Gotham-Book.otf);
-}
-
-@font-family-sans-serif:  gothamBook,"Helvetica Neue", Helvetica, Arial, sans-serif;
-@font-family-serif:       surveyorBook,Georgia, "Times New Roman", Times, serif;
+@font-family-sans-serif:  "Helvetica Neue", Helvetica, Arial, sans-serif;
+@font-family-serif:       Georgia, "Times New Roman", Times, serif;
 //** Default monospace fonts for `<code>`, `<kbd>`, and `<pre>`.
 @font-family-monospace:   Menlo, Monaco, Consolas, "Courier New", monospace;
-@font-family-base:        @font-family-serif;
+@font-family-base:        @font-family-sans-serif;
 
-@font-size-base:          18px;
+@font-size-base:          14px;
 @font-size-large:         ceil((@font-size-base * 1.25)); // ~18px
 @font-size-small:         ceil((@font-size-base * 0.85)); // ~12px
 
@@ -91,7 +65,7 @@
 @line-height-computed:    floor((@font-size-base * @line-height-base)); // ~20px
 
 //** By default, this inherits from the `<body>`.
-@headings-font-family:    @font-family-sans-serif;
+@headings-font-family:    inherit;
 @headings-font-weight:    500;
 @headings-line-height:    1.1;
 @headings-color:          inherit;
@@ -128,9 +102,9 @@
 @line-height-large:         1.3333333; // extra decimals for Win 8.1 Chrome
 @line-height-small:         1.5;
 
-@border-radius-base:        2px;
-@border-radius-large:       4px;
-@border-radius-small:       0px;
+@border-radius-base:        4px;
+@border-radius-large:       6px;
+@border-radius-small:       3px;
 
 //** Global color for active items (e.g., navs or dropdowns).
 @component-active-color:    #fff;
@@ -170,9 +144,9 @@
 
 @btn-font-weight:                normal;
 
-@btn-default-color:              @joco_darkblue;
-@btn-default-bg:                 rgba(255,255,255,0);
-@btn-default-border:             @joco_darkblue;
+@btn-default-color:              #333;
+@btn-default-bg:                 #fff;
+@btn-default-border:             #ccc;
 
 @btn-primary-color:              #fff;
 @btn-primary-bg:                 @brand-primary;
@@ -207,14 +181,14 @@
 //##
 
 //** `<input>` background color
-@input-bg:                       rgba(255,255,255,0);
+@input-bg:                       #fff;
 //** `<input disabled>` background color
 @input-bg-disabled:              @gray-lighter;
 
 //** Text color for `<input>`s
-@input-color:                    @link-color;
+@input-color:                    @gray;
 //** `<input>` border color
-@input-border:                   #fff;
+@input-border:                   #ccc;
 
 // TODO: Rename `@input-border-radius` to `@input-border-radius-base` in v4
 //** Default `.form-control` border radius
@@ -229,7 +203,7 @@
 @input-border-focus:             #66afe9;
 
 //** Placeholder text color
-@input-color-placeholder:        @joco_beige;
+@input-color-placeholder:        #999;
 
 //** Default `.form-control` height
 @input-height-base:              (@line-height-computed + (@padding-base-vertical * 2) + 2);
@@ -258,7 +232,7 @@
 //## Dropdown menu container and contents.
 
 //** Background for the dropdown menu.
-@dropdown-bg:                    @joco_darkblue;
+@dropdown-bg:                    #fff;
 //** Dropdown menu `border-color`.
 @dropdown-border:                rgba(0,0,0,.15);
 //** Dropdown menu `border-color` **for IE8**.
@@ -267,11 +241,11 @@
 @dropdown-divider-bg:            #e5e5e5;
 
 //** Dropdown link text color.
-@dropdown-link-color:            @joco_offwhite;
+@dropdown-link-color:            @gray-dark;
 //** Hover color for dropdown links.
-@dropdown-link-hover-color:      @joco_offwhite;
+@dropdown-link-hover-color:      darken(@gray-dark, 5%);
 //** Hover background for dropdown links.
-@dropdown-link-hover-bg:         darken(@joco_darkblue, 5%);
+@dropdown-link-hover-bg:         #f5f5f5;
 
 //** Active dropdown menu item text color.
 @dropdown-link-active-color:     @component-active-color;
@@ -417,15 +391,15 @@
 //=== Inverted navbar
 // Reset inverted navbar basics
 @navbar-inverse-color:                      lighten(@gray-light, 15%);
-@navbar-inverse-bg:                         @joco_darkblue;
-@navbar-inverse-border:                     darken(@navbar-inverse-bg, 3%);
+@navbar-inverse-bg:                         #222;
+@navbar-inverse-border:                     darken(@navbar-inverse-bg, 10%);
 
 // Inverted navbar links
 @navbar-inverse-link-color:                 lighten(@gray-light, 15%);
 @navbar-inverse-link-hover-color:           #fff;
 @navbar-inverse-link-hover-bg:              transparent;
 @navbar-inverse-link-active-color:          @navbar-inverse-link-hover-color;
-@navbar-inverse-link-active-bg:             darken(@navbar-inverse-bg, 3%);
+@navbar-inverse-link-active-bg:             darken(@navbar-inverse-bg, 10%);
 @navbar-inverse-link-disabled-color:        #444;
 @navbar-inverse-link-disabled-bg:           transparent;
 
@@ -446,7 +420,7 @@
 
 //=== Shared nav styles
 @nav-link-padding:                          10px 15px;
-@nav-link-hover-bg:                         darken(@joco_darkblue, 10%);
+@nav-link-hover-bg:                         @gray-lighter;
 
 @nav-disabled-link-color:                   @gray-light;
 @nav-disabled-link-hover-color:             @gray-light;
