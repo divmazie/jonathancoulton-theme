@@ -17,10 +17,10 @@
 					<nav id="nav-main" class="" role="navigation">
 						<ul class="">
 						{% for item in menu.get_items %}
-							<li class=" {{item.classes | join(' ')}}">
+							<li class=" {{item.classes | join(' ')}}" {% if item.get_children %}onmouseover="$('#children{{ item.post_name }}').show()" onmouseout="$('#children{{ item.post_name }}').hide()" {% endif %}>
 								<a class="" href="{{item.get_link}}">{{item.title}}</a>
 								{% if item.get_children %}
-									<ul class="">
+									<ul id="children{{ item.post_name }}" class="menu_children">
 									{% for child in item.get_children %}
 										<li class="">
 											<a class="" href="{{child.get_link}}">{{child.title}}</a>
