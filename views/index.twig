@@ -1,6 +1,14 @@
 {% extends "base.twig" %}
 
 {% block content %}
+	<div class="col-xs-12">
+		<div data-slick='{"slidesToShow": 3, "slidesToScroll": 1}' class="slick-element">
+			<div class="joco-promo">Something</div>
+			<div class="joco-promo">Something else</div>
+			<div class="joco-promo">Something entirely different</div>
+			<div class="joco-promo">Something sweet</div>
+		</div>
+	</div>
 	<div class="col-xs-12 col-sm-10">
 		{% include ['tease-'~post.post_type~'.twig', 'tease.twig'] with {'post': posts|first} %}
 	</div>
