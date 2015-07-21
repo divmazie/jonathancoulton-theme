@@ -56,3 +56,54 @@ function myfoo( $text ) {
 wp_enqueue_style('bootstrap',get_template_directory_uri().'/css/bootstrap.css');
 wp_enqueue_script('bower',get_template_directory_uri().'/js/bower.min.js');
 wp_enqueue_script('site',get_template_directory_uri().'/js/site.js');
+
+if( function_exists('acf_add_options_page') ) {
+	acf_add_options_page(array(
+		'page_title' => 'Theme General Settings',
+		'menu_title' => 'Theme Settings',
+		'menu_slug' => 'theme-general-settings',
+		'capability' => 'edit_posts',
+		'redirect' => false
+	));
+	acf_add_local_field_group(array (
+		'key' => 'group_55ad56ef6b3ea',
+		'title' => 'Options',
+		'fields' => array (
+			array(
+				'key' => 'field_54b83b55ed730',
+				'label' => 'Footer left column header',
+				'name' => 'footer_left_header',
+				'type' => 'text',
+				'instructions' => '',
+				'required' => 0,
+				'default_value' => 'Contact / Press',
+				'placeholder' => ''
+			),
+			array(
+				'key' => 'field_54b83bbced731',
+				'label' => 'Footer left column text',
+				'name' => 'footer_left_text',
+				'type' => 'text',
+				'instructions' => '',
+				'required' => 0,
+				'default_value' => '',
+				'placeholder' => ''
+			)
+		),
+		'location' => array (
+			array (
+				array (
+					'param' => 'options_page',
+					'operator' => '==',
+					'value' => 'theme-general-settings',
+				),
+			),
+		),
+		'menu_order' => 1,
+		'position' => 'normal',
+		'style' => 'seamless',
+		'label_placement' => 'top',
+		'instruction_placement' => 'label',
+		'hide_on_screen' => '',
+	));
+}

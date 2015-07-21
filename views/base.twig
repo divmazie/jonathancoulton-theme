@@ -51,9 +51,13 @@
 		</section>
 
 		{% block footer %}
-			<div class="col-xs-12 col-sm-4">Recent news</div>
+			<div class="col-xs-12 col-sm-4">
+				<h4>{{ function('the_field','footer_left_header','option') }}</h4>
+				<p>{{ function('the_field','footer_left_text','option') }}</p>
+			</div>
 			<div class="col-xs-12 col-sm-4">Search area</div>
 			<div class="col-xs-12 col-sm-4">Basic contact info</div>
+			<div class="clearfix"></div>
 			<footer id="footer">
 				{% include 'footer.twig' %}
 			</footer>
