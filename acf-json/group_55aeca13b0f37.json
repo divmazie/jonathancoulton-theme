@@ -7,7 +7,7 @@
             "label": "Footer left header",
             "name": "footer_left_header",
             "type": "text",
-            "instructions": "",
+            "instructions": "Header for the left-most of three columns in the footer",
             "required": 0,
             "conditional_logic": 0,
             "wrapper": {
@@ -60,5 +60,5 @@
     "label_placement": "top",
     "instruction_placement": "label",
     "hide_on_screen": "",
-    "modified": 1437518487
+    "modified": 1437518730
 }
