@@ -73,3 +73,5 @@ if( function_exists('acf_add_options_page') ) {
 		'redirect' => false
 	));
 }
+
+include get_template_directory().'/include/tgm.php';
