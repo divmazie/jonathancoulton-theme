@@ -35,18 +35,8 @@ class StarterSite extends TimberSite {
 		$context['menu'] = new TimberMenu();
 		$context['site'] = $this;
 		$theme_options = array();
-		// get ACF theme-options from json files to make automatically available in twig
-		foreach (scandir(get_template_directory().'/acf-json') as $file) {
-			if (substr($file,-5)==".json") {
-				$json = json_decode(file_get_contents(get_template_directory().'/acf-json/'.$file));
-				if($json->location[0][0]->param == "options_page") {
-					foreach ($json->fields as $field) {
-						$theme_options[$field->name] = get_field($field->name,"option");
-					}
-				}
-			}
-		}
-		$context['theme_options'] = $theme_options;
+		// make get ACF theme-options automatically available in twig
+		$context['theme_options'] = get_fields('options');
 		return $context;
 	}
 
