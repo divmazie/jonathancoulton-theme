@@ -29,5 +29,8 @@
 				}
 			}
 		}
-	]
+	],
+    "require": {
+        "tgmpa/tgm-plugin-activation": "dev-master"
+    }
 }
