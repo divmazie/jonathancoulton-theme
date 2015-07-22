@@ -75,3 +75,4 @@ if( function_exists('acf_add_options_page') ) {
 }
 
 include get_template_directory().'/include/tgm.php';
+include get_template_directory().'/include/cpt.php';
