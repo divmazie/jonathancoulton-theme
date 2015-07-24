@@ -20,18 +20,26 @@ class Track {
         $this->parentAlbum->addTrack($this);
     }
 
+    public function getTrackVersionHash() {
+        return md5(serialize(array(
+                                 $this->getTrackArtist(),
+                                 $this->getTrackComment(),
+                                 $this->getTrackGenre(),
+                                 $this->getTrackNumber(),
+                                 $this->getTrackTitle(),
+                                 $this->getTrackYear(),
+                                 $this->getTrackArtFilePath(),
+                                 $this->getTrackSourceFilePath(),
+                             )));
+
+
+    }
+
     /**
      * @return mixed
      */
     public function getTrackTitle() {
         return $this->trackTitle;
-    }
-
-    /**
-     * @param mixed $trackTitle
-     */
-    public function setTrackTitle($trackTitle) {
-        $this->trackTitle = $trackTitle;
     }
 
     /**
@@ -75,6 +83,14 @@ class Track {
      */
     public function getTrackArtObject() {
         return $this->trackArtObject ? $this->trackArtObject : $this->parentAlbum->getAlbumArtObject();
+    }
+
+    public function getTrackArtFilePath() {
+        get_attached_file($this->getTrackArtObject()->ID);
+    }
+
+    public function getTrackSourceFilePath() {
+        get_attached_file($this->trackSourceFileObject->ID);
     }
 
     /**
