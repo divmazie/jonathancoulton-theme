@@ -21,18 +21,24 @@ class Track {
     }
 
     public function getTrackVersionHash() {
-        return md5(serialize(array(
-                                 $this->getTrackArtist(),
-                                 $this->getTrackComment(),
-                                 $this->getTrackGenre(),
-                                 $this->getTrackNumber(),
-                                 $this->getTrackTitle(),
-                                 $this->getTrackYear(),
-                                 $this->getTrackArtFilePath(),
-                                 $this->getTrackSourceFilePath(),
-                             )));
+        return md5(implode('|||', array(
+            $this->getTrackArtist(),
+            $this->getTrackComment(),
+            $this->getTrackGenre(),
+            $this->getTrackNumber(),
+            $this->getTrackTitle(),
+            $this->getTrackYear(),
+            $this->getTrackArtFilePath(),
+            $this->getTrackSourceFilePath(),
+        )));
+    }
 
-
+    public function getChildEncodes() {
+        return array(
+            new Encode($this, 'mp3', '-V1'),
+            new Encode($this, 'flac', '--best'),
+            new Encode($this, 'ogg', ''),
+        );
     }
 
     /**

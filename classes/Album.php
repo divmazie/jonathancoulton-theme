@@ -31,7 +31,7 @@ class Album {
     }
 
     public function getNumberOfAlbumTracks() {
-
+        return count($this->albumTracks);
     }
 
     // @return array the album tracks IN ORDER
