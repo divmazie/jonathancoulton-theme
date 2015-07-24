@@ -50,7 +50,7 @@
             "label": "Track artist",
             "name": "track_artist",
             "type": "text",
-            "instructions": "Defaults to album artist",
+            "instructions": "Blank defaults to album artist",
             "required": 0,
             "conditional_logic": 0,
             "wrapper": {
@@ -71,7 +71,7 @@
             "label": "Track year",
             "name": "track_year",
             "type": "number",
-            "instructions": "Defaults to album year",
+            "instructions": "Blank defaults to album year",
             "required": 0,
             "conditional_logic": 0,
             "wrapper": {
@@ -94,7 +94,7 @@
             "label": "Track genre",
             "name": "track_genre",
             "type": "text",
-            "instructions": "Defaults to album genre",
+            "instructions": "Blank defaults to album genre",
             "required": 0,
             "conditional_logic": 0,
             "wrapper": {
@@ -115,7 +115,7 @@
             "label": "Track art",
             "name": "track_art",
             "type": "image",
-            "instructions": "Defaults to album art",
+            "instructions": "Blank defaults to album art",
             "required": 0,
             "conditional_logic": 0,
             "wrapper": {
@@ -139,7 +139,7 @@
             "label": "Track comment",
             "name": "track_comment",
             "type": "text",
-            "instructions": "Defaults to album comment",
+            "instructions": "Blank defaults to album comment",
             "required": 0,
             "conditional_logic": 0,
             "wrapper": {
@@ -187,5 +187,5 @@
         "tags",
         "send-trackbacks"
     ],
-    "modified": 1437765976
+    "modified": 1437767328
 }
