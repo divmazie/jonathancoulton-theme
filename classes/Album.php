@@ -22,7 +22,6 @@ class Album {
     }
 
 
-
     public function addTrack(Track $track) {
 
     }
@@ -48,24 +47,10 @@ class Album {
     }
 
     /**
-     * @param mixed $albumTitle
-     */
-    public function setAlbumTitle($albumTitle) {
-        $this->albumTitle = $albumTitle;
-    }
-
-    /**
      * @return mixed
      */
     public function getAlbumArtist() {
         return $this->albumArtist;
-    }
-
-    /**
-     * @param mixed $albumArtist
-     */
-    public function setAlbumArtist($albumArtist) {
-        $this->albumArtist = $albumArtist;
     }
 
     /**
@@ -76,24 +61,10 @@ class Album {
     }
 
     /**
-     * @param mixed $albumYear
-     */
-    public function setAlbumYear($albumYear) {
-        $this->albumYear = $albumYear;
-    }
-
-    /**
      * @return mixed
      */
     public function getAlbumGenre() {
         return $this->albumGenre;
-    }
-
-    /**
-     * @param mixed $albumGenre
-     */
-    public function setAlbumGenre($albumGenre) {
-        $this->albumGenre = $albumGenre;
     }
 
     /**
@@ -104,25 +75,10 @@ class Album {
     }
 
     /**
-     * @param mixed $albumArtObject
-     */
-    public function setAlbumArtObject($albumArtObject) {
-        $this->albumArtObject = $albumArtObject;
-    }
-
-    /**
      * @return mixed
      */
     public function getAlbumComment() {
         return $this->albumComment;
     }
-
-    /**
-     * @param mixed $albumComment
-     */
-    public function setAlbumComment($albumComment) {
-        $this->albumComment = $albumComment;
-    }
-
 
 }

@@ -4,7 +4,7 @@ namespace jct;
 
 class Track {
 
-    private $trackTitle, $trackArtist, $trackGenre, $trackYear, $trackComment, $trackArtObject, $trackSourceFileObject;
+    private $trackNumber, $trackTitle, $trackArtist, $trackGenre, $trackYear, $trackComment, $trackArtObject, $trackSourceFileObject;
     private $wpPost;
     private $parentAlbum;
 
@@ -37,15 +37,16 @@ class Track {
     /**
      * @return mixed
      */
-    public function getTrackArtist() {
-        return $this->trackArtist ? $this->trackArtist : $this->parentAlbum->getAlbumArtist();
+    public function getTrackNumber() {
+        return abs(intval($this->trackNumber));
     }
 
+
     /**
-     * @param mixed $trackArtist
+     * @return mixed
      */
-    public function setTrackArtist($trackArtist) {
-        $this->trackArtist = $trackArtist;
+    public function getTrackArtist() {
+        return $this->trackArtist ? $this->trackArtist : $this->parentAlbum->getAlbumArtist();
     }
 
     /**
@@ -56,24 +57,10 @@ class Track {
     }
 
     /**
-     * @param mixed $trackGenre
-     */
-    public function setTrackGenre($trackGenre) {
-        $this->trackGenre = $trackGenre;
-    }
-
-    /**
      * @return mixed
      */
     public function getTrackYear() {
         return $this->trackYear ? $this->trackYear : $this->parentAlbum->getAlbumYear();
-    }
-
-    /**
-     * @param mixed $trackYear
-     */
-    public function setTrackYear($trackYear) {
-        $this->trackYear = $trackYear;
     }
 
     /**
@@ -84,13 +71,6 @@ class Track {
     }
 
     /**
-     * @param mixed $trackComment
-     */
-    public function setTrackComment($trackComment) {
-        $this->trackComment = $trackComment;
-    }
-
-    /**
      * @return mixed
      */
     public function getTrackArtObject() {
@@ -98,24 +78,10 @@ class Track {
     }
 
     /**
-     * @param mixed $trackArtObject
-     */
-    public function setTrackArtObject($trackArtObject) {
-        $this->trackArtObject = $trackArtObject;
-    }
-
-    /**
      * @return mixed
      */
     public function getTrackSourceFileObject() {
         return $this->trackSourceFileObject;
-    }
-
-    /**
-     * @param mixed $trackSourceFileObject
-     */
-    public function setTrackSourceFileObject($trackSourceFileObject) {
-        $this->trackSourceFileObject = $trackSourceFileObject;
     }
 
 
