@@ -63,3 +63,13 @@ function register_my_cpt_showcase_tile() {
     register_generic_cpt("Showcase Tile");
 }
 add_action('init', 'register_my_cpt_showcase_tile');
+
+function register_my_cpt_album() {
+    register_generic_cpt("Album");
+}
+add_action('init', 'register_my_cpt_album'); // fields: artist, year, genre, art
+
+function register_my_cpt_track() {
+    register_generic_cpt("Track");
+}
+add_action('init', 'register_my_cpt_track'); // fields: artist, album, source
