@@ -83,16 +83,5 @@ RUN make install
 RUN make distclean
 RUN hash -r
 
-# cleanup
-RUN mv ~/bin/* /usr/local/bin && rm -rf ~/*
+RUN mv ~/bin/* /usr/local/bin
 
-# END INSTALL FFMPEG
-
-WORKDIR /root/
-RUN  DEBIAN_FRONTEND=noninteractive apt-get install -y --force-yes \
-    php5 php5-cli
-
-RUN mkdir ~/encodes
-WORKDIR /root/encodes
-
-CMD php -e /root/src/proc.php
