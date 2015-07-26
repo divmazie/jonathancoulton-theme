@@ -1,0 +1,7 @@
+encodebot:
+  hostname: encodebot
+  build: ./encodebot
+  ports:
+    - "80:80"
+  volumes:
+    - "./encodebot/dest:/tmp/encodes/tagging2"
