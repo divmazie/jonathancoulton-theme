@@ -30,7 +30,7 @@ class Encode extends WordpressFileAsset {
         // remove non ascii alnum_ with
         $title = preg_replace('/[^\da-z_]/i', '', $title);
 
-        // track number underscore track title dot extension
+        // track number underscore track title underscore short hash dot extension
         return sprintf('%d_%s_%s.%s', $this->parentTrack->getTrackNumber(),
                        $this->getShortEncodeHash(),
                        $title, $this->encodeFormat);
