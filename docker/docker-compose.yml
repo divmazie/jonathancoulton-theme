@@ -4,5 +4,5 @@ encodebot:
   ports:
     - "80:80"
   volumes:
-    - "./encodebot/dest:/tmp/encodes"
+    - "./encodebot/dest:/root/encodes"
     - "./encodebot/src:/root/src"

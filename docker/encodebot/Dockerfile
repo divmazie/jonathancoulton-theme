@@ -95,4 +95,4 @@ RUN  DEBIAN_FRONTEND=noninteractive apt-get install -y --force-yes \
 RUN mkdir ~/encodes
 WORKDIR /root/encodes
 
-CMD php -e /root/src/proc.php
+CMD php -d display_errors /root/src/proc.php
