@@ -1,28 +1,40 @@
 <?php
 return [
-    'alac' => [
-        'lib'          => 'alac',
-        'defaultflags' => '',
+    'mp3'  => [
+        'lib'      => 'libmp3lame',
+        'flags'    => '-q:a 1',
+        'file_ext' => 'mp3',
+        'add_art'  => 'ffmpeg',
     ],
-    'aac' => [
-        'lib'          => 'libfdk_aac',
-        'defaultflags' => '-b:a 128k',
-    ],
-    'mp3' => [
-        'lib'          => 'libmp3lame',
-        'defaultflags' => '-q:a 1',
+    'aac'  => [
+        'lib'      => 'libfdk_aac',
+        'flags'    => '-b:a 128k',
+        'file_ext' => 'm4a',
+        'add_art'  => 'atomicparsley',
     ],
     'flac' => [
-        'lib'          => 'flac',
-        'defaultflags' => '-compression_level 8',
+        'lib'      => 'flac',
+        'flags'    => '-compression_level 8',
+        'file_ext' => 'flac',
+        'add_art'  => 'metaflac',
     ],
-    'ogg' => [
-        'lib'          => 'libvorbis',
-        'defaultflags' => '-b:a 224',
+    'alac' => [
+        'lib'           => 'alac',
+        'flags' => '',
+        'file_ext'      => 'm4a',
+        'add_art'       => 'atomicparsley',
     ],
     'opus' => [
-        'lib'          => 'libopus',
-        'defaultflags' => '-b:a 128',
+        'lib'      => 'libopus',
+        'flags'    => '-b:a 128',
+        'file_ext' => 'opus',
+        'add_art'  => 'metaflac',
+    ],
+    'ogg'  => [
+        'lib'      => 'libvorbis',
+        'flags'    => '-b:a 224',
+        'file_ext' => 'ogg',
+        'add_art'  => 'metaflac',
     ],
 ];
 ?>

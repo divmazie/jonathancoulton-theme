@@ -92,7 +92,11 @@ WORKDIR /root/
 RUN  DEBIAN_FRONTEND=noninteractive apt-get install -y --force-yes \
     php5 php5-cli
 
+RUN  DEBIAN_FRONTEND=noninteractive apt-get install -y --force-yes \
+    atomicparsley flac
+
 RUN mkdir ~/encodes
 WORKDIR /root/encodes
 
-CMD php -d display_errors /root/src/proc.php
+
+CMD php -d display_errors /root/src/proc2.php
