@@ -80,7 +80,7 @@
                 "class": "",
                 "id": ""
             },
-            "return_format": "url",
+            "return_format": "array",
             "preview_size": "medium",
             "library": "all",
             "min_width": 300,
@@ -111,6 +111,22 @@
             "maxlength": "",
             "readonly": 0,
             "disabled": 0
+        },
+        {
+            "key": "field_55b2b535a86b3",
+            "label": "Show album in store",
+            "name": "show_album_in_store",
+            "type": "true_false",
+            "instructions": "Don't check until all songs posted",
+            "required": 0,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "",
+                "class": "",
+                "id": ""
+            },
+            "message": "",
+            "default_value": 0
         }
     ],
     "location": [
@@ -144,5 +160,5 @@
         "tags",
         "send-trackbacks"
     ],
-    "modified": 1437761220
+    "modified": 1437775274
 }

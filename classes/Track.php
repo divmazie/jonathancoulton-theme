@@ -13,9 +13,17 @@ class Track {
      *
      */
     public function __construct(\WP_Post $post, Album $parentAlbum) {
+        $post_id = $post->ID;
         // fill in private fields from post object/acf/postmeta
         $this->wpPost = $post;
         $this->parentAlbum = $parentAlbum;
+        $this->trackTitle = $post->post_title;
+        $this->trackArtist = get_field('track_artist',$post_id);
+        $this->trackGenre = get_field('track_genre',$post_id);
+        $this->trackYear = get_field('track_year',$post_id);
+        $this->trackComment = get_field('track_comment',$post_id);
+        $this->trackArtObject = get_field('track_art',$post_id);
+        $this->trackSourceFileObject = get_field('track_source',$post_id);
 
         $this->parentAlbum->addTrack($this);
     }

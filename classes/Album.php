@@ -17,8 +17,15 @@ class Album {
      * internal variables of this class
      **/
     public function __construct(\WP_Post $post) {
+        $post_id = $post->ID;
         // fill in private fields from post object/acf/postmeta
         $this->wpPost = $post;
+        $this->albumTitle = $post->post_title;
+        $this->albumArtist = get_field('album_artist',$post_id);
+        $this->albumYear = get_field('album_year',$post_id);
+        $this->albumGenre = get_field('album_genre',$post_id);
+        $this->albumComment = get_field('album_comment',$post_id);
+        $this->albumArtObject  = get_field('album_art',$post_id); // returns array with id, url, sizes, etc
     }
 
 
