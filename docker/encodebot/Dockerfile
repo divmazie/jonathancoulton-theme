@@ -93,7 +93,8 @@ RUN  DEBIAN_FRONTEND=noninteractive apt-get install -y --force-yes \
     php5 php5-cli
 
 RUN  DEBIAN_FRONTEND=noninteractive apt-get install -y --force-yes \
-    atomicparsley flac
+     flac vorbis-tools gpac
+
 
 RUN mkdir ~/encodes
 WORKDIR /root/encodes

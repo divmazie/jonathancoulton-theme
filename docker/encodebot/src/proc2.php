@@ -43,7 +43,7 @@ $sampleConfig = [
         // mandatories
         'source_url'    => 'http://dl.project-voodoo.org/killer-samples/killer-highs.flac',
         'source_md5'    => '587067eae68960e10a185a04b3f20dbd',
-        'encode_format' => 'alac',
+        'encode_format' => 'ogg',
         'dest_url'      => 'not implemented',
         'art_url'       => 'https://jococruise.com/uploads/2015/03/unnamed-11-e1426704582517.jpg',
         'art_md5'       => 'dd98328e5b9734d27e86825ab8d7008b',
@@ -54,7 +54,7 @@ $sampleConfig = [
         ],
 
 // optionals
-        'ffmpeg_flags'  => '',
+        'ffmpeg_flags'  => '-b:a 224k',
 
     ],
 

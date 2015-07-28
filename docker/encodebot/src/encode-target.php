@@ -16,20 +16,21 @@ class EncodeTarget {
         $outputFormats = require('ffmpeg-output-formats.php');
         $metadataKeys = require('ffmpeg-metadata-fields.php');
 
-        $this->fromWavFile=$fromWav;
+        $this->fromWavFile = $fromWav;
         $rowJSON = json_encode($config);
         $this->nameBase = $fromNameBase . md5($rowJSON);
         // for debugging & tracking
         file_put_contents($this->nameBase . '.txt', $rowJSON);
-        $this->errorsFile = $this->nameBase.'.errors';
+        $this->errorsFile = $this->nameBase . '.errors';
 
         $this->fromArtFile = $fromArtFile;
 
         // default to first format if illegal format given
         $this->destFormatDesc = isset($outputFormats[$config['encode_format']]) ?
             $outputFormats[$config['encode_format']] : $outputFormats[0];
+
         if(isset($config['ffmpeg_flags']) &&
-           preg_match('/[^a-z0-9\ :-]/i', $config['ffmpeg_flags'])
+           !preg_match('/[^a-z0-9 :-]/i', $config['ffmpeg_flags'])
         ) {
             // only allow subset of chars to be in flags
             $this->destFormatDesc['flags'] = $config['ffmpeg_flags'];
@@ -69,7 +70,10 @@ class EncodeTarget {
             return false;
         }
 
-        exec($this->addAlbumArtCommand(), $output,$rv);
+        exec($this->addAlbumArtCommand() . ' 2>&1',
+             $output, $rv);
+        error_log($rv);
+        error_log(implode("\n", $output));
         if($rv != 0) {
             file_put_contents($this->errorsFile, implode("\n", $output));
             return false;
@@ -81,30 +85,48 @@ class EncodeTarget {
     private function addAlbumArtCommand() {
         switch($this->destFormatDesc['add_art']) {
 
+            // http://ffmpeg.org/ffmpeg-formats.html#mp3
+            // working
             case 'ffmpeg':
-                return sprintf('ffmpeg -i %s -i %s -map 0:0 -map 1:0 -c copy -id3v2_version 3 metadata:s:v title="Album cover" -metadata:s:v comment="Cover (Front)" %s',
-                               escapeshellarg($this->fromWavFile),
+                $tempName = $this->destFileName . '.temp.' . $this->destFormatDesc['file_ext'];
+                return sprintf('ffmpeg -i %s -i %s -c copy -map 0 -map 1 ' .
+                               '-metadata:s:v title="Album cover" -metadata:s:v comment="Cover (Front)" %s; ' .
+                               'mv %s %s',
+                               escapeshellarg($this->destFileName),
                                escapeshellarg($this->fromArtFile),
-                               escapeshellarg($this->fromWavFile)
+                               escapeshellarg($tempName),
+                               escapeshellarg($tempName),
+                               escapeshellarg($this->destFileName)
                 );
 
+            // tested and working!
             case 'metaflac':
                 return sprintf('metaflac --import-picture-from=%s %s',
                                escapeshellarg($this->fromArtFile),
-                               escapeshellarg($this->fromWavFile)
+                               escapeshellarg($this->destFileName)
                 );
                 break;
 
-            case 'atomicparsley':
-                return sprintf('AtomicParsley %s -artwork %s',
-                               escapeshellarg($this->fromWavFile),
-                               escapeshellarg($this->fromArtFile)
+            case 'ogg-cover-art':
+                $scriptPath = __DIR__ . '/ogg-cover-art.sh';
+                return sprintf('%s %s %s',
+                               $scriptPath,
+                               escapeshellarg($this->fromArtFile),
+                               escapeshellarg($this->destFileName)
+                );
+                break;
+
+            case 'mp4box':
+                return sprintf('MP4Box -itags cover=%s %s',
+                               escapeshellarg($this->fromArtFile),
+                               escapeshellarg($this->destFileName)
                 );
                 break;
 
             default:
                 break;
         }
+        return '';
     }
 
 }

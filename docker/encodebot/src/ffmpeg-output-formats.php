@@ -10,7 +10,7 @@ return [
         'lib'      => 'libfdk_aac',
         'flags'    => '-b:a 128k',
         'file_ext' => 'm4a',
-        'add_art'  => 'atomicparsley',
+        'add_art'  => 'mp4box',
     ],
     'flac' => [
         'lib'      => 'flac',
@@ -19,22 +19,22 @@ return [
         'add_art'  => 'metaflac',
     ],
     'alac' => [
-        'lib'           => 'alac',
-        'flags' => '',
-        'file_ext'      => 'm4a',
-        'add_art'       => 'atomicparsley',
+        'lib'      => 'alac',
+        'flags'    => '',
+        'file_ext' => 'm4a',
+        'add_art'  => 'mp4box',
     ],
     'opus' => [
         'lib'      => 'libopus',
         'flags'    => '-b:a 128',
         'file_ext' => 'opus',
-        'add_art'  => 'metaflac',
+        'add_art'  => 'not supported',
     ],
     'ogg'  => [
         'lib'      => 'libvorbis',
         'flags'    => '-b:a 224',
         'file_ext' => 'ogg',
-        'add_art'  => 'metaflac',
+        'add_art'  => 'ogg-cover-art',
     ],
 ];
 ?>
