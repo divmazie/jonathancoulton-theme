@@ -4,7 +4,7 @@ namespace jct;
 
 class Track {
 
-    private $trackTitle, $trackArtist, $trackGenre, $trackYear, $trackComment, $trackArtObject, $trackSourceFileObject;
+    private $trackNumber, $trackTitle, $trackArtist, $trackGenre, $trackYear, $trackComment, $trackArtObject, $trackSourceFileObject;
     private $wpPost;
     private $parentAlbum;
 
@@ -28,6 +28,27 @@ class Track {
         $this->parentAlbum->addTrack($this);
     }
 
+    public function getTrackVersionHash() {
+        return md5(implode('|||', array(
+            $this->getTrackArtist(),
+            $this->getTrackComment(),
+            $this->getTrackGenre(),
+            $this->getTrackNumber(),
+            $this->getTrackTitle(),
+            $this->getTrackYear(),
+            $this->getTrackArtFilePath(),
+            $this->getTrackSourceFilePath(),
+        )));
+    }
+
+    public function getChildEncodes() {
+        return array(
+            new Encode($this, 'mp3', '-V1'),
+            new Encode($this, 'flac', '--best'),
+            new Encode($this, 'ogg', ''),
+        );
+    }
+
     /**
      * @return mixed
      */
@@ -36,24 +57,18 @@ class Track {
     }
 
     /**
-     * @param mixed $trackTitle
+     * @return mixed
      */
-    public function setTrackTitle($trackTitle) {
-        $this->trackTitle = $trackTitle;
+    public function getTrackNumber() {
+        return abs(intval($this->trackNumber));
     }
+
 
     /**
      * @return mixed
      */
     public function getTrackArtist() {
         return $this->trackArtist ? $this->trackArtist : $this->parentAlbum->getAlbumArtist();
-    }
-
-    /**
-     * @param mixed $trackArtist
-     */
-    public function setTrackArtist($trackArtist) {
-        $this->trackArtist = $trackArtist;
     }
 
     /**
@@ -64,24 +79,10 @@ class Track {
     }
 
     /**
-     * @param mixed $trackGenre
-     */
-    public function setTrackGenre($trackGenre) {
-        $this->trackGenre = $trackGenre;
-    }
-
-    /**
      * @return mixed
      */
     public function getTrackYear() {
         return $this->trackYear ? $this->trackYear : $this->parentAlbum->getAlbumYear();
-    }
-
-    /**
-     * @param mixed $trackYear
-     */
-    public function setTrackYear($trackYear) {
-        $this->trackYear = $trackYear;
     }
 
     /**
@@ -92,24 +93,18 @@ class Track {
     }
 
     /**
-     * @param mixed $trackComment
-     */
-    public function setTrackComment($trackComment) {
-        $this->trackComment = $trackComment;
-    }
-
-    /**
      * @return mixed
      */
     public function getTrackArtObject() {
         return $this->trackArtObject ? $this->trackArtObject : $this->parentAlbum->getAlbumArtObject();
     }
 
-    /**
-     * @param mixed $trackArtObject
-     */
-    public function setTrackArtObject($trackArtObject) {
-        $this->trackArtObject = $trackArtObject;
+    public function getTrackArtFilePath() {
+        get_attached_file($this->getTrackArtObject()->ID);
+    }
+
+    public function getTrackSourceFilePath() {
+        get_attached_file($this->trackSourceFileObject->ID);
     }
 
     /**
@@ -117,13 +112,6 @@ class Track {
      */
     public function getTrackSourceFileObject() {
         return $this->trackSourceFileObject;
-    }
-
-    /**
-     * @param mixed $trackSourceFileObject
-     */
-    public function setTrackSourceFileObject($trackSourceFileObject) {
-        $this->trackSourceFileObject = $trackSourceFileObject;
     }
 
 
