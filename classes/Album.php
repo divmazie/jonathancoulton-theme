@@ -26,6 +26,10 @@ class Album {
         $this->albumGenre = get_field('album_genre',$post_id);
         $this->albumComment = get_field('album_comment',$post_id);
         $this->albumArtObject  = get_field('album_art',$post_id); // returns array with id, url, sizes, etc
+        $tracks = get_posts(array('post_type' => 'track', 'meta_key' => 'track_album', 'meta_value' => $post_id));
+        foreach ($tracks as $track) {
+            $this->albumTracks[get_field('track_number',$track->id)] = new Track($track,$this);
+        }
     }
 
 
@@ -43,7 +47,7 @@ class Album {
 
     // @return array the album tracks IN ORDER
     public function getAlbumTracks() {
-
+        return $this->albumTracks;
     }
 
     /**

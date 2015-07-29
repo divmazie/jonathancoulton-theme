@@ -46,6 +46,29 @@
             "mime_types": ".flac,.wav"
         },
         {
+            "key": "field_55b953b0bd654",
+            "label": "Track number",
+            "name": "track_number",
+            "type": "number",
+            "instructions": "Determines ordering of tracks on album.",
+            "required": 1,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "",
+                "class": "",
+                "id": ""
+            },
+            "default_value": "",
+            "placeholder": "",
+            "prepend": "",
+            "append": "",
+            "min": "",
+            "max": "",
+            "step": "",
+            "readonly": 0,
+            "disabled": 0
+        },
+        {
             "key": "field_55b2823eb84e0",
             "label": "Track artist",
             "name": "track_artist",
@@ -187,5 +210,5 @@
         "tags",
         "send-trackbacks"
     ],
-    "modified": 1437768130
+    "modified": 1438209013
 }
