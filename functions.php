@@ -76,3 +76,19 @@ if( function_exists('acf_add_options_page') ) {
 
 include get_template_directory().'/include/tgm.php';
 include get_template_directory().'/include/cpt.php';
+
+function authcode_valid($code) { // Check against transient with encoder validation
+	if ($code=="404")
+		return false;
+	else
+		return true;
+}
+
+Timber::add_route('api/:authcode/:script/:var', function($params){
+	if (authcode_valid($params['authcode'])) {
+		include $params['script'].".php";
+		die();
+	} else {
+		Timber::load_template("404.php");
+	}
+});
