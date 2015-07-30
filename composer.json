@@ -32,5 +32,8 @@
 	],
     "require": {
         "tgmpa/tgm-plugin-activation": "dev-master"
-    }
+	},
+  "autoload": {
+	"psr-4": {"jct\\": "classes/"}
+  }
 }

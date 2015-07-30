@@ -1,10 +1,6 @@
 <?php
 
 namespace jct;
-require_once get_template_directory()."/classes/Album.php";
-require_once get_template_directory()."/classes/Track.php";
-require_once get_template_directory()."/classes/WordpressFileAsset.php";
-require_once get_template_directory()."/classes/Encode.php";
 
 /**
  * Created by PhpStorm.
