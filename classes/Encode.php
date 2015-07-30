@@ -8,7 +8,7 @@ class Encode extends WordpressFileAsset {
     // encode format === file extension!
     private $encodeFormat, $encodeCLIFlags;
 
-    public function __construct(\Track $parentTrack, $encodeFormat, $encodeCLIFlags) {
+    public function __construct(Track $parentTrack, $encodeFormat, $encodeCLIFlags) {
         $this->parentTrack = $parentTrack;
         $this->encodeCLIFlags = $encodeCLIFlags;
         $this->encodeFormat = $encodeFormat;

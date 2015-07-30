@@ -54,7 +54,7 @@ class Track {
         $needed_encodes = array();
         foreach ($this->getChildEncodes() as $encode) {
             if (!$encode->encodeExists()) {
-                $needed_encodes[] = array("format" => $encode->getEncodeFormat, "cliflags" => $encode->getEncodeCLIFlags);
+                $needed_encodes[] = array("format" => $encode->getEncodeFormat(), "cliflags" => $encode->getEncodeCLIFlags());
             }
         }
         return $needed_encodes;

@@ -50,6 +50,26 @@ class Album {
         return $this->albumTracks;
     }
 
+    public function getNeededEncodes() {
+        $encodes = array();
+        foreach ($this->albumTracks as $track) {
+            $track_encodes = $track->getNeededEncodes();
+            if (count($track_encodes)) {
+                $encodes[] = array('title' => $track->getTrackTitle(),
+                                 'number' => $track->getTrackNumber(),
+                                 'artist' => $track->getTrackArtist(),
+                                 'encodes' => $track_encodes);
+            }
+        }
+        if (count($encodes)) {
+            return array('title' => $this->albumTitle,
+                         'artist' => $this->albumArtist,
+                         'tracks' => $encodes);
+        } else {
+            return false;
+        }
+    }
+
     /**
      * @return mixed
      */
