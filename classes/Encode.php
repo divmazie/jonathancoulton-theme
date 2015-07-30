@@ -36,6 +36,38 @@ class Encode extends WordpressFileAsset {
                         $this->encodeFormat);
     }
 
+    public function getWPpost() {
+        $args = array(
+            'post_parent' => $this->parentTrack->getPostID(),
+            'post_type' => 'attachment',
+            'post_mime_type' => 'audio',
+            'meta_key' => 'encodeHash',
+            'meta_value' => $this->getEncodeHash()
+        );
+        $attachments = get_children( $args );
+        if (count($attachments)) {
+            return $attachments[0];
+        } else {
+            return false;
+        }
+    }
+
+    public function encodeExists() {
+        if ($this->getWPpost()) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    public function getEncodeFormat() {
+        return $this->encodeFormat;
+    }
+
+    public function getEncodeCLIFlags() {
+        return $this->encodeCLIFlags;
+    }
+
 
 }
 

@@ -4,7 +4,7 @@ namespace jct;
 
 class Track {
 
-    private $trackNumber, $trackTitle, $trackArtist, $trackGenre, $trackYear, $trackComment, $trackArtObject, $trackSourceFileObject;
+    private $postID, $trackNumber, $trackTitle, $trackArtist, $trackGenre, $trackYear, $trackComment, $trackArtObject, $trackSourceFileObject;
     private $wpPost;
     private $parentAlbum;
 
@@ -14,6 +14,7 @@ class Track {
      */
     public function __construct(\WP_Post $post, Album $parentAlbum) {
         $post_id = $post->ID;
+        $this->postID = $post_id;
         // fill in private fields from post object/acf/postmeta
         $this->wpPost = $post;
         $this->parentAlbum = $parentAlbum;
@@ -47,6 +48,20 @@ class Track {
             new Encode($this, 'flac', '--best'),
             new Encode($this, 'ogg', ''),
         );
+    }
+
+    public function getNeededEncodes() {
+        $needed_encodes = array();
+        foreach ($this->getChildEncodes() as $encode) {
+            if (!$encode->encodeExists()) {
+                $needed_encodes[] = array("format" => $encode->getEncodeFormat, "cliflags" => $encode->getEncodeCLIFlags);
+            }
+        }
+        return $needed_encodes;
+    }
+
+    public function getPostID() {
+        return $this->postID;
     }
 
     /**
