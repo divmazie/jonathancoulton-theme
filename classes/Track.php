@@ -4,6 +4,10 @@ namespace jct;
 
 class Track {
 
+    static $encode_types = array('mp3' => '-V1',
+        'flac' => '--best',
+        'ogg' => '');
+
     private $postID, $trackNumber, $trackTitle, $trackArtist, $trackGenre, $trackYear, $trackComment, $trackArtObject, $trackSourceFileURL;
     private $wpPost;
     private $parentAlbum;
@@ -43,11 +47,11 @@ class Track {
     }
 
     public function getChildEncodes() {
-        return array(
-            new Encode($this, 'mp3', '-V1'),
-            new Encode($this, 'flac', '--best'),
-            new Encode($this, 'ogg', ''),
-        );
+        $encodes = array();
+        foreach (self::$encode_types as $format => $flags) {
+            $encodes[$format] = new Encode($this, $format, $flags);
+        }
+        return $encodes;
     }
 
     public function getNeededEncodes() {
@@ -124,7 +128,8 @@ class Track {
     }
 
     public function getTrackArtFilePath() {
-        get_attached_file($this->getTrackArtObject()->ID);
+        $art_object = $this->getTrackArtObject();
+        return wp_get_attachment_url($art_object['id']);
     }
 
     /**

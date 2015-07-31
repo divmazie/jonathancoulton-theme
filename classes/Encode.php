@@ -68,21 +68,30 @@ class Encode extends WordpressFileAsset {
         return $this->encodeCLIFlags;
     }
 
+    private function getPathFromURL($url) {
+        return str_replace(get_site_url(),explode('wp-',getcwd())[0],$url); // the explode wp- thing is a hack to get the root directory
+    }
+
     public function getEncodeConfig() {
+        $authcode = "something";
         if ($this->getURL()) {
             $config = false;
         } else {
             $parent = $this->parentTrack;
             $config = array('source_url' => $parent->getTrackSourceFileURL(),
-                            'source_md5' => md5($parent->getTrackSourceFileURL()),
+                            'source_md5' => md5_file($this->getPathFromURL($parent->getTrackSourceFileURL())),
                             'encode_format' => $this->getEncodeFormat(),
                             'dest_url' => get_site_url()."/api/".$authcode."/receiveencode/".$this->getEncodeHash(),
                             'art_url' => $parent->getTrackArtFilePath(),
-                            'art_md5' => md5($parent->getTrackArtFilePath()),
+                            'art_md5' => md5_file($this->getPathFromURL($parent->getTrackArtFilePath())),
                             'meta_data' => array('title' => $parent->getTrackTitle(),
                                                  'track' => $parent->getTrackNumber(),
                                                  'album' => $parent->getAlbum()->getAlbumTitle(),
-                                                 'artist' => $parent->getTrackArtist())
+                                                 'album_artist' => $parent->getAlbum()->getAlbumArtist(),
+                                                 'artist' => $parent->getTrackArtist(),
+                                                 'comment' => $parent->getTrackComment(),
+                                                 'genre' => $parent->getTrackGenre(),
+                                                 'filename' => $this->getFileAssetFileName())
                             );
 
         }
@@ -90,6 +99,11 @@ class Encode extends WordpressFileAsset {
     }
 
 
+}
+
+base64_url_encode(openssl_random_pseudo_bytes(18, $did));
+function base64_url_encode($input) {
+    return strtr(base64_encode($input), '+/=', '-_~');
 }
 
 ?>
