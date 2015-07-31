@@ -4,7 +4,7 @@ namespace jct;
 
 class Track {
 
-    private $postID, $trackNumber, $trackTitle, $trackArtist, $trackGenre, $trackYear, $trackComment, $trackArtObject, $trackSourceFileObject;
+    private $postID, $trackNumber, $trackTitle, $trackArtist, $trackGenre, $trackYear, $trackComment, $trackArtObject, $trackSourceFileURL;
     private $wpPost;
     private $parentAlbum;
 
@@ -24,7 +24,7 @@ class Track {
         $this->trackYear = get_field('track_year',$post_id);
         $this->trackComment = get_field('track_comment',$post_id);
         $this->trackArtObject = get_field('track_art',$post_id);
-        $this->trackSourceFileObject = get_field('track_source',$post_id);
+        $this->trackSourceFileURL = get_field('track_source',$post_id);
 
         $this->parentAlbum->addTrack($this);
     }
@@ -38,7 +38,7 @@ class Track {
             $this->getTrackTitle(),
             $this->getTrackYear(),
             $this->getTrackArtFilePath(),
-            $this->getTrackSourceFilePath(),
+            $this->getTrackSourceFileURL(),
         )));
     }
 
@@ -53,11 +53,20 @@ class Track {
     public function getNeededEncodes() {
         $needed_encodes = array();
         foreach ($this->getChildEncodes() as $encode) {
-            if (!$encode->encodeExists()) {
-                $needed_encodes[] = array("format" => $encode->getEncodeFormat(), "cliflags" => $encode->getEncodeCLIFlags());
+            $config = $encode->getEncodeConfig();
+            if ($config) {
+                $needed_encodes[] = $config;
             }
         }
-        return $needed_encodes;
+        if (count($needed_encodes)) {
+            return $needed_encodes;
+        } else {
+            return false;
+        }
+    }
+
+    public function getAlbum() {
+        return $this->parentAlbum;
     }
 
     public function getPostID() {
@@ -118,15 +127,11 @@ class Track {
         get_attached_file($this->getTrackArtObject()->ID);
     }
 
-    public function getTrackSourceFilePath() {
-        get_attached_file($this->trackSourceFileObject->ID);
-    }
-
     /**
      * @return mixed
      */
-    public function getTrackSourceFileObject() {
-        return $this->trackSourceFileObject;
+    public function getTrackSourceFileURL() {
+        return $this->trackSourceFileURL;
     }
 
 

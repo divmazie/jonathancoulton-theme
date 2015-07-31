@@ -36,7 +36,7 @@ class Encode extends WordpressFileAsset {
                         $this->encodeFormat);
     }
 
-    public function getWPpost() {
+    public function getURL() {
         $args = array(
             'post_parent' => $this->parentTrack->getPostID(),
             'post_type' => 'attachment',
@@ -46,14 +46,14 @@ class Encode extends WordpressFileAsset {
         );
         $attachments = get_children( $args );
         if (count($attachments)) {
-            return $attachments[0];
+            return wp_get_attachment_url($attachments[0]->ID);
         } else {
             return false;
         }
     }
 
     public function encodeExists() {
-        if ($this->getWPpost()) {
+        if ($this->getURL()) {
             return true;
         } else {
             return false;
@@ -66,6 +66,27 @@ class Encode extends WordpressFileAsset {
 
     public function getEncodeCLIFlags() {
         return $this->encodeCLIFlags;
+    }
+
+    public function getEncodeConfig() {
+        if ($this->getURL()) {
+            $config = false;
+        } else {
+            $parent = $this->parentTrack;
+            $config = array('source_url' => $parent->getTrackSourceFileURL(),
+                            'source_md5' => md5($parent->getTrackSourceFileURL()),
+                            'encode_format' => $this->getEncodeFormat(),
+                            'dest_url' => get_site_url()."/api/".$authcode."/receiveencode/".$this->getEncodeHash(),
+                            'art_url' => $parent->getTrackArtFilePath(),
+                            'art_md5' => md5($parent->getTrackArtFilePath()),
+                            'meta_data' => array('title' => $parent->getTrackTitle(),
+                                                 'track' => $parent->getTrackNumber(),
+                                                 'album' => $parent->getAlbum()->getAlbumTitle(),
+                                                 'artist' => $parent->getTrackArtist())
+                            );
+
+        }
+        return $config;
     }
 
 

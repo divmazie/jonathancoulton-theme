@@ -55,16 +55,11 @@ class Album {
         foreach ($this->albumTracks as $track) {
             $track_encodes = $track->getNeededEncodes();
             if (count($track_encodes)) {
-                $encodes[] = array('title' => $track->getTrackTitle(),
-                                 'number' => $track->getTrackNumber(),
-                                 'artist' => $track->getTrackArtist(),
-                                 'encodes' => $track_encodes);
+                $encodes = array_merge($encodes,$track_encodes);
             }
         }
         if (count($encodes)) {
-            return array('title' => $this->albumTitle,
-                         'artist' => $this->albumArtist,
-                         'tracks' => $encodes);
+            return $encodes;
         } else {
             return false;
         }
