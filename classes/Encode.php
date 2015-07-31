@@ -69,10 +69,14 @@ class Encode extends WordpressFileAsset {
     }
 
     private function getPathFromURL($url) {
-        return str_replace(get_site_url(),explode('wp-',getcwd())[0],$url); // the explode wp- thing is a hack to get the root directory
+        $wp_path = defined(ABSPATH) ? ABSPATH : explode('wp-',getcwd())[0]; // the explode wp- thing is a hack to get the root directory, if ABSPATH is not set
+        return str_replace(get_site_url(),$wp_path,$url);
     }
 
     public function getEncodeConfig() {
+        if (!get_transient($this->getEncodeHash())) {
+            set_transient($this->getEncodeHash(),$this->parentTrack->getPostID()."|".$this->getEncodeFormat(),60*60*24);
+        }
         $authcode = "something";
         if ($this->getURL()) {
             $config = false;
@@ -98,12 +102,6 @@ class Encode extends WordpressFileAsset {
         return $config;
     }
 
-
-}
-
-base64_url_encode(openssl_random_pseudo_bytes(18, $did));
-function base64_url_encode($input) {
-    return strtr(base64_encode($input), '+/=', '-_~');
 }
 
 ?>
