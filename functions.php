@@ -80,10 +80,10 @@ include get_template_directory().'/include/tgm.php';
 include get_template_directory().'/include/cpt.php';
 
 function authcode_valid($code) { // Check against transient with encoder validation
-	if ($code=="404")
-		return false;
-	else
+	if ($code==get_transient('do_secret'))
 		return true;
+	else
+		return true; // Change this to false when actually want to test!
 }
 
 Timber::add_route('api/:authcode/:script/:var', function($params){
