@@ -50,6 +50,9 @@ class Track {
         $encodes = array();
         foreach (self::$encode_types as $format => $flags) {
             $encodes[$format] = new Encode($this, $format, $flags);
+            if ($encodes[$format]->getEncodeHash() != get_post_meta($this->postID,'lastforsale_'.$format.'_hash')) {
+                set_transient('encodes_needed',true);
+            }
         }
         return $encodes;
     }
