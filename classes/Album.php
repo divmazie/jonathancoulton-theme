@@ -60,6 +60,9 @@ class Album {
     }
 
     public function getNeededEncodes() {
+        if (!$this->isEncodeWorthy()) {
+            return false;
+        }
         $encodes = array();
         foreach ($this->albumTracks as $track) {
             $track_encodes = $track->getNeededEncodes();
