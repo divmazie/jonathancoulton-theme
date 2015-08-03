@@ -5,7 +5,7 @@ namespace jct;
 class Album {
 
 
-    private $albumTitle, $albumArtist, $albumYear, $albumGenre, $albumComment, $albumArtObject;
+    private $albumTitle, $albumArtist, $albumYear, $albumGenre, $albumComment, $albumArtObject, $albumShow;
     // the parent post object
     private $wpPost;
     //
@@ -26,6 +26,7 @@ class Album {
         $this->albumGenre = get_field('album_genre',$post_id);
         $this->albumComment = get_field('album_comment',$post_id);
         $this->albumArtObject  = get_field('album_art',$post_id); // returns array with id, url, sizes, etc
+        $this->albumShow = get_field('show_album_in_store',$post_id);
         $tracks = get_posts(array('post_type' => 'track', 'meta_key' => 'track_album', 'meta_value' => $post_id));
         foreach ($tracks as $track) {
             $this->albumTracks[get_field('track_number',$track->id)] = new Track($track,$this);
@@ -48,6 +49,14 @@ class Album {
     // @return array the album tracks IN ORDER
     public function getAlbumTracks() {
         return $this->albumTracks;
+    }
+
+    public function isEncodeWorthy() {
+        $worthy = false;
+        if ($this->albumShow && $this->albumTitle && $this->albumArtist && $this->albumArtObject) {
+            $worthy = true;
+        }
+        return $worthy;
     }
 
     public function getNeededEncodes() {

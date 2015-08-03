@@ -46,9 +46,19 @@ class Track {
             $this->getTrackNumber(),
             $this->getTrackTitle(),
             $this->getTrackYear(),
-            $this->getTrackArtFilePath(),
+            $this->getTrackArtURL(),
             $this->getTrackSourceFileURL(),
         )));
+    }
+
+    public function isEncodeWorthy() {
+        $worthy = false;
+        if ($this->parentAlbum->isEncodeWorthy()) {
+            if ($this->trackTitle && $this->getTrackArtist() && $this->trackSourceFileURL && $this->getTrackArtURL()) {
+                $worthy = true;
+            }
+        }
+        return $worthy;
     }
 
     public function getAllChildEncodes() {
@@ -140,7 +150,7 @@ class Track {
         return $this->trackArtObject ? $this->trackArtObject : $this->parentAlbum->getAlbumArtObject();
     }
 
-    public function getTrackArtFilePath() {
+    public function getTrackArtURL() {
         $art_object = $this->getTrackArtObject();
         return wp_get_attachment_url($art_object['id']);
     }
