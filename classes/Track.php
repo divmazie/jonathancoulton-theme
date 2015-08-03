@@ -9,6 +9,7 @@ class Track {
         'ogg' => '');
 
     private $postID, $trackNumber, $trackTitle, $trackArtist, $trackGenre, $trackYear, $trackComment, $trackArtObject, $trackSourceFileURL;
+    private $lastforsale;
     private $wpPost;
     private $parentAlbum;
 
@@ -29,6 +30,10 @@ class Track {
         $this->trackComment = get_field('track_comment',$post_id);
         $this->trackArtObject = get_field('track_art',$post_id);
         $this->trackSourceFileURL = get_field('track_source',$post_id);
+        $this->lastforsale = array();
+        foreach (self::$encode_types as $format => $flags) {
+            $this->lastforsale[$format] = get_post_meta($this->postID,'lastforsale_'.$format.'_hash');
+        }
 
         $this->parentAlbum->addTrack($this);
     }
@@ -46,20 +51,25 @@ class Track {
         )));
     }
 
-    public function getChildEncodes() {
+    public function getAllChildEncodes() {
         $encodes = array();
         foreach (self::$encode_types as $format => $flags) {
-            $encodes[$format] = new Encode($this, $format, $flags);
-            if ($encodes[$format]->getEncodeHash() != get_post_meta($this->postID,'lastforsale_'.$format.'_hash')) {
-                set_transient('encodes_needed',true);
-            }
+            $encodes[$format] = $this->getChildEncode($format);
         }
         return $encodes;
     }
 
+    public function getChildEncode($format) {
+        $encode = new Encode($this, $format, $flags);
+        if ($encode->getEncodeHash() != $this->lastforsale[$format]) {
+            set_transient('encodes_needed',true);
+        }
+        return $encode;
+    }
+
     public function getNeededEncodes() {
         $needed_encodes = array();
-        foreach ($this->getChildEncodes() as $encode) {
+        foreach ($this->getAllChildEncodes() as $encode) {
             $config = $encode->getEncodeConfig();
             if ($config) {
                 $needed_encodes[] = $config;
