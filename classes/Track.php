@@ -64,12 +64,12 @@ class Track {
     public function getAllChildEncodes() {
         $encodes = array();
         foreach (self::$encode_types as $format => $flags) {
-            $encodes[$format] = $this->getChildEncode($format);
+            $encodes[$format] = $this->getChildEncode($format,$flags);
         }
         return $encodes;
     }
 
-    public function getChildEncode($format) {
+    public function getChildEncode($format,$flags) {
         $encode = new Encode($this, $format, $flags);
         if ($encode->getEncodeHash() != $this->lastforsale[$format]) {
             set_transient('encodes_needed',true);
