@@ -7,7 +7,9 @@
  */
 $encode_hash = $params['var'];
 $encode_transient = get_transient($encode_hash);
-if ($encode_transient) {
+if (!$encode_transient) {
+    die("Can't find that encode hash!");
+} else {
     $encode_details = explode("|", $encode_transient);
     $track_post_id = $encode_details[0];
     $encode_format = $encode_details[1];
@@ -16,6 +18,10 @@ if ($encode_transient) {
         require_once(ABSPATH . 'wp-admin/includes/file.php');
     } else {
         die("wp_handle_upload() doesn't exist!");
+    }
+
+    if (!isset($_FILES['file'])) {
+        die("No file!");
     }
 
     $uploadedfile = $_FILES['file'];
