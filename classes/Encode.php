@@ -78,7 +78,7 @@ class Encode extends WordpressFileAsset {
             set_transient($this->getEncodeHash(),$this->parentTrack->getPostID()."|".$this->getEncodeFormat(),60*60*24);
         }
         $authcode = get_transient('do_secret');
-        if ($this->getURL()) {
+        if ($this->encodeExists()) {
             $config = false;
         } else {
             $parent = $this->parentTrack;

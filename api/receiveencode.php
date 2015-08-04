@@ -16,23 +16,34 @@ if (!$encode_transient) {
 
     if (!function_exists('wp_handle_upload')) {
         require_once(ABSPATH . 'wp-admin/includes/file.php');
-    } else {
-        die("wp_handle_upload() doesn't exist!");
+    }
+    if (!function_exists('wp_generate_attachment_metadata')) {
+        require_once(ABSPATH . 'wp-admin/includes/image.php');
+    }
+    if (!function_exists('media_handle_upload')) {
+        require_once(ABSPATH . 'wp-admin/includes/media.php');
     }
 
     if (!isset($_FILES['file'])) {
         die("No file!");
     }
 
-    //$uploadedfile = $_FILES['file']; // media_handle_upload() takes only the index to $_FILES
-
     $upload_overrides = array('test_form' => false);
 
-    $attachment_id = media_handle_upload('file', $track_post_id, array(), $upload_overrides);
+    $meta_data = array('meta_key' => 'encodeHash', 'meta_value' => $encode_hash);
+
+    $attachment_id = media_handle_upload('file', $track_post_id, $meta_data, $upload_overrides) or die('media_handle_upload() failed!');
 
     if ( !is_wp_error($attachment_id) ) {
         echo "File is valid, and was successfully uploaded.\n";
-        var_dump($movefile);
+        if (!function_exists('update_metadata')) {
+            die("Can't update metadata!");
+        }
+        $old_meta = wp_get_attachment_metadata($attachment_id);
+        $new_meta = array_merge($old_meta, array('encodeHash' => $encode_hash));
+        $success = wp_update_attachment_metadata($attachment_id,$new_meta);
+        echo $success ? "Updated metadata! \n" : "Failed to update metadata! \n";
+        echo "Attachment_id = ".$attachment_id."\n";
 
         /* This code block should be unnecessary, since everything should be handled by wp_handle_upload()
         // $filename should be the path to a file in the upload directory.
@@ -67,7 +78,7 @@ if (!$encode_transient) {
         wp_update_attachment_metadata( $attach_id, $attach_data );
         */
 
-        update_post_meta($track_post_id, 'lastforsale_'.$encode_format.'_id', $attach_id);
+        update_post_meta($track_post_id, 'lastforsale_'.$encode_format.'_id', $attachment_id);
         update_post_meta($track_post_id, 'lastforsale_'.$encode_format.'_hash', $encode_hash);
     } else {
         echo $attachment_id->get_error_message();;

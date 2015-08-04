@@ -15,7 +15,7 @@ function authcode_valid($code) { // Check against transient with encoder validat
 
 Timber::add_route('api/:authcode/:script/:var', function($params){
     if (authcode_valid($params['authcode'])) {
-        include "api/".$params['script'].".php";
+        include get_template_directory()."/api/".$params['script'].".php";
         die();
     } else {
         Timber::load_template("404.php");
