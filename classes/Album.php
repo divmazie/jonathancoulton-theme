@@ -78,6 +78,14 @@ class Album {
         }
     }
 
+    public function getAlbumVersionHash() {
+        $strings = array($this->getAlbumTitle(),$this->getAlbumArtURL(),$this->getFullAlbumAsset());
+        foreach ($this->albumTracks as $track) {
+            $strings[] = $track->getTrackVersionHash();
+        }
+        return md5(implode("|||",$strings));
+    }
+
     /**
      * @return mixed
      */
@@ -111,6 +119,11 @@ class Album {
      */
     public function getAlbumArtObject() {
         return $this->albumArtObject;
+    }
+
+    public function getAlbumArtURL() {
+        $art_object = $this->getAlbumArtObject();
+        return wp_get_attachment_url($art_object['id']);
     }
 
     /**
