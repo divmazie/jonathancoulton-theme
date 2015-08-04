@@ -33,6 +33,8 @@ if (!$encode_transient) {
     if ($movefile && !isset($movefile['error'])) {
         echo "File is valid, and was successfully uploaded.\n";
         var_dump($movefile);
+
+        /* This code block should be unnecessary, since everything should be handled by wp_handle_upload()
         // $filename should be the path to a file in the upload directory.
         $filename = $movefile['file'];
 
@@ -63,6 +65,7 @@ if (!$encode_transient) {
         // Generate the metadata for the attachment, and update the database record.
         $attach_data = wp_generate_attachment_metadata( $attach_id, $filename );
         wp_update_attachment_metadata( $attach_id, $attach_data );
+        */
 
         update_post_meta($track_post_id, 'lastforsale_'.$encode_format.'_id', $attach_id);
         update_post_meta($track_post_id, 'lastforsale_'.$encode_format.'_hash', $encode_hash);
