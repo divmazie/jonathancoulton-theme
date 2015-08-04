@@ -89,6 +89,8 @@ class EncodeTarget {
             // working
             case 'ffmpeg':
                 $tempName = $this->destFileName . '.temp.' . $this->destFormatDesc['file_ext'];
+                // we've gotta move the file and delete it after because otherwise... FFMpeg seems to truncate
+                // or something? It makes no goddamn sense, but this does work.
                 return sprintf('ffmpeg -i %s -i %s -c copy -map 0 -map 1 ' .
                                '-metadata:s:v title="Album cover" -metadata:s:v comment="Cover (Front)" %s; ' .
                                'mv %s %s',
