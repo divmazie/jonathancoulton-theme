@@ -17,7 +17,7 @@ class EncodeTarget {
         $metadataKeys = require('ffmpeg-metadata-fields.php');
 
         $this->fromWavFile = $fromWav;
-        $rowJSON = json_encode($config);
+        $rowJSON = json_encode($config, JSON_PRETTY_PRINT);
         $this->nameBase = $fromNameBase . md5($rowJSON);
         // for debugging & tracking
         file_put_contents($this->nameBase . '.txt', $rowJSON);
@@ -30,9 +30,11 @@ class EncodeTarget {
             $outputFormats[$config['encode_format']] : $outputFormats[0];
 
         if(isset($config['ffmpeg_flags']) &&
+           isset($outputFormats[$config['encode_format']]) &&
            !preg_match('/[^a-z0-9 :-]/i', $config['ffmpeg_flags'])
         ) {
             // only allow subset of chars to be in flags
+            // only use supplied flags if we have a descriptor for the format
             $this->destFormatDesc['flags'] = $config['ffmpeg_flags'];
         }
 
