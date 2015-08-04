@@ -26,13 +26,13 @@ return [
     ],
     'opus' => [
         'lib'      => 'libopus',
-        'flags'    => '-b:a 128',
+        'flags'    => '-b:a 128k',
         'file_ext' => 'opus',
         'add_art'  => 'not supported',
     ],
     'ogg'  => [
         'lib'      => 'libvorbis',
-        'flags'    => '-b:a 224',
+        'flags'    => '-b:a 224k',
         'file_ext' => 'ogg',
         'add_art'  => 'ogg-cover-art',
     ],
