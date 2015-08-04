@@ -5,7 +5,7 @@ namespace jct;
 class Album {
 
 
-    private $albumTitle, $albumArtist, $albumYear, $albumGenre, $albumComment, $albumArtObject, $albumShow;
+    private $albumTitle, $albumArtist, $albumYear, $albumGenre, $albumComment, $albumArtObject, $fullAlbumAsset, $albumShow;
     // the parent post object
     private $wpPost;
     //
@@ -26,6 +26,7 @@ class Album {
         $this->albumGenre = get_field('album_genre',$post_id);
         $this->albumComment = get_field('album_comment',$post_id);
         $this->albumArtObject  = get_field('album_art',$post_id); // returns array with id, url, sizes, etc
+        $this->fullAlbumAsset = get_field('full_album_asset',$post_id);
         $this->albumShow = get_field('show_album_in_store',$post_id);
         $tracks = get_posts(array('post_type' => 'track', 'meta_key' => 'track_album', 'meta_value' => $post_id));
         foreach ($tracks as $track) {
@@ -110,6 +111,13 @@ class Album {
      */
     public function getAlbumArtObject() {
         return $this->albumArtObject;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getFullAlbumAsset() {
+        return $this->fullAlbumAsset;
     }
 
     /**

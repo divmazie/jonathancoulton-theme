@@ -127,6 +127,25 @@
             },
             "message": "",
             "default_value": 0
+        },
+        {
+            "key": "field_55c0db03e8bb9",
+            "label": "Full album asset",
+            "name": "full_album_asset",
+            "type": "file",
+            "instructions": "File to include in a zip of the entire album, but not offered for individual sale.",
+            "required": 0,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "",
+                "class": "",
+                "id": ""
+            },
+            "return_format": "url",
+            "library": "all",
+            "min_size": "",
+            "max_size": "",
+            "mime_types": ""
         }
     ],
     "location": [
@@ -160,5 +179,5 @@
         "tags",
         "send-trackbacks"
     ],
-    "modified": 1437775274
+    "modified": 1438702402
 }
