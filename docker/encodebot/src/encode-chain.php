@@ -121,7 +121,7 @@ class EncodeChain {
         }
 
         if(($this->hasSource() || $this->getSource()) &&
-           $this->hasAlbumArt() || $this->getAlbumArt()
+           ($this->hasAlbumArt() || $this->getAlbumArt())
         ) {
             error_log("doing encodes");
             foreach($this->children as $child) {
