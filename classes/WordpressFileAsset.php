@@ -6,7 +6,7 @@ abstract class WordpressFileAsset {
 
     abstract public function getUniqueKey();
 
-    abstract public function getFileAssetName();
+    abstract public function getFileAssetFileName();
 
     public function fileAssetExists() {
         if ($this->getWPAttachment()) {
@@ -17,7 +17,8 @@ abstract class WordpressFileAsset {
     }
 
     public function getWPAttachment($parent = null) {
-        $query = new WP_Query(array(
+        //return false;
+        $query = get_posts(array(
             'post_type' => 'attachment',
             'post_status' => 'any',
             'post_parent' => $parent,
