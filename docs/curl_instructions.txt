@@ -1,0 +1,11 @@
+Using cURL to test receiveencode script from command line
+
+On my system:
+curl -F file=@/Users/DAM/Music/Logic/Feel/Bounces/feel160.mp3 http://192.168.1.159:8888/jonathancoulton/api/404u/receiveencode/bc8137d6554ce362eab4704104f8056f
+
+General:
+curl -F file=@/path/to/file.wav [WORDPRESS_SITE_URL]/api/[AUTHCODE]/receiveencode/[TRANSIENT_KEY]
+
+WORDPRESS_SITE_URL is self explanatory
+AUTHCODE accepted anything as of my testing, but should eventually be secure code passed to droplet on creation
+TRANSIENT_KEY used to be the encode version hash, but can be anything that WP uses to recover track information

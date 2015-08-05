@@ -36,28 +36,24 @@ class Encode extends WordpressFileAsset {
                         $this->encodeFormat);
     }
 
-    public function getWPAttachment() {
-        $args = array(
-            'post_parent' => $this->parentTrack->getPostID(),
-            'post_type' => 'attachment',
-            'numberposts' => 1,
-            'order' => 'ASC',
-            'post_mime_type' => 'audio',
-            'meta_key' => 'encodeHash',
-            'meta_value' => $this->getEncodeHash()
-        );
-        $attachments = array_values( get_children( $args, ARRAY_A ) );
-        if (count($attachments)) {
-            return $attachments[0];
-        } else {
+    public function getWPAttachmentID() {
+        $attachment_id = get_post_meta($this->parentTrack->getPostID(),'attachment_id_'.$this->encodeFormat.$this->encodeCLIFlags,false)[0];
+        if (!$attachment_id) {
             return false;
+        } else {
+            $metadata = wp_get_attachment_metadata($attachment_id);
+            if ($metadata['encodeHash']==$this->getEncodeHash()) {
+                return $attachment_id;
+            } else {
+                return false;
+            }
         }
     }
 
     public function getURL() {
-        $attachment = $this->getWPAttachment();
-        if ($attachment) {
-            return wp_get_attachment_url($attachment->ID);
+        $attachment_id = $this->getWPAttachmentID();
+        if ($attachment_id) {
+            return wp_get_attachment_url($attachment_id);
         } else {
             return false;
         }
@@ -86,7 +82,7 @@ class Encode extends WordpressFileAsset {
 
     public function getEncodeConfig() {
         if (!get_transient($this->getEncodeHash())) {
-            set_transient($this->getEncodeHash(),$this->parentTrack->getPostID()."|".$this->getEncodeFormat(),60*60*24);
+            set_transient($this->getEncodeHash(),array($this->parentTrack->getPostID(),$this->getEncodeFormat(),$this->getEncodeCLIFlags()),60*60*24);
         }
         $authcode = get_transient('do_secret');
         if ($this->encodeExists()) {
