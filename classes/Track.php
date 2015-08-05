@@ -4,13 +4,8 @@ namespace jct;
 
 class Track {
 
-    static $encode_types = array('mp3' => '-V1',
-        'flac' => '--best',
-        'ogg' => '');
-
     private $postID, $trackNumber, $trackTitle, $trackArtist, $trackGenre, $trackYear, $trackComment, $trackArtObject, $trackSourceFileURL;
-    private $lastforsale;
-    private $wpPost;
+    private $wpPost, $encode_types;
     private $parentAlbum;
 
     /**
@@ -30,10 +25,7 @@ class Track {
         $this->trackComment = get_field('track_comment',$post_id);
         $this->trackArtObject = get_field('track_art',$post_id);
         $this->trackSourceFileURL = get_field('track_source',$post_id);
-        $this->lastforsale = array();
-        foreach (self::$encode_types as $format => $flags) {
-            $this->lastforsale[$format] = get_post_meta($this->postID,'lastforsale_'.$format.'_hash');
-        }
+        $this->encode_types = include(get_template_directory().'/config/encode_types.php');
 
         $this->parentAlbum->addTrack($this);
     }
@@ -63,7 +55,7 @@ class Track {
 
     public function getAllChildEncodes() {
         $encodes = array();
-        foreach (self::$encode_types as $format => $flags) {
+        foreach ($this->encode_types as $format => $flags) {
             $encodes[$format] = $this->getChildEncode($format,$flags);
         }
         return $encodes;
@@ -71,9 +63,9 @@ class Track {
 
     public function getChildEncode($format,$flags) {
         $encode = new Encode($this, $format, $flags);
-        if ($encode->getEncodeHash() != $this->lastforsale[$format]) {
-            set_transient('encodes_needed',true);
-        }
+        //if ($encode->getEncodeHash() != $this->lastforsale[$format]) {
+            //set_transient('encodes_needed',true);
+        //}
         return $encode;
     }
 

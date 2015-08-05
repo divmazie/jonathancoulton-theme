@@ -78,8 +78,8 @@ if (!$encode_transient) {
         wp_update_attachment_metadata( $attach_id, $attach_data );
         */
 
-        update_post_meta($track_post_id, 'lastforsale_'.$encode_format.'_id', $attachment_id);
-        update_post_meta($track_post_id, 'lastforsale_'.$encode_format.'_hash', $encode_hash);
+        //update_post_meta($track_post_id, 'lastforsale_'.$encode_format.'_id', $attachment_id);
+        //update_post_meta($track_post_id, 'lastforsale_'.$encode_format.'_hash', $encode_hash);
     } else {
         echo $attachment_id->get_error_message();;
     }
