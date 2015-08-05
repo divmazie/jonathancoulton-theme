@@ -108,7 +108,9 @@ class Encode extends WordpressFileAsset {
                                                  'genre' => $parent->getTrackGenre(),
                                                  'filename' => $this->getFileAssetFileName())
                             );
-
+            if ($this->encodeCLIFlags) {
+                $config['ffmpeg_flags'] = $this->encodeCLIFlags;
+            }
         }
         return $config;
     }

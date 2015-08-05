@@ -55,7 +55,9 @@ class Track {
 
     public function getAllChildEncodes() {
         $encodes = array();
-        foreach ($this->encode_types as $format => $flags) {
+        foreach ($this->encode_types as $encode_type) {
+            $format = $encode_type[0];
+            $flags = $encode_type[1];
             $encodes[$format] = $this->getChildEncode($format,$flags);
         }
         return $encodes;
