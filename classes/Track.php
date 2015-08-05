@@ -77,7 +77,7 @@ class Track {
         }
         $needed_encodes = array();
         foreach ($this->getAllChildEncodes() as $encode) {
-            $config = $encode->getEncodeConfig();
+            $config = $encode->getEncodeConfigIfNecessary();
             if ($config) {
                 $needed_encodes[] = $config;
             }

@@ -20,7 +20,7 @@ class Encode extends WordpressFileAsset {
 
     public function getShortEncodeHash() {
         // if 7 is good enough for git/github, it's good enough for us
-        return substr($this->getEncodeHash(), 0, 7);
+        return substr($this->getUniqueKey(), 0, 7);
     }
 
 
@@ -36,6 +36,7 @@ class Encode extends WordpressFileAsset {
                         $this->encodeFormat);
     }
 
+    /* Saved only so I can remember how I did this for now, get_post_meta() is a tricky function
     public function getWPAttachmentID() {
         $attachment_id = get_post_meta($this->parentTrack->getPostID(),'attachment_id_'.$this->encodeFormat.$this->encodeCLIFlags,false)[0];
         if (!$attachment_id) {
@@ -49,23 +50,7 @@ class Encode extends WordpressFileAsset {
             }
         }
     }
-
-    public function getURL() {
-        $attachment_id = $this->getWPAttachmentID();
-        if ($attachment_id) {
-            return wp_get_attachment_url($attachment_id);
-        } else {
-            return false;
-        }
-    }
-
-    public function encodeExists() {
-        if ($this->getURL()) {
-            return true;
-        } else {
-            return false;
-        }
-    }
+    */
 
     public function getEncodeFormat() {
         return $this->encodeFormat;
@@ -75,38 +60,47 @@ class Encode extends WordpressFileAsset {
         return $this->encodeCLIFlags;
     }
 
-    private function getPathFromURL($url) {
+    public function getUniqueKey() {
+        md5(serialize($this->getEncodeConfig())); // This gets config without unique key, to prevent infinite loop
+    }
+
+    private function getPathFromURL($url) { // Should find a way to do this from WP database
         $wp_path = defined(ABSPATH) ? ABSPATH : explode('wp-',getcwd())[0]; // the explode wp- thing is a hack to get the root directory, if ABSPATH is not set
         return str_replace(get_site_url(),$wp_path,$url);
     }
 
-    public function getEncodeConfig() {
-        if (!get_transient($this->getEncodeHash())) {
-            set_transient($this->getEncodeHash(),array($this->parentTrack->getPostID(),$this->getEncodeFormat(),$this->getEncodeCLIFlags()),60*60*24);
-        }
+    public function getEncodeConfig($unique_key = "") {
         $authcode = get_transient('do_secret');
-        if ($this->encodeExists()) {
+        $parent = $this->parentTrack;
+        $config = array('source_url' => $parent->getTrackSourceFileURL(),
+            'source_md5' => md5_file($this->getPathFromURL($parent->getTrackSourceFileURL())),
+            'encode_format' => $this->getEncodeFormat(),
+            'dest_url' => get_site_url()."/api/".$authcode."/receiveencode/".$unique_key,
+            'art_url' => $parent->getTrackArtURL(),
+            'art_md5' => md5_file($this->getPathFromURL($parent->getTrackArtURL())),
+            'meta_data' => array('title' => $parent->getTrackTitle(),
+                'track' => $parent->getTrackNumber(),
+                'album' => $parent->getAlbum()->getAlbumTitle(),
+                'album_artist' => $parent->getAlbum()->getAlbumArtist(),
+                'artist' => $parent->getTrackArtist(),
+                'comment' => $parent->getTrackComment(),
+                'genre' => $parent->getTrackGenre(),
+                'filename' => $this->getFileAssetFileName())
+        );
+        if ($this->encodeCLIFlags) {
+            $config['ffmpeg_flags'] = $this->encodeCLIFlags;
+        }
+        return $config;
+    }
+
+    public function getEncodeConfigIfNecessary() {
+        if (!get_transient($this->getUniqueKey())) {
+            set_transient($this->getUniqueKey(),array($this->parentTrack->getPostID(),$this->getEncodeFormat(),$this->getEncodeCLIFlags()),60*60*24);
+        }
+        if ($this->fileAssetExists()) {
             $config = false;
         } else {
-            $parent = $this->parentTrack;
-            $config = array('source_url' => $parent->getTrackSourceFileURL(),
-                            'source_md5' => md5_file($this->getPathFromURL($parent->getTrackSourceFileURL())),
-                            'encode_format' => $this->getEncodeFormat(),
-                            'dest_url' => get_site_url()."/api/".$authcode."/receiveencode/".$this->getEncodeHash(),
-                            'art_url' => $parent->getTrackArtURL(),
-                            'art_md5' => md5_file($this->getPathFromURL($parent->getTrackArtURL())),
-                            'meta_data' => array('title' => $parent->getTrackTitle(),
-                                                 'track' => $parent->getTrackNumber(),
-                                                 'album' => $parent->getAlbum()->getAlbumTitle(),
-                                                 'album_artist' => $parent->getAlbum()->getAlbumArtist(),
-                                                 'artist' => $parent->getTrackArtist(),
-                                                 'comment' => $parent->getTrackComment(),
-                                                 'genre' => $parent->getTrackGenre(),
-                                                 'filename' => $this->getFileAssetFileName())
-                            );
-            if ($this->encodeCLIFlags) {
-                $config['ffmpeg_flags'] = $this->encodeCLIFlags;
-            }
+            $config = $this->getEncodeConfig($this->getUniqueKey());
         }
         return $config;
     }
