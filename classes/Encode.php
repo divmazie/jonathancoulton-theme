@@ -10,6 +10,7 @@ class Encode extends WordpressFileAsset {
 
     public function __construct(Track $parentTrack, $encodeFormat, $encodeCLIFlags) {
         $this->parentTrack = $parentTrack;
+        $this->parent_post_id = $parentTrack->getPostID();
         $this->encodeCLIFlags = $encodeCLIFlags;
         $this->encodeFormat = $encodeFormat;
     }
@@ -61,7 +62,7 @@ class Encode extends WordpressFileAsset {
     }
 
     public function getUniqueKey() {
-        md5(serialize($this->getEncodeConfig())); // This gets config without unique key or filename to prevent infinite loop
+        return md5(serialize($this->getEncodeConfig())); // This gets config without unique key or filename to prevent infinite loop
     }
 
     private function getPathFromURL($url) { // Should find a way to do this from WP database
@@ -94,6 +95,7 @@ class Encode extends WordpressFileAsset {
     }
 
     public function getEncodeConfigIfNecessary() {
+        $this->setEncodeTransient();
         $unique_key = $this->getUniqueKey();
         if ($this->fileAssetExists()) {
             $config = false;

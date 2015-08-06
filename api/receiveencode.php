@@ -39,12 +39,12 @@ if (!$encode_transient) {
             die("Can't update metadata!");
         }
         $old_meta = wp_get_attachment_metadata($attachment_id);
-        $new_meta = array_merge($old_meta, array('encodeHash' => $encode_hash));
+        $new_meta = array_merge($old_meta, array('unique_key' => $encode_hash));
         $success = wp_update_attachment_metadata($attachment_id,$new_meta);
         echo $success ? "Updated metadata! \n" : "Failed to update metadata! \n";
         echo "Attachment_id = ".$attachment_id."\n";
 
-        update_post_meta($track_post_id, 'attachment_id_'.$encode_format.$encode_flags, $attachment_id);
+        update_post_meta($track_post_id, 'attachment_id_'.$encode_hash, $attachment_id);
     } else {
         echo $attachment_id->get_error_message();;
     }
