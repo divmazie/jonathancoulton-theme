@@ -61,7 +61,7 @@ class Encode extends WordpressFileAsset {
     }
 
     public function getUniqueKey() {
-        md5(serialize($this->getEncodeConfig())); // This gets config without unique key or filename to prevent infinite loop
+        md5(serialize($this->getEncodeConfig(true))); // This gets config without unique key or filename to prevent infinite loop
     }
 
     private function getPathFromURL($url) { // Should find a way to do this from WP database
@@ -69,13 +69,13 @@ class Encode extends WordpressFileAsset {
         return str_replace(get_site_url(),$wp_path,$url);
     }
 
-    public function getEncodeConfig($unique_key = "", $file_name = "") {
+    public function getEncodeConfig($skipUniqueKeys=false) {
         $authcode = get_transient('do_secret');
         $parent = $this->parentTrack;
         $config = array('source_url' => $parent->getTrackSourceFileURL(),
             'source_md5' => md5_file($this->getPathFromURL($parent->getTrackSourceFileURL())),
             'encode_format' => $this->getEncodeFormat(),
-            'dest_url' => get_site_url()."/api/".$authcode."/receiveencode/".$unique_key,
+            'dest_url' => get_site_url()."/api/".$authcode."/receiveencode/".($skipUniqueKeys?'':$this->getUniqueKey()),
             'art_url' => $parent->getTrackArtURL(),
             'art_md5' => md5_file($this->getPathFromURL($parent->getTrackArtURL())),
             'meta_data' => array('title' => $parent->getTrackTitle(),
@@ -85,7 +85,7 @@ class Encode extends WordpressFileAsset {
                 'artist' => $parent->getTrackArtist(),
                 'comment' => $parent->getTrackComment(),
                 'genre' => $parent->getTrackGenre(),
-                'filename' => $file_name)
+                'filename' => $skipUniqueKeys?'':$this->getFileAssetFileName())
         );
         if ($this->encodeCLIFlags) {
             $config['ffmpeg_flags'] = $this->encodeCLIFlags;
@@ -93,17 +93,8 @@ class Encode extends WordpressFileAsset {
         return $config;
     }
 
-    public function getEncodeConfigIfNecessary() {
-        $unique_key = $this->getUniqueKey();
-        if (!get_transient($unique_key)) {
-            set_transient($unique_key,array($this->parentTrack->getPostID(),$this->getEncodeFormat(),$this->getEncodeCLIFlags()),60*60*24);
-        }
-        if ($this->fileAssetExists()) {
-            $config = false;
-        } else {
-            $config = $this->getEncodeConfig($unique_key, $this->getFileAssetFileName());
-        }
-        return $config;
+    public function encodeIsNeeded(){
+        return !$this->fileAssetExists();
     }
 
 }
