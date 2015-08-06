@@ -19,9 +19,6 @@ foreach ($album_posts as $album_post) {
         $encodes = array_merge($encodes,$album_encodes);
     }
 }
-if (count($encodes)) {
-    set_transient('encodes_needed',true);
-}
 $content['encodes'] = $encodes;
 echo json_encode($content);
 ?>

@@ -30,19 +30,6 @@ class Track {
         $this->parentAlbum->addTrack($this);
     }
 
-    public function getTrackVersionHash() {
-        return md5(implode('|||', array(
-            $this->getTrackArtist(),
-            $this->getTrackComment(),
-            $this->getTrackGenre(),
-            $this->getTrackNumber(),
-            $this->getTrackTitle(),
-            $this->getTrackYear(),
-            $this->getTrackArtURL(),
-            $this->getTrackSourceFileURL(),
-        )));
-    }
-
     public function isEncodeWorthy() {
         $worthy = false;
         if ($this->parentAlbum->isEncodeWorthy()) {
