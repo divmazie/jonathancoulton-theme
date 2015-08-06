@@ -26,10 +26,6 @@ class Encode extends WordpressFileAsset {
         $this->encodeFormat = $encodeFormat;
     }
 
-    public function getEncodeHash() {
-        return md5($this->encodeFormat . ':' . $this->encodeCLIFlags . ':' . $this->parentTrack->getTrackVersionHash());
-    }
-
     public function getShortEncodeHash() {
         // if 7 is good enough for git/github, it's good enough for us
         return substr($this->getUniqueKey(), 0, 7);
@@ -48,22 +44,6 @@ class Encode extends WordpressFileAsset {
                         $title,$this->getShortEncodeHash(),
                         $this->encodeFormat);
     }
-
-    /* Saved only so I can remember how I did this for now, get_post_meta() is a tricky function
-    public function getWPAttachmentID() {
-        $attachment_id = get_post_meta($this->parentTrack->getPostID(),'attachment_id_'.$this->encodeFormat.$this->encodeCLIFlags,false)[0];
-        if (!$attachment_id) {
-            return false;
-        } else {
-            $metadata = wp_get_attachment_metadata($attachment_id);
-            if ($metadata['encodeHash']==$this->getEncodeHash()) {
-                return $attachment_id;
-            } else {
-                return false;
-            }
-        }
-    }
-    */
 
     public function getEncodeFormat() {
         return $this->encodeFormat;

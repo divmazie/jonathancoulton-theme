@@ -30,8 +30,6 @@ class Track {
         $this->trackArtObject = get_field('track_art',$post_id);
         $this->trackSourceFileURL = get_field('track_source',$post_id);
         $this->encode_types = include(get_template_directory().'/config/encode_types.php');
-
-        $this->parentAlbum->addTrack($this);
     }
 
     public function isEncodeWorthy() {
@@ -56,9 +54,6 @@ class Track {
 
     public function getChildEncode($format,$flags) {
         $encode = new Encode($this, $format, $flags);
-        //if ($encode->getEncodeHash() != $this->lastforsale[$format]) {
-            //set_transient('encodes_needed',true);
-        //}
         return $encode;
     }
 

@@ -34,24 +34,6 @@ class Album {
         }
     }
 
-
-    public function addTrack(Track $track) {
-
-    }
-
-    public function removeTrack(Track $track) {
-
-    }
-
-    public function getNumberOfAlbumTracks() {
-        return count($this->albumTracks);
-    }
-
-    // @return array the album tracks IN ORDER
-    public function getAlbumTracks() {
-        return $this->albumTracks;
-    }
-
     public function isEncodeWorthy() {
         $worthy = false;
         if ($this->albumShow && $this->albumTitle && $this->albumArtist && $this->albumArtObject) {
@@ -78,12 +60,13 @@ class Album {
         }
     }
 
-    public function getAlbumVersionHash() {
-        $strings = array($this->getAlbumTitle(),$this->getAlbumArtURL(),$this->getFullAlbumAsset());
-        foreach ($this->albumTracks as $track) {
-            $strings[] = $track->getTrackVersionHash();
-        }
-        return md5(implode("|||",$strings));
+    public function getNumberOfAlbumTracks() {
+        return count($this->albumTracks);
+    }
+
+    // @return array the album tracks IN ORDER
+    public function getAlbumTracks() {
+        return $this->albumTracks;
     }
 
     /**
