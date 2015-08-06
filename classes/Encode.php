@@ -95,15 +95,19 @@ class Encode extends WordpressFileAsset {
 
     public function getEncodeConfigIfNecessary() {
         $unique_key = $this->getUniqueKey();
-        if (!get_transient($unique_key)) {
-            set_transient($unique_key,array($this->parentTrack->getPostID(),$this->getEncodeFormat(),$this->getEncodeCLIFlags()),60*60*24);
-        }
         if ($this->fileAssetExists()) {
             $config = false;
         } else {
             $config = $this->getEncodeConfig($unique_key, $this->getFileAssetFileName());
         }
         return $config;
+    }
+
+    public function setEncodeTransient() {
+        $unique_key = $this->getUniqueKey();
+        if (!get_transient($unique_key)) {
+            set_transient($unique_key,array($this->parentTrack->getPostID(),$this->getEncodeFormat(),$this->getEncodeCLIFlags()),60*60*24);
+        }
     }
 
 }
