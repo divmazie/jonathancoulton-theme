@@ -12,7 +12,11 @@ class Track {
      * @param \WP_Post $post the parent post object whence the fields
      *
      */
-    public function __construct(\WP_Post $post, Album $parentAlbum) {
+    public function __construct(\WP_Post $post, Album $parentAlbum = NULL) {
+        if (!$parentAlbum) {
+            $parent_post = get_field('track_album',$post->ID);
+            $parentAlbum = new Album($parent_post);
+        }
         $post_id = $post->ID;
         $this->postID = $post_id;
         // fill in private fields from post object/acf/postmeta
