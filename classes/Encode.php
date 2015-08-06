@@ -10,11 +10,13 @@ class Encode extends WordpressFileAsset {
 
     static function recoverFromTransient($transient_key) {
         $encode_details = get_transient($transient_key);
+        if (!$encode_details) { return false; }
         $track_post_id = $encode_details[0];
         $encode_format = $encode_details[1];
         $encode_flags = $encode_details[2];
         $track_post = get_post($track_post_id);
-        return new Encode($track_post,$encode_format,$encode_flags);
+        $track = new Track($track_post);
+        return new Encode($track,$encode_format,$encode_flags);
     }
 
     public function __construct(Track $parentTrack, $encodeFormat, $encodeCLIFlags) {
@@ -32,7 +34,6 @@ class Encode extends WordpressFileAsset {
         // if 7 is good enough for git/github, it's good enough for us
         return substr($this->getUniqueKey(), 0, 7);
     }
-
 
     public function getFileAssetFileName() {
         $title = $this->parentTrack->getTrackTitle();
@@ -120,6 +121,38 @@ class Encode extends WordpressFileAsset {
         $unique_key = $this->getUniqueKey();
         if (!get_transient($unique_key)) {
             set_transient($unique_key,array($this->parentTrack->getPostID(),$this->getEncodeFormat(),$this->getEncodeCLIFlags()),60*60*24);
+        }
+    }
+
+    public function saveEncodeFromUpload() {
+        if (!function_exists('wp_handle_upload')) {
+            require_once(ABSPATH . 'wp-admin/includes/file.php');
+        }
+        if (!function_exists('wp_generate_attachment_metadata')) {
+            require_once(ABSPATH . 'wp-admin/includes/image.php');
+        }
+        if (!function_exists('media_handle_upload')) {
+            require_once(ABSPATH . 'wp-admin/includes/media.php');
+        }
+
+        $file_array_key = "file";
+        if (!isset($_FILES[$file_array_key])) {
+            return "No file!";
+        }
+        $attachment_id = media_handle_upload($file_array_key, $this->parentTrack->getPostID(), array(), array('test_form' => false));
+
+        if ( is_wp_error($attachment_id) ) {
+            return $attachment_id->get_error_message();
+        } else {
+            $return = "File is valid, and was successfully uploaded.\n";
+            $old_meta = wp_get_attachment_metadata($attachment_id);
+            $new_meta = array_merge($old_meta, array('unique_key' => $this->getUniqueKey()));
+            $success = wp_update_attachment_metadata($attachment_id,$new_meta);
+            $return .= $success ? "Updated metadata! \n" : "Failed to update metadata! \n";
+            $return .= "Attachment_id = ".$attachment_id."\n";
+
+            $this->setWPAttachmentID($attachment_id);
+            return $return;
         }
     }
 

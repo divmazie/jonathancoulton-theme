@@ -1,11 +1,20 @@
 <?php
+namespace jct;
 /**
  * Created by PhpStorm.
  * User: DAM
  * Date: 7/31/15
  * Time: 17:16
  */
-$encode_hash = $params['var'];
+$transient_key = $params['var'];
+$encode = Encode::recoverFromTransient($transient_key) or die("Couldn't recover encode information from transient key!");
+if ($encode->getUniqueKey() == $transient_key) {
+    echo $encode-> saveEncodeFromUpload();
+} else {
+    echo "Transient key does not match Encode!";
+}
+
+/*
 $encode_transient = get_transient($encode_hash);
 if (!$encode_transient) {
     die("Can't find that encode hash!");
@@ -49,3 +58,4 @@ if (!$encode_transient) {
         echo $attachment_id->get_error_message();;
     }
 }
+*/
