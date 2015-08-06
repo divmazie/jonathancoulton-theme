@@ -8,6 +8,15 @@ class Encode extends WordpressFileAsset {
     // encode format === file extension!
     private $encodeFormat, $encodeCLIFlags;
 
+    static function recoverFromTransient($transient_key) {
+        $encode_details = get_transient($transient_key);
+        $track_post_id = $encode_details[0];
+        $encode_format = $encode_details[1];
+        $encode_flags = $encode_details[2];
+        $track_post = get_post($track_post_id);
+        return new Encode($track_post,$encode_format,$encode_flags);
+    }
+
     public function __construct(Track $parentTrack, $encodeFormat, $encodeCLIFlags) {
         $this->parentTrack = $parentTrack;
         $this->parent_post_id = $parentTrack->getPostID();
