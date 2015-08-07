@@ -10,6 +10,11 @@ abstract class WordpressFileAsset {
 
     abstract public function getFileAssetFileName();
 
+    public function getShortUniqueKey() {
+        // if 7 is good enough for git/github, it's good enough for us
+        return substr($this->getUniqueKey(), 0, 7);
+    }
+
     public function fileAssetExists() {
         if ($this->getWPAttachment()) {
             return true;
@@ -63,6 +68,11 @@ abstract class WordpressFileAsset {
     public function getURL() {
         $attachment_id = $this->getWPAttachmentID();
         return $attachment_id ? wp_get_attachment_url($attachment_id) : false;
+    }
+
+    public function getPath() {
+        $attachment_id = $this->getWPAttachmentID();
+        return $attachment_id ? get_attached_file($attachment_id) : false;
     }
 
 }

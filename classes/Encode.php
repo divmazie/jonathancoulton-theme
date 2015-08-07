@@ -26,11 +26,6 @@ class Encode extends WordpressFileAsset {
         $this->encodeFormat = $encodeFormat;
     }
 
-    public function getShortEncodeHash() {
-        // if 7 is good enough for git/github, it's good enough for us
-        return substr($this->getUniqueKey(), 0, 7);
-    }
-
     public function getFileAssetFileName() {
         $title = $this->parentTrack->getTrackTitle();
         $title = iconv('UTF-8','ASCII//TRANSLIT',$title);
@@ -41,7 +36,7 @@ class Encode extends WordpressFileAsset {
 
         // track number underscore track title underscore short hash dot extension
         return sprintf('%d_%s_%s.%s', $this->parentTrack->getTrackNumber(),
-                        $title,$this->getShortEncodeHash(),
+                        $title,$this->getShortUniqueKey(),
                         $this->encodeFormat);
     }
 
@@ -55,11 +50,6 @@ class Encode extends WordpressFileAsset {
 
     public function getUniqueKey() {
         return md5(serialize($this->getEncodeConfig())); // This gets config without unique key or filename to prevent infinite loop
-    }
-
-    private function getPathFromURL($url) { // Should find a way to do this from WP database
-        $wp_path = defined(ABSPATH) ? ABSPATH : explode('wp-',getcwd())[0]; // the explode wp- thing is a hack to get the root directory, if ABSPATH is not set
-        return str_replace(get_site_url(),$wp_path,$url);
     }
 
     public function getEncodeConfig($unique_key = "", $file_name = "") {
