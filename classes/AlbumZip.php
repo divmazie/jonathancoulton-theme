@@ -23,10 +23,44 @@ class AlbumZip extends WordpressFileAsset {
     }
 
     public function getUniqueKey() {
-
+        $parent_album = $this->parentAlbum;
+        $album_info = array(
+            $parent_album->getAlbumTitle(),
+            md5_file($parent_album->getAlbumBonusAssetPath())
+        );
+        foreach ($this->getEncodes() as $encode) {
+            $album_info[] = $encode->getUniqueKey();
+        }
+        return md5(serialize($album_info));
     }
 
     public function getFileAssetFileName() {
 
+    }
+
+    public function getEncodes() {
+        $parent_album = $this->getParentAlbum();
+        $tracks = $parent_album->getAlbumTracks();
+        $encodes = array();
+        foreach ($tracks as $track) {
+            $encodes[] = $track->getChildEncode($this->encodeFormat,$this->encodeCLIFlags);
+        }
+        return $encodes;
+    }
+
+    public function createZip() {
+        $temp_file = tmpfile ();
+    }
+
+    public function getParentAlbum() {
+        return $this->parentAlbum;
+    }
+
+    public function getEncodeFormat() {
+        return $this->encodeFormat;
+    }
+
+    public function getEncodeCLIFlags() {
+        return $this->encodeCLIFlags;
     }
 }
