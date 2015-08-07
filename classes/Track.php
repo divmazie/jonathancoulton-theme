@@ -4,7 +4,7 @@ namespace jct;
 
 class Track {
 
-    private $postID, $trackNumber, $trackTitle, $trackArtist, $trackGenre, $trackYear, $trackComment, $trackArtObject, $trackSourceFileURL;
+    private $postID, $trackNumber, $trackTitle, $trackArtist, $trackGenre, $trackYear, $trackComment, $trackArtObject, $trackSourceFileObject;
     private $wpPost, $encode_types;
     private $parentAlbum;
 
@@ -28,14 +28,14 @@ class Track {
         $this->trackYear = get_field('track_year',$post_id);
         $this->trackComment = get_field('track_comment',$post_id);
         $this->trackArtObject = get_field('track_art',$post_id);
-        $this->trackSourceFileURL = get_field('track_source',$post_id);
+        $this->trackSourceFileObject = get_field('track_source',$post_id);
         $this->encode_types = include(get_template_directory().'/config/encode_types.php');
     }
 
     public function isEncodeWorthy() {
         $worthy = false;
         if ($this->parentAlbum->isEncodeWorthy()) {
-            if ($this->trackTitle && $this->getTrackArtist() && $this->trackSourceFileURL && $this->getTrackArtURL()) {
+            if ($this->trackTitle && $this->getTrackArtist() && $this->trackSourceFileObject && $this->getTrackArtURL()) {
                 $worthy = true;
             }
         }
@@ -138,11 +138,26 @@ class Track {
         return wp_get_attachment_url($art_object['id']);
     }
 
+    public function getTrackArtPath() {
+        $art_object = $this->getTrackArtObject();
+        return get_attached_file($art_object['id']);
+    }
+
+    public function getTrackSourceFileObject() {
+        return $this->trackSourceFileObject;
+    }
+
     /**
      * @return mixed
      */
     public function getTrackSourceFileURL() {
-        return $this->trackSourceFileURL;
+        $source_object = $this->getTrackSourceFileObject();
+        return wp_get_attachment_url($source_object['id']);
+    }
+
+    public function getTrackSourceFilePath() {
+        $source_object = $this->getTrackSourceFileObject();
+        return get_attached_file($source_object['id']);
     }
 
 

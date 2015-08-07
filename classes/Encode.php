@@ -66,11 +66,11 @@ class Encode extends WordpressFileAsset {
         $authcode = get_transient('do_secret');
         $parent = $this->parentTrack;
         $config = array('source_url' => $parent->getTrackSourceFileURL(),
-            'source_md5' => md5_file($this->getPathFromURL($parent->getTrackSourceFileURL())),
+            'source_md5' => md5_file($parent->getTrackSourceFileURL()),
             'encode_format' => $this->getEncodeFormat(),
             'dest_url' => get_site_url()."/api/".$authcode."/receiveencode/".$unique_key,
             'art_url' => $parent->getTrackArtURL(),
-            'art_md5' => md5_file($this->getPathFromURL($parent->getTrackArtURL())),
+            'art_md5' => md5_file($parent->getTrackArtPath()),
             'meta_data' => array('title' => $parent->getTrackTitle(),
                 'track' => $parent->getTrackNumber(),
                 'album' => $parent->getAlbum()->getAlbumTitle(),

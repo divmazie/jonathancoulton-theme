@@ -109,6 +109,11 @@ class Album {
         return wp_get_attachment_url($art_object['id']);
     }
 
+    public function getAlbumArtPath() {
+        $art_object = $this->getAlbumArtObject();
+        return get_attached_file($art_object['id']);
+    }
+
     /**
      * @return mixed
      */
