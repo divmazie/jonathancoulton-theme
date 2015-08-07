@@ -5,7 +5,7 @@ namespace jct;
 class Album {
 
 
-    private $albumTitle, $albumArtist, $albumYear, $albumGenre, $albumComment, $albumArtObject, $albumBonusAssetObject, $albumShow;
+    private $postID, $albumTitle, $albumArtist, $albumYear, $albumGenre, $albumComment, $albumArtObject, $albumBonusAssetObject, $albumShow;
     // the parent post object
     private $wpPost;
     //
@@ -18,6 +18,7 @@ class Album {
      **/
     public function __construct(\WP_Post $post) {
         $post_id = $post->ID;
+        $this->postID = $post_id;
         // fill in private fields from post object/acf/postmeta
         $this->wpPost = $post;
         $this->albumTitle = $post->post_title;
@@ -67,6 +68,10 @@ class Album {
     // @return array the album tracks IN ORDER
     public function getAlbumTracks() {
         return $this->albumTracks;
+    }
+
+    public function getPostID() {
+        return $this->postID;
     }
 
     /**
