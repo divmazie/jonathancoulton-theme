@@ -141,7 +141,7 @@
                 "class": "",
                 "id": ""
             },
-            "return_format": "url",
+            "return_format": "array",
             "library": "all",
             "min_size": "",
             "max_size": "",
@@ -179,5 +179,5 @@
         "tags",
         "send-trackbacks"
     ],
-    "modified": 1438702402
+    "modified": 1438973488
 }

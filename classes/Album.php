@@ -5,7 +5,7 @@ namespace jct;
 class Album {
 
 
-    private $albumTitle, $albumArtist, $albumYear, $albumGenre, $albumComment, $albumArtObject, $fullAlbumAsset, $albumShow;
+    private $albumTitle, $albumArtist, $albumYear, $albumGenre, $albumComment, $albumArtObject, $albumBonusAssetObject, $albumShow;
     // the parent post object
     private $wpPost;
     //
@@ -26,9 +26,9 @@ class Album {
         $this->albumGenre = get_field('album_genre',$post_id);
         $this->albumComment = get_field('album_comment',$post_id);
         $this->albumArtObject  = get_field('album_art',$post_id); // returns array with id, url, sizes, etc
-        $this->fullAlbumAsset = get_field('full_album_asset',$post_id);
+        $this->albumBonusAssetObject = get_field('full_album_asset',$post_id);
         $this->albumShow = get_field('show_album_in_store',$post_id);
-        $tracks = get_posts(array('post_type' => 'track', 'meta_key' => 'track_album', 'meta_value' => $post_id));
+        $tracks = get_posts(array('post_type' => 'track', 'meta_key' => 'track_album', 'meta_value' => $post_id)); // Constructor probs shouldn't do this lookup
         foreach ($tracks as $track) {
             $this->albumTracks[get_field('track_number',$track->id)] = new Track($track,$this);
         }
@@ -117,8 +117,18 @@ class Album {
     /**
      * @return mixed
      */
-    public function getFullAlbumAsset() {
-        return $this->fullAlbumAsset;
+    public function getAlbumBonusAssetObject() {
+        return $this->albumBonusAssetObject;
+    }
+
+    public function getAlbumBonusAssetURL() {
+        $bonus_object = $this->getBonusAssetObject();
+        return wp_get_attachment_url($bonus_object['id']);
+    }
+
+    public function getAlbumBonusAssetPath() {
+        $bonus_object = $this->getAlbumBonusAssetObject();
+        return get_attached_file($bonus_object['id']);
     }
 
     /**
