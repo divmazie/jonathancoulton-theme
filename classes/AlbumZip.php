@@ -49,7 +49,15 @@ class AlbumZip extends WordpressFileAsset {
     }
 
     public function createZip() {
-        $temp_file = tmpfile ();
+        //return "before zip construct";
+        $zip = new ZipArchive();
+        return "after zip construct";
+        $filename = "./test112.zip";
+        return $filename;
+        if ($zip->open($filename, ZipArchive::CREATE)!==TRUE) {
+            exit("cannot open <$filename>\n");
+        }
+        return $zip;
     }
 
     public function getParentAlbum() {
