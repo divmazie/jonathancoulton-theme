@@ -2,6 +2,9 @@
 
 require __DIR__ . '/vendor/autoload.php';
 
+include __DIR__.'/include/tgm.php';
+
+
 if ( ! class_exists( 'Timber' ) ) {
 	add_action( 'admin_notices', function() {
 			echo '<div class="error"><p>Timber not activated. Make sure you activate the plugin in <a href="' . esc_url( admin_url( 'plugins.php#timber' ) ) . '">' . esc_url( admin_url( 'plugins.php' ) ) . '</a></p></div>';
@@ -61,9 +64,8 @@ if( function_exists('acf_add_options_page') ) {
 	));
 }
 
-include get_template_directory().'/include/tgm.php';
-include get_template_directory().'/include/cpt.php';
-include get_template_directory().'/include/routes.php';
+include __DIR__.'/include/cpt.php';
+include __DIR__.'/include/routes.php';
 
 function check_encodes_on_post_save($post_id) {
 	$post_type = get_post_type($post_id);

@@ -1,8 +1,21 @@
 encodebot:
   hostname: encodebot
   build: ./encodebot
-  ports:
-    - "80:80"
   volumes:
     - "./encodebot/dest:/root/encodes"
     - "./encodebot/src:/root/src"
+
+wordpress:
+  image: wordpress
+  links:
+    - db:mysql
+  ports:
+    - 80:80
+  volumes:
+  - "../../jonathancoulton-theme:/var/www/html/wp-content/themes/jonathancoulton-theme"
+
+db:
+  image: mariadb
+  environment:
+    MYSQL_ROOT_PASSWORD: password
+
