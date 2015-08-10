@@ -1,0 +1,8 @@
+encodebot:
+  hostname: encodebot
+  build: ./encodebot
+  ports:
+    - "80:80"
+  volumes:
+    - "./encodebot/dest:/root/encodes"
+    - "./encodebot/src:/root/src"
