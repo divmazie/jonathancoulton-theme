@@ -6,7 +6,7 @@ encodebot:
     - "./encodebot/src:/root/src"
 
 wordpress:
-  image: wordpress
+  build: ./wordpress
   links:
     - db:mysql
   ports:
@@ -18,4 +18,6 @@ db:
   image: mariadb
   environment:
     MYSQL_ROOT_PASSWORD: password
+    MYSQL_USER: pma
+    MYSQL_PASSWORD: 1234
 

@@ -78,3 +78,4 @@ function check_encodes_on_post_save($post_id) {
 	}
 }
 add_action( 'save_post', 'check_encodes_on_post_save' );
+
