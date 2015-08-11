@@ -57,6 +57,19 @@ class AlbumZip extends WordpressFileAsset {
         return $encodes;
     }
 
+    public function isZipWorthy() {
+        if (!$this->parentAlbum->isEncodeWorthy()) {
+            return false;
+        } else {
+            foreach ($this->getEncodes() as $encode) {
+                if (!$encode->fileAssetExists()) {
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+
     public function createZip() {
         $upload_dir = wp_upload_dir();
         $zip = new \ZipArchive();
