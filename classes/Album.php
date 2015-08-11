@@ -51,15 +51,9 @@ class Album {
         $encodes = array();
         foreach ($this->albumTracks as $track) {
             $track_encodes = $track->getNeededEncodes();
-            if ($track_encodes) {
-                $encodes = array_merge($encodes,$track_encodes);
-            }
+            $encodes = array_merge($encodes,$track_encodes);
         }
-        if (count($encodes)) {
-            return $encodes;
-        } else {
-            return false;
-        }
+        return $encodes;
     }
 
     public function getAllChildZips() {

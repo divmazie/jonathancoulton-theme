@@ -1,9 +1,16 @@
 encodebot:
   hostname: encodebot
   build: ./encodebot
+  ports:
+  - 81:80
   volumes:
-    - "./encodebot/dest:/root/encodes"
-    - "./encodebot/src:/root/src"
+    - "./encodebot/www/:/var/www/"
+    - "./encodebot/lighttpd/:/etc/lighttpd/"
+  volumes_from:
+    - plugins
+    - uploads
+  environment:
+    ENCODE_ACCESS_KEY: testingtesting
 
 wordpress:
   build: ./wordpress
@@ -14,6 +21,7 @@ wordpress:
   volumes:
   - "../../jonathancoulton-theme:/var/www/html/wp-content/themes/jonathancoulton-theme"
   - "../../wp-uploads:/var/www/html/wp-content/uploads"
+  - "./wordpress/uploads.ini:/usr/local/etc/php/conf.d/uploads.ini"
 
 db:
   image: mariadb
@@ -22,3 +30,12 @@ db:
     MYSQL_USER: pma
     MYSQL_PASSWORD: 1234
 
+plugins:
+  image: busybox
+  volumes:
+  - /var/www/wp-content/plugins
+
+uploads:
+  image: busybox
+  volumes:
+  - /var/www/wp-content/uploads
