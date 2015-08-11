@@ -1,7 +1,7 @@
 Using cURL to test receiveencode script from command line
 
 On my system:
-curl -F file=@/Users/DAM/Music/Logic/Feel/Bounces/feel160.mp3 http://192.168.1.159:8888/jonathancoulton/api/404u/receiveencode/bc8137d6554ce362eab4704104f8056f
+curl -F file=@/Users/DAM/Music/Logic/Feel/Bounces/feel160.mp3 http://192.168.59.103/api/code/receiveencode/eecb828a97f0b49cac8bedbd2344cf01
 
 General:
 curl -F file=@/path/to/file.wav [WORDPRESS_SITE_URL]/api/[AUTHCODE]/receiveencode/[TRANSIENT_KEY]
