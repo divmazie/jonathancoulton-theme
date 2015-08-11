@@ -88,16 +88,14 @@ RUN mv ~/bin/* /usr/local/bin && rm -rf ~/*
 
 # END INSTALL FFMPEG
 
+# install php5, lighthttpd, and some album art tagging programs
 WORKDIR /root/
 RUN  DEBIAN_FRONTEND=noninteractive apt-get install -y --force-yes \
-    php5 php5-cli
+    php5 php5-cgi php5-cli php5-curl flac vorbis-tools gpac lighttpd
 
-RUN  DEBIAN_FRONTEND=noninteractive apt-get install -y --force-yes \
-     flac vorbis-tools gpac
+# this returns 2 but the result is good
+RUN lighttpd-enable-mod fastcgi fastcgi-php || echo $?
 
+RUN mkdir -p /var/www/html/ && chown -R www-data /var/www/html
 
-RUN mkdir ~/encodes
-WORKDIR /root/encodes
-
-
-CMD php -d display_errors /root/src/proc2.php
+ENTRYPOINT ["lighttpd", "-D", "-f", "/etc/lighttpd/lighttpd.conf"]

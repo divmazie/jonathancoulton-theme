@@ -64,7 +64,7 @@ class EncodeTarget {
                        $this->destFormatDesc['flags'],
                        escapeshellarg($this->destFileName)
         );
-        error_log($cmd);
+        //error_log($cmd);
         exec($cmd, $output, $rv);
 
         if($rv != 0) {
@@ -74,8 +74,8 @@ class EncodeTarget {
 
         exec($this->addAlbumArtCommand() . ' 2>&1',
              $output, $rv);
-        error_log($rv);
-        error_log(implode("\n", $output));
+        //error_log($rv);
+        //error_log(implode("\n", $output));
         if($rv != 0) {
             file_put_contents($this->errorsFile, implode("\n", $output));
             return false;
