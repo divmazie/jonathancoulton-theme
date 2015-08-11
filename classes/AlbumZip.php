@@ -26,7 +26,7 @@ class AlbumZip extends WordpressFileAsset {
         $parent_album = $this->parentAlbum;
         $album_info = array(
             $parent_album->getAlbumTitle(),
-            md5_file($parent_album->getAlbumBonusAssetPath())
+            $parent_album->getAlbumBonusAssetObject() ? md5_file($parent_album->getAlbumBonusAssetPath()) : ""
         );
         foreach ($this->getEncodes() as $encode) {
             $album_info[] = $encode->getUniqueKey();
@@ -43,8 +43,8 @@ class AlbumZip extends WordpressFileAsset {
         // remove non ascii alnum_ with
         $title = preg_replace('/[^\da-z_]/i', '', $title);
 
-        // album title underscore short hash dot extension
-        return sprintf('%s_%s.%s',$title,$this->getShortUniqueKey(),"zip");
+        // album title underscore format underscore short hash dot extension
+        return sprintf('%s_%s_%s.%s',$title,$this->encodeFormat,$this->getShortUniqueKey(),"zip");
     }
 
     public function getEncodes() {

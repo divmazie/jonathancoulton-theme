@@ -138,12 +138,12 @@ class Album {
 
     public function getAlbumBonusAssetURL() {
         $bonus_object = $this->getBonusAssetObject();
-        return wp_get_attachment_url($bonus_object['id']);
+        return $bonus_object ? wp_get_attachment_url($bonus_object['id']) : false;
     }
 
     public function getAlbumBonusAssetPath() {
         $bonus_object = $this->getAlbumBonusAssetObject();
-        return get_attached_file($bonus_object['id']);
+        return $bonus_object ? get_attached_file($bonus_object['id']) : false;
     }
 
     /**
