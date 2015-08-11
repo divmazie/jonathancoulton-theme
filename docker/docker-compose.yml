@@ -6,6 +6,9 @@ encodebot:
   volumes:
     - "./encodebot/www/:/var/www/"
     - "./encodebot/lighttpd/:/etc/lighttpd/"
+  volumes_from:
+    - plugins
+    - uploads
   environment:
     ENCODE_ACCESS_KEY: testingtesting
 
@@ -26,3 +29,12 @@ db:
     MYSQL_USER: pma
     MYSQL_PASSWORD: 1234
 
+plugins:
+  image: busybox
+  volumes:
+  - /var/www/wp-content/plugins
+
+uploads:
+  image: busybox
+  volumes:
+  - /var/www/wp-content/uploads
