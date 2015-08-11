@@ -56,7 +56,7 @@ abstract class WordpressFileAsset {
     }
 
     public function setWPAttachmentID($attachment_id) {
-        update_post_meta($this->parent_post_id, 'attachment_id_'.$this->getUniqueKey(), $attachment_id);
+        return update_post_meta($this->parent_post_id, 'attachment_id_'.$this->getUniqueKey(), $attachment_id);
     }
 
     public function getWPAttachmentID() {

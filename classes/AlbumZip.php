@@ -28,7 +28,7 @@ class AlbumZip extends WordpressFileAsset {
             $parent_album->getAlbumTitle(),
             $parent_album->getAlbumBonusAssetObject() ? md5_file($parent_album->getAlbumBonusAssetPath()) : ""
         );
-        foreach ($this->getEncodes() as $encode) {
+        foreach ($this->getEncodesToZip() as $encode) {
             $album_info[] = $encode->getUniqueKey();
         }
         return md5(serialize($album_info));
@@ -47,7 +47,7 @@ class AlbumZip extends WordpressFileAsset {
         return sprintf('%s_%s_%s.%s',$title,$this->encodeFormat,$this->getShortUniqueKey(),"zip");
     }
 
-    public function getEncodes() {
+    public function getEncodesToZip() {
         $parent_album = $this->getParentAlbum();
         $tracks = $parent_album->getAlbumTracks();
         $encodes = array();
@@ -61,7 +61,7 @@ class AlbumZip extends WordpressFileAsset {
         if (!$this->parentAlbum->isEncodeWorthy()) {
             return false;
         } else {
-            foreach ($this->getEncodes() as $encode) {
+            foreach ($this->getEncodesToZip() as $encode) {
                 if (!$encode->fileAssetExists()) {
                     return false;
                 }
@@ -71,7 +71,11 @@ class AlbumZip extends WordpressFileAsset {
     }
 
     public function createZip() {
-        if ($this->isZipWorthy() && !$this->fileAssetExists()) {
+        if (!$this->isZipWorthy()) {
+            return "Album is not zip-worthy!\n";
+        } elseif ($this->fileAssetExists()) {
+            return "Album is already zipped!\n";
+        } else {
             $upload_dir = wp_upload_dir();
             $zip = new \ZipArchive();
             $filename = $upload_dir['path'] . "/" . $this->getFileAssetFileName();
@@ -80,7 +84,7 @@ class AlbumZip extends WordpressFileAsset {
                 return "Cannot open zip file: <$filename>\n";
             }
             $zip_dir_name = $this->parentAlbum->getAlbumTitle() . "/";
-            foreach ($this->getEncodes() as $encode) {
+            foreach ($this->getEncodesToZip() as $encode) {
                 $encode_path = $encode->getPath();
                 if ($encode_path) {
                     $success = $zip->addFile($encode_path, $zip_dir_name . basename($encode_path));
@@ -121,6 +125,7 @@ class AlbumZip extends WordpressFileAsset {
                 return "Failed to update metadata of attachment!\n";
             }
             $this->setWPAttachmentID($attach_id);
+            return "Album zipped and attached to WP succesfully! Attachment ID = $attach_id\n";
         }
     }
 

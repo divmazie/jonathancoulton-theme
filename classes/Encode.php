@@ -114,7 +114,10 @@ class Encode extends WordpressFileAsset {
             $return .= $success ? "Updated metadata! \n" : "Failed to update metadata! \n";
             $return .= "Attachment_id = ".$attachment_id."\n";
 
-            $this->setWPAttachmentID($attachment_id);
+            $success = $this->setWPAttachmentID($attachment_id);
+            if (!$success) {
+                $return .= "Attachment ID not added to parent track post meta!\n";
+            }
             return $return;
         }
     }
