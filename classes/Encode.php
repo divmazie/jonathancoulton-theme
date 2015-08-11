@@ -58,7 +58,7 @@ class Encode extends WordpressFileAsset {
         $config = array('source_url' => $parent->getTrackSourceFileURL(),
             'source_md5' => md5_file($parent->getTrackSourceFilePath()),
             'encode_format' => $this->getEncodeFormat(),
-            'dest_url' => get_site_url()."/api/".$authcode."/receiveencode/".($skipUniqueKeys?'':$this->getUniqueKey()),
+            'dest_url' => get_site_url()."/api/".($skipUniqueKeys?'':$authcode)."/receiveencode/".($skipUniqueKeys?'':$this->getUniqueKey()),
             'art_url' => $parent->getTrackArtURL(),
             'art_md5' => md5_file($parent->getTrackArtPath()),
             'metadata' => array('title' => $parent->getTrackTitle(),

@@ -79,3 +79,16 @@ function check_encodes_on_post_save($post_id) {
 }
 add_action( 'save_post', 'check_encodes_on_post_save' );
 
+function base64_url_encode($input) {
+	return strtr(base64_encode($input), '+/=', '-_~');
+}
+
+function randstr($len) {
+	return substr(base64_url_encode(openssl_random_pseudo_bytes($len + 5, $did)), 0, $len);
+}
+
+add_filter('upload_mimes', function ($existing_mimes = []) {
+	// add as many as you like e.g.
+	$existing_mimes['flac'] = 'audio/x-flac';
+	return $existing_mimes;
+});

@@ -10,11 +10,14 @@ class EncodeTarget {
     protected $destMetadata;
     protected $fromArtFile;
     protected $errorsFile;
+    protected $destPostURL;
 
     public function __construct($config, $fromWav, $fromNameBase, $fromArtFile) {
         // get some reference materials
         $outputFormats = require('ffmpeg-output-formats.php');
         $metadataKeys = require('ffmpeg-metadata-fields.php');
+
+        $this->destPostURL = $config['dest_url'];
 
         $this->fromWavFile = $fromWav;
         $rowJSON = json_encode($config, JSON_PRETTY_PRINT);
@@ -81,7 +84,31 @@ class EncodeTarget {
             return false;
         }
 
+        $this->postEncodeFile();
         return true;
+    }
+
+    private function postEncodeFile() {
+        // initialise the curl request
+        $ch = curl_init($this->destPostURL);
+
+// send a file
+        curl_setopt($ch, CURLOPT_POST, true);
+        curl_setopt(
+            $ch,
+            CURLOPT_POSTFIELDS,
+            [
+                'md5'  => md5_file($this->destFileName),
+                'file' => '@' . realpath($this->destFileName),
+            ]);
+
+// output the response
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        echo(curl_exec($ch));
+
+// close the session
+        curl_close($ch);
+
     }
 
     private function addAlbumArtCommand() {
