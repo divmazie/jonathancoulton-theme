@@ -70,8 +70,39 @@ class EncodeChain {
             $output = [];
             $rv = 0;
 
-            exec(sprintf('ffmpeg -y -i %s %s 2>&1',
+
+            /**
+             * If we've been passed a file that contains raw pcm data
+             * we don't want to just blindly slap it into a 16 bit data container
+             * we want to encode the full bitrate file into the various formats.
+             *
+             * This will satisfy the snobs if they are looking. A very few people would be happy
+             * to get 24 bit flac files. The rest wouldn't know the difference.
+             *
+             * How do I know the resultant files don't do some weird transform? Well, I don't know
+             * for sure, except that it would be extra work on FFMpeg's part... and I had two 24
+             * bit files (one from before and after), put them into Audacity, put an inverted one
+             * on top of the other and exported to raw 24 bit pcm. The resultant file was entirely
+             * zeroes. Obv "audacity is not a scientific tool" but someone else got small amounts of
+             * noise when comparing some files that weren't the same. I think they are the same.
+             *
+             * Note that I mean the PCM audio stream WITHIN the files is the same. The source
+             * files will usually be larger as they may be gummed up with metadata and whatnot.
+             * They may be flac, whatever. Just if they are already PCM (not alaw or ulaw, but regular
+             * old pcm) we will use the bitstream we are given for quality. Settled? Settled.
+             */
+            $allowedPCMTypes = array_keys(require(__DIR__ . '/ffmpeg-pcm-allowed-formats.php'));
+            $codec =
+                shell_exec(sprintf("ffprobe -show_streams -select_streams 0 -i %s 2>&1 | grep codec_name", escapeshellarg($this->sourceLocalRawName)));
+            $acodecLine = '';
+            if(($codec = str_replace('codec_name=', '', trim($codec))) &&
+                        in_array($codec, $allowedPCMTypes)
+            ) {
+                $acodecLine = '-acodec ' . $codec;
+            }
+            exec(sprintf('ffmpeg -y -i %s %s %s 2>&1',
                          escapeshellarg($this->sourceLocalRawName),
+                         $acodecLine,
                          escapeshellarg($this->sourceLocalWavName)),
                  $output, $rv);
             if($rv === 0) {
