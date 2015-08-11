@@ -7,7 +7,7 @@ class Album {
 
     private $postID, $albumTitle, $albumArtist, $albumYear, $albumGenre, $albumComment, $albumArtObject, $albumBonusAssetObject, $albumShow;
     // the parent post object
-    private $wpPost;
+    private $encode_types,$wpPost;
     //
     private $albumTracks = array();
 
@@ -29,6 +29,7 @@ class Album {
         $this->albumArtObject  = get_field('album_art',$post_id); // returns array with id, url, sizes, etc
         $this->albumBonusAssetObject = get_field('full_album_asset',$post_id);
         $this->albumShow = get_field('show_album_in_store',$post_id);
+        $this->encode_types = include(get_template_directory().'/config/encode_types.php');
         $tracks = get_posts(array('post_type' => 'track', 'meta_key' => 'track_album', 'meta_value' => $post_id)); // Constructor probs shouldn't do this lookup
         foreach ($tracks as $track) {
             $this->albumTracks[get_field('track_number',$track->id)] = new Track($track,$this);
@@ -59,6 +60,21 @@ class Album {
         } else {
             return false;
         }
+    }
+
+    public function getAllChildZips() {
+        $zips = array();
+        foreach ($this->encode_types as $encode_type) {
+            $format = $encode_type[0];
+            $flags = $encode_type[1];
+            $zips[$format] = $this->getChildZip($format,$flags);
+        }
+        return $zips;
+    }
+
+    public function getChildZip($format,$flags) {
+        $zip = new AlbumZip($format,$flags);
+        return $zip;
     }
 
     public function getNumberOfAlbumTracks() {
