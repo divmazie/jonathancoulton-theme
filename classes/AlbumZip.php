@@ -74,6 +74,10 @@ class AlbumZip extends WordpressFileAsset {
                 $zip->addFile($encode_path, $zip_dir_name . basename($encode_path));
             }
         }
+        $bonus_path = $this->parentAlbum->getAlbumBonusAssetPath();
+        if ($bonus_path) {
+            $zip->addFile($bonus_path, $zip_dir_name . basename($bonus_path));
+        }
         $zip->close();
         //return $zip;
         $attachment = array(
