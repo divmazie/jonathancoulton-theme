@@ -67,7 +67,7 @@ class Album {
     }
 
     public function getChildZip($format,$flags) {
-        $zip = new AlbumZip($format,$flags);
+        $zip = new AlbumZip($this,$format,$flags);
         return $zip;
     }
 
