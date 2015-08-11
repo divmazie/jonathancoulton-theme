@@ -7,7 +7,7 @@
  */
 
 return array(
-    array('mp3', '-V1'),
-    array('flac', '--best'),
+    array('mp3', '-q:a 1'),
+    array('flac', '-compression_level 8'),
     array('ogg', '')
 );
