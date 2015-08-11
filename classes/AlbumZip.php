@@ -71,24 +71,32 @@ class AlbumZip extends WordpressFileAsset {
     }
 
     public function createZip() {
-        if ($this->isZipWorthy()) {
+        if ($this->isZipWorthy() && !$this->fileAssetExists()) {
             $upload_dir = wp_upload_dir();
             $zip = new \ZipArchive();
             $filename = $upload_dir['path'] . "/" . $this->getFileAssetFileName();
             $filetype = wp_check_filetype(basename($filename), null);
             if ($zip->open($filename, \ZipArchive::CREATE) !== TRUE) {
-                exit("cannot open <$filename>\n");
+                return "Cannot open zip file: <$filename>\n";
             }
             $zip_dir_name = $this->parentAlbum->getAlbumTitle() . "/";
             foreach ($this->getEncodes() as $encode) {
                 $encode_path = $encode->getPath();
                 if ($encode_path) {
-                    $zip->addFile($encode_path, $zip_dir_name . basename($encode_path));
+                    $success = $zip->addFile($encode_path, $zip_dir_name . basename($encode_path));
+                    if (!$success) {
+                        return "Cannot find ".$encode_path."\n";
+                    }
+                } else {
+                    return "Cannot find path for ".$encode->getFileAssetFileName()."\n";
                 }
             }
             $bonus_path = $this->parentAlbum->getAlbumBonusAssetPath();
             if ($bonus_path) {
-                $zip->addFile($bonus_path, $zip_dir_name . basename($bonus_path));
+                $success = $zip->addFile($bonus_path, $zip_dir_name . basename($bonus_path));
+                if (!$success) {
+                    return "Cannot find ".$encode_path."\n";
+                }
             }
             $zip->close();
             $attachment = array(
@@ -100,12 +108,18 @@ class AlbumZip extends WordpressFileAsset {
             );
             // Insert the attachment.
             $attach_id = wp_insert_attachment($attachment, $filename, $this->parentAlbum->getPostID());
+            if (!$attach_id) {
+                return "Zip created, but couldn't add it as attachment to WP!\n";
+            }
             // Make sure that this file is included, as wp_generate_attachment_metadata() depends on it.
             require_once(ABSPATH . 'wp-admin/includes/image.php');
             // Generate the metadata for the attachment, and update the database record.
             $attach_data = wp_generate_attachment_metadata($attach_id, $filename);
             $attach_data = array_merge($attach_data, array('unique_key' => $this->getUniqueKey()));
-            wp_update_attachment_metadata($attach_id, $attach_data);
+            $success = wp_update_attachment_metadata($attach_id, $attach_data);
+            if (!$success) {
+                return "Failed to update metadata of attachment!\n";
+            }
             $this->setWPAttachmentID($attach_id);
         }
     }
