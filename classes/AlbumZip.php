@@ -93,6 +93,7 @@ class AlbumZip extends WordpressFileAsset {
         require_once( ABSPATH . 'wp-admin/includes/image.php' );
         // Generate the metadata for the attachment, and update the database record.
         $attach_data = wp_generate_attachment_metadata( $attach_id, $filename );
+        $attach_data = array_merge($attach_data, array('unique_key' => $this->getUniqueKey()));
         wp_update_attachment_metadata( $attach_id, $attach_data );
         $this->setWPAttachmentID($attach_id);
     }
