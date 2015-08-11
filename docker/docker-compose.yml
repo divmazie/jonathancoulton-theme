@@ -13,6 +13,7 @@ wordpress:
     - 80:80
   volumes:
   - "../../jonathancoulton-theme:/var/www/html/wp-content/themes/jonathancoulton-theme"
+  - "../../wp-uploads:/var/www/html/wp-content/uploads"
 
 db:
   image: mariadb
