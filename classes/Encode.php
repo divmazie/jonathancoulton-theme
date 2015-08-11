@@ -61,7 +61,7 @@ class Encode extends WordpressFileAsset {
             'dest_url' => get_site_url()."/api/".$authcode."/receiveencode/".($skipUniqueKeys?'':$this->getUniqueKey()),
             'art_url' => $parent->getTrackArtURL(),
             'art_md5' => md5_file($parent->getTrackArtPath()),
-            'meta_data' => array('title' => $parent->getTrackTitle(),
+            'metadata' => array('title' => $parent->getTrackTitle(),
                 'track' => $parent->getTrackNumber(),
                 'album' => $parent->getAlbum()->getAlbumTitle(),
                 'album_artist' => $parent->getAlbum()->getAlbumArtist(),
