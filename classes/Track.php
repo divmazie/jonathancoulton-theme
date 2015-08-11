@@ -58,20 +58,16 @@ class Track {
     }
 
     public function getNeededEncodes() {
-        if (!$this->isEncodeWorthy()) {
+        if(!$this->isEncodeWorthy()) {
             return false;
         }
-        $needed_encodes = array();
-        foreach ($this->getAllChildEncodes() as $encode) {
-            if ($encode->encodeIsNeeded()) {
-                $needed_encodes[] = $encode->getEncodeConfig();
+        $needed_encodes = [];
+        foreach($this->getAllChildEncodes() as $encode) {
+            if($encode->encodeIsNeeded()) {
+                $needed_encodes[] = $encode;
             }
         }
-        if (count($needed_encodes)) {
-            return $needed_encodes;
-        } else {
-            return false;
-        }
+        return $needed_encodes;
     }
 
     public function getAlbum() {

@@ -19,6 +19,9 @@ foreach ($album_posts as $album_post) {
         $encodes = array_merge($encodes,$album_encodes);
     }
 }
-$content['encodes'] = $encodes;
-echo json_encode($content);
+foreach($encodes as $enc){
+    $enc->setEncodeTransient();
+}
+$content['encodes'] = array_map(function($enc){return $enc->getEncodeConfig();},$encodes);
+echo json_encode($content, JSON_PRETTY_PRINT);
 ?>
