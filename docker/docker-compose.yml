@@ -38,3 +38,12 @@ uploads:
   image: busybox
   volumes:
   - /var/www/wp-content/uploads
+
+pma:
+  build: ./pma
+  links:
+    - db:mysql
+  ports:
+    - 82:80
+  environment:
+    BLOWFISH_SECRET: testing
