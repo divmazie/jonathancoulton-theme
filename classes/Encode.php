@@ -102,6 +102,9 @@ class Encode extends WordpressFileAsset {
         if (!isset($_FILES[$file_array_key])) {
             return "No file!";
         }
+        if (md5_file($_FILES[$file_array_key]['tmp_name']) != $_POST['md5']) {
+            return "Uploaded file md5 does not match posted md5!";
+        }
         $attachment_id = media_handle_upload($file_array_key, $this->parentTrack->getPostID(), array(), array('test_form' => false));
 
         if ( is_wp_error($attachment_id) ) {

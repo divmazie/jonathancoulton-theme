@@ -9,7 +9,7 @@ namespace jct;
 $transient_key = $params['var'];
 $encode = Encode::recoverFromTransient($transient_key) or die("Couldn't recover encode information from transient key!");
 if ($encode->getUniqueKey() == $transient_key) {
-    echo $encode-> saveEncodeFromUpload();
+    echo $encode->saveEncodeFromUpload();
 } else {
     echo "Transient key does not match Encode!";
 }
