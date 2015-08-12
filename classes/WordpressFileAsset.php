@@ -75,6 +75,14 @@ abstract class WordpressFileAsset {
         return $attachment_id ? get_attached_file($attachment_id) : false;
     }
 
+    public function fixAttachmentFileName() {
+        $file = $this->getPath();
+        $dir = pathinfo($file)['dirname'];
+        $newfile = $dir."/".$this->getFileAssetFileName();
+        rename($file, $newfile);
+        update_attached_file($this->getWPAttachmentID(),$newfile);
+    }
+
 }
 
 
