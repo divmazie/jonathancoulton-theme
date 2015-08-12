@@ -21,3 +21,11 @@ Timber::add_route('api/:authcode/:script/:var', function($params){
         Timber::load_template("404.php");
     }
 });
+
+Timber::add_route('music_admin', function($params){
+    if (current_user_can('manage_options')) {
+        Timber::load_template("music_admin.php");
+    } else {
+        Timber::load_template("404.php");
+    }
+});
