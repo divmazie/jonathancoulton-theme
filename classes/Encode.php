@@ -48,6 +48,10 @@ class Encode extends WordpressFileAsset {
         return $this->encodeCLIFlags;
     }
 
+    public function getParentTrack() {
+        return $this->parentTrack;
+    }
+
     public function getUniqueKey() {
         return md5(serialize($this->getEncodeConfig(true))); // This gets config without unique key or filename to prevent infinite loop
     }

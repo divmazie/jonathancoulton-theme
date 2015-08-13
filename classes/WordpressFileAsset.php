@@ -91,9 +91,12 @@ abstract class WordpressFileAsset {
 
     public function deleteOldAttachments() {
         $metadata = get_post_meta($this->parent_post_id);
+        //return $metadata;
         foreach ($metadata as $key => $val) {
             if (substr($key,0,14)=='attachment_id_' && substr($key,-32)!=$this->getUniqueKey()) {
-                return wp_delete_attachment($val[0],true);
+                //return array($key => intval($val[0]));
+                //return get_attachment($val[0]);
+                return wp_delete_attachment(intval($val[0]));
             }
         }
     }
