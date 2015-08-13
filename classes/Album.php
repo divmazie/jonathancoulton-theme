@@ -57,7 +57,6 @@ class Album {
         $encodes = array();
         foreach ($this->albumTracks as $track) {
             $track_encodes = $track->getNeededEncodes();
-            var_dump($track_encodes);
             if ($track_encodes) {
                 $encodes = array_merge($encodes, $track_encodes);
             }

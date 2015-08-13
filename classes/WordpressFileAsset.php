@@ -16,7 +16,7 @@ abstract class WordpressFileAsset {
     }
 
     public function fileAssetExists() {
-        if ($this->getWPAttachment()) {
+        if ($this->getWPAttachment() && file_exists($this->getPath()) && filesize($this->getPath())) {
             return true;
         } else {
             return false;
