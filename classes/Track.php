@@ -59,6 +59,14 @@ class Track {
         return $encode;
     }
 
+    public function deleteOldEncodes() {
+        $goodKeys = array();
+        foreach ($this->getAllChildEncodes() as $encode) {
+            $goodKeys[] = $encode->getUniqueKey();
+        }
+        return Encode::deleteOldAttachments($this->postID,$goodKeys);
+    }
+
     public function getNeededEncodes() {
         if(!$this->isEncodeWorthy()) {
             return false;

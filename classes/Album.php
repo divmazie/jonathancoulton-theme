@@ -79,6 +79,14 @@ class Album {
         return $zip;
     }
 
+    public function deleteOldZips() {
+        $goodKeys = array();
+        foreach ($this->getAllChildZips() as $zip) {
+            $goodKeys[] = $zip->getUniqueKey();
+        }
+        return AlbumZip::deleteOldAttachments($this->postID,$goodKeys);
+    }
+
     public function getNumberOfAlbumTracks() {
         return count($this->albumTracks);
     }

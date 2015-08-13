@@ -78,7 +78,6 @@ abstract class WordpressFileAsset {
     public function completeAttaching($attachment_id) {
         $this->setWPAttachmentID($attachment_id);
         $this->fixAttachmentFileName($attachment_id);
-        $this->deleteOldAttachments();
     }
 
     public function fixAttachmentFileName($attachment_id) {
@@ -89,16 +88,15 @@ abstract class WordpressFileAsset {
         update_attached_file($attachment_id,$newfile);
     }
 
-    public function deleteOldAttachments() {
-        $metadata = get_post_meta($this->parent_post_id);
-        //return $metadata;
+    static function deleteOldAttachments($post_id,$goodKeys) {
+        $metadata = get_post_meta($post_id);
+        $deleted = array();
         foreach ($metadata as $key => $val) {
-            if (substr($key,0,14)=='attachment_id_' && substr($key,-32)!=$this->getUniqueKey()) {
-                //return array($key => intval($val[0]));
-                //return get_attachment($val[0]);
-                return wp_delete_attachment(intval($val[0]));
+            if (substr($key,0,14)=='attachment_id_' && !in_array(substr($key,-32),$goodKeys)) {
+                $deleted[] = wp_delete_attachment(intval($val[0]));
             }
         }
+        return $deleted;
     }
 
 }
