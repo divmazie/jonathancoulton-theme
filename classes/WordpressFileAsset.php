@@ -83,6 +83,15 @@ abstract class WordpressFileAsset {
         update_attached_file($this->getWPAttachmentID(),$newfile);
     }
 
+    public function deleteOldAttachments() {
+        $metadata = get_post_meta($this->parent_post_id);
+        foreach ($metadata as $key => $val) {
+            if (substr($key,0,14)=='attachment_id_' && substr($key,-32)!=$this->getUniqueKey()) {
+                return wp_delete_attachment($val[0],true);
+            }
+        }
+    }
+
 }
 
 
