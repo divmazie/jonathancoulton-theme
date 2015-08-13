@@ -55,12 +55,12 @@ class Encode extends WordpressFileAsset {
     public function getEncodeConfig($skipUniqueKeys=false) {
         $authcode = get_transient('do_secret');
         $parent = $this->parentTrack;
-        $config = array('source_url' => $parent->getTrackSourceFileURL(),
-            'source_md5' => md5_file($parent->getTrackSourceFilePath()),
+        $config = array('source_url' => $parent->getTrackSourceFileObject()->getURL(),
+            'source_md5' => md5_file($parent->getTrackSourceFileObject()->getPath()),
             'encode_format' => $this->getEncodeFormat(),
             'dest_url' => get_site_url()."/api/".($skipUniqueKeys?'':$authcode)."/receiveencode/".($skipUniqueKeys?'':$this->getUniqueKey()),
-            'art_url' => $parent->getTrackArtURL(),
-            'art_md5' => md5_file($parent->getTrackArtPath()),
+            'art_url' => $parent->getTrackArtObject()->getURL(),
+            'art_md5' => md5_file($parent->getTrackArtObject()->getPath()),
             'metadata' => array('title' => $parent->getTrackTitle(),
                 'track' => $parent->getTrackNumber(),
                 'album' => $parent->getAlbum()->getAlbumTitle(),

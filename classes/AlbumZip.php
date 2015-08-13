@@ -26,8 +26,10 @@ class AlbumZip extends WordpressFileAsset {
         $parent_album = $this->parentAlbum;
         $album_info = array(
             $parent_album->getAlbumTitle(),
-            $parent_album->getAlbumBonusAssetObject() ? md5_file($parent_album->getAlbumBonusAssetPath()) : ""
         );
+        foreach ($parent_album->getAlbumBonusAssetObjects() as $bonus_asset) {
+            $album_info[] = md5_file($bonus_asset->getPath());
+        }
         foreach ($this->getEncodesToZip() as $encode) {
             $album_info[] = $encode->getUniqueKey();
         }
@@ -95,11 +97,13 @@ class AlbumZip extends WordpressFileAsset {
                     return "Cannot find path for ".$encode->getFileAssetFileName()."\n";
                 }
             }
-            $bonus_path = $this->parentAlbum->getAlbumBonusAssetPath();
-            if ($bonus_path) {
-                $success = $zip->addFile($bonus_path, $zip_dir_name . basename($bonus_path));
-                if (!$success) {
-                    return "Cannot find ".$encode_path."\n";
+            foreach ($this->parentAlbum->getAlbumBonusAssetObjects() as $bonus_asset) {
+                $bonus_path = $bonus_asset->getPath();
+                if ($bonus_path) {
+                    $success = $zip->addFile($bonus_path, $zip_dir_name . basename($bonus_path));
+                    if (!$success) {
+                        return "Cannot find " . $bonus_path . "\n";
+                    }
                 }
             }
             $zip->close();

@@ -28,15 +28,16 @@ class Track {
         $this->trackGenre = get_field('track_genre',$post_id);
         $this->trackYear = get_field('track_year',$post_id);
         $this->trackComment = get_field('track_comment',$post_id);
-        $this->trackArtObject = get_field('track_art',$post_id);
-        $this->trackSourceFileObject = get_field('track_source',$post_id);
+        $this->trackArtObject = get_field('track_art',$post_id) ? new WordpressACFFile(get_field('track_art',$post_id)) : false;
+        $this->trackSourceFileObject = get_field('track_source',$post_id) ? new WordpressACFFile(get_field('track_source',$post_id)) : false;
         $this->encode_types = include(get_template_directory().'/config/encode_types.php');
     }
 
     public function isEncodeWorthy() {
         $worthy = false;
         if ($this->parentAlbum->isEncodeWorthy()) {
-            if ($this->trackTitle && $this->getTrackArtist() && $this->trackSourceFileObject && $this->getTrackArtURL()) {
+            //$worthy = true;
+            if ($this->trackTitle && $this->getTrackArtist() && $this->trackSourceFileObject && $this->getTrackArtObject()) {
                 $worthy = true;
             }
         }
@@ -48,7 +49,7 @@ class Track {
         foreach ($this->encode_types as $encode_type) {
             $format = $encode_type[0];
             $flags = $encode_type[1];
-            $encodes[$format] = $this->getChildEncode($format,$flags);
+            $encodes[] = $this->getChildEncode($format,$flags);
         }
         return $encodes;
     }
@@ -62,7 +63,7 @@ class Track {
         if(!$this->isEncodeWorthy()) {
             return false;
         }
-        $needed_encodes = [];
+        $needed_encodes = array();
         foreach($this->getAllChildEncodes() as $encode) {
             if($encode->encodeIsNeeded()) {
                 $needed_encodes[] = $encode;
@@ -129,33 +130,9 @@ class Track {
         return $this->trackArtObject ? $this->trackArtObject : $this->parentAlbum->getAlbumArtObject();
     }
 
-    public function getTrackArtURL() {
-        $art_object = $this->getTrackArtObject();
-        return wp_get_attachment_url($art_object['id']);
-    }
-
-    public function getTrackArtPath() {
-        $art_object = $this->getTrackArtObject();
-        return get_attached_file($art_object['id']);
-    }
-
     public function getTrackSourceFileObject() {
         return $this->trackSourceFileObject;
     }
-
-    /**
-     * @return mixed
-     */
-    public function getTrackSourceFileURL() {
-        $source_object = $this->getTrackSourceFileObject();
-        return wp_get_attachment_url($source_object['id']);
-    }
-
-    public function getTrackSourceFilePath() {
-        $source_object = $this->getTrackSourceFileObject();
-        return get_attached_file($source_object['id']);
-    }
-
 
 }
 

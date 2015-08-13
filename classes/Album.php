@@ -5,7 +5,7 @@ namespace jct;
 class Album {
 
 
-    private $postID, $albumTitle, $albumArtist, $albumYear, $albumGenre, $albumComment, $albumArtObject, $albumBonusAssetObject, $albumShow;
+    private $postID, $albumTitle, $albumArtist, $albumYear, $albumGenre, $albumComment, $albumArtObject, $albumBonusAssetObjects, $albumShow;
     // the parent post object
     private $encode_types,$wpPost;
     //
@@ -26,8 +26,14 @@ class Album {
         $this->albumYear = get_field('album_year',$post_id);
         $this->albumGenre = get_field('album_genre',$post_id);
         $this->albumComment = get_field('album_comment',$post_id);
-        $this->albumArtObject  = get_field('album_art',$post_id); // returns array with id, url, sizes, etc
-        $this->albumBonusAssetObject = get_field('full_album_asset',$post_id);
+        $this->albumArtObject = get_field('album_art',$post_id) ? new WordpressACFFile(get_field('album_art',$post_id)) : false;
+        $this->albumBonusAssetObjects = array();
+        $bonus_asset_rows = get_field('bonus_assets',$post_id);
+        if (is_array($bonus_asset_rows)) {
+            foreach ($bonus_asset_rows as $row) {
+                $this->albumBonusAssetObjects[] = new WordpressACFFile($row['bonus_asset']);
+            }
+        }
         $this->albumShow = get_field('show_album_in_store',$post_id);
         $this->encode_types = include(get_template_directory().'/config/encode_types.php');
         $tracks = get_posts(array('post_type' => 'track', 'meta_key' => 'track_album', 'meta_value' => $post_id)); // Constructor probs shouldn't do this lookup
@@ -51,7 +57,10 @@ class Album {
         $encodes = array();
         foreach ($this->albumTracks as $track) {
             $track_encodes = $track->getNeededEncodes();
-            $encodes = array_merge($encodes,$track_encodes);
+            var_dump($track_encodes);
+            if ($track_encodes) {
+                $encodes = array_merge($encodes, $track_encodes);
+            }
         }
         return $encodes;
     }
@@ -119,31 +128,11 @@ class Album {
         return $this->albumArtObject;
     }
 
-    public function getAlbumArtURL() {
-        $art_object = $this->getAlbumArtObject();
-        return wp_get_attachment_url($art_object['id']);
-    }
-
-    public function getAlbumArtPath() {
-        $art_object = $this->getAlbumArtObject();
-        return get_attached_file($art_object['id']);
-    }
-
     /**
      * @return mixed
      */
-    public function getAlbumBonusAssetObject() {
-        return $this->albumBonusAssetObject;
-    }
-
-    public function getAlbumBonusAssetURL() {
-        $bonus_object = $this->getBonusAssetObject();
-        return $bonus_object ? wp_get_attachment_url($bonus_object['id']) : false;
-    }
-
-    public function getAlbumBonusAssetPath() {
-        $bonus_object = $this->getAlbumBonusAssetObject();
-        return $bonus_object ? get_attached_file($bonus_object['id']) : false;
+    public function getAlbumBonusAssetObjects() {
+        return $this->albumBonusAssetObjects;
     }
 
     /**
