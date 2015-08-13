@@ -75,12 +75,18 @@ abstract class WordpressFileAsset {
         return $attachment_id ? get_attached_file($attachment_id) : false;
     }
 
-    public function fixAttachmentFileName() {
+    public function completeAttaching($attachment_id) {
+        $this->setWPAttachmentID($attachment_id);
+        $this->fixAttachmentFileName($attachment_id);
+        $this->deleteOldAttachments();
+    }
+
+    public function fixAttachmentFileName($attachment_id) {
         $file = $this->getPath();
         $dir = pathinfo($file)['dirname'];
         $newfile = $dir."/".$this->getFileAssetFileName();
         rename($file, $newfile);
-        update_attached_file($this->getWPAttachmentID(),$newfile);
+        update_attached_file($attachment_id,$newfile);
     }
 
     public function deleteOldAttachments() {

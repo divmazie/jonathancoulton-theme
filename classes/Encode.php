@@ -114,15 +114,8 @@ class Encode extends WordpressFileAsset {
             $return = "File is valid, and was successfully uploaded.\n";
             $old_meta = wp_get_attachment_metadata($attachment_id);
             $new_meta = array_merge($old_meta, array('unique_key' => $this->getUniqueKey()));
-            $success = wp_update_attachment_metadata($attachment_id,$new_meta);
-            $return .= $success ? "Updated metadata! \n" : "Failed to update metadata! \n";
-            $return .= "Attachment_id = ".$attachment_id."\n";
-
-            $success = $this->setWPAttachmentID($attachment_id);
-            if (!$success) {
-                $return .= "Attachment ID not added to parent track post meta!\n";
-            }
-            $this->fixAttachmentFileName();
+            wp_update_attachment_metadata($attachment_id,$new_meta);
+            $this->completeAttaching($attachment_id);
             return $return;
         }
     }

@@ -124,12 +124,8 @@ class AlbumZip extends WordpressFileAsset {
             // Generate the metadata for the attachment, and update the database record.
             $attach_data = wp_generate_attachment_metadata($attach_id, $filename);
             $attach_data = array_merge($attach_data, array('unique_key' => $this->getUniqueKey()));
-            $success = wp_update_attachment_metadata($attach_id, $attach_data);
-            if (!$success) {
-                return "Failed to update metadata of attachment!\n";
-            }
-            $this->setWPAttachmentID($attach_id);
-            return "Album zipped and attached to WP succesfully! Attachment ID = $attach_id\n";
+            wp_update_attachment_metadata($attach_id, $attach_data);
+            $this->completeAttaching($attach_id);
         }
     }
 
