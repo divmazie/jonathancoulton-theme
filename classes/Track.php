@@ -23,6 +23,7 @@ class Track {
         $this->wpPost = $post;
         $this->parentAlbum = $parentAlbum;
         $this->trackTitle = $post->post_title;
+        $this->trackNumber = get_field('track_number',$post_id);
         $this->trackArtist = get_field('track_artist',$post_id);
         $this->trackGenre = get_field('track_genre',$post_id);
         $this->trackYear = get_field('track_year',$post_id);
