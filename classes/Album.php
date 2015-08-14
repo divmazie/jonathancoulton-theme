@@ -52,7 +52,10 @@ class Album {
     }
 
     public function getAlbumContext() {
-        $context = array('title' => $this->getAlbumTitle(), 'encode_worthy' => $this->isEncodeWorthy());
+        $context = array('title' => $this->getAlbumTitle(), 'artist' => $this->getAlbumArtist());
+        $context['show_album'] = $this->albumShow ? true : false;
+        $context['encode_worthy'] = $this->isEncodeWorthy() ? true : false;
+        $context['art'] = array('filename'=>basename($this->getAlbumArtObject()->getPath()),'exists'=>file_exists($this->getAlbumArtObject()->getPath()));
         $context['album_zips'] = array();
         foreach ($this->getAllChildZips() as $zip) {
             $context['album_zips'][] = $zip->getZipContext();
@@ -60,6 +63,10 @@ class Album {
         $context['tracks'] = array();
         foreach ($this->getAlbumTracks() as $track) {
             $context['tracks'][$track->getTrackNumber()] = $track->getTrackContext();
+        }
+        $context['bonus_assets'] = array();
+        foreach ($this->getAlbumBonusAssetObjects() as $bonus_asset) {
+            $context['bonus_assets'][] = array('filename'=>basename($bonus_asset->getPath()),'exists'=>file_exists($bonus_asset->getPath()));
         }
         return $context;
     }

@@ -143,8 +143,10 @@ class Track {
     }
 
     public function getTrackContext() {
-        $context = array('title' => $this->getTrackTitle());
+        $context = array('title' => $this->getTrackTitle(), 'artist' => $this->getTrackArtist());
         $context['encode_worthy'] = $this->isEncodeWorthy();
+        $context['art'] = array('filename'=>basename($this->getTrackArtObject()->getPath()),'exists'=>file_exists($this->getTrackArtObject()->getPath()));
+        $context['source'] = array('filename'=>basename($this->getTrackSourceFileObject()->getPath()),'exists'=>file_exists($this->getTrackSourceFileObject()->getPath()));
         $context['encodes'] = array();
         foreach ($this->getAllChildEncodes() as $encode) {
             $context['encodes'][] = $encode->getEncodeContext();

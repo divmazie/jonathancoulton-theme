@@ -59,15 +59,20 @@ class AlbumZip extends WordpressFileAsset {
         return $encodes;
     }
 
+    public function isMissingEncodes() {
+        foreach ($this->getEncodesToZip() as $encode) {
+            if (!$encode->fileAssetExists()) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     public function isZipWorthy() {
         if (!$this->parentAlbum->isEncodeWorthy()) {
             return false;
-        } else {
-            foreach ($this->getEncodesToZip() as $encode) {
-                if (!$encode->fileAssetExists()) {
-                    return false;
-                }
-            }
+        } else if ($this->isMissingEncodes()) {
+            return false;
         }
         return true;
     }
@@ -144,8 +149,9 @@ class AlbumZip extends WordpressFileAsset {
 
     public function getZipContext() {
         $context = array('format' => $this->getEncodeFormat(), 'flags' => $this->getEncodeCLIFlags());
-        $context['zip_worthy'] = $this->isZipWorthy();
-        $context['exists'] = $this->fileAssetExists();
+        $context['zip_worthy'] = $this->isZipWorthy() ? true : false;
+        $context['missing_encodes'] = $this->isMissingEncodes() ? true : false;
+        $context['exists'] = $this->fileAssetExists() ? true : false;
         return $context;
     }
 }
