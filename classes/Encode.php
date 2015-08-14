@@ -124,6 +124,12 @@ class Encode extends WordpressFileAsset {
         }
     }
 
+    public function getEncodeContext() {
+        $context = array('format' => $this->getEncodeFormat(), 'flags' => $this->getEncodeCLIFlags());
+        $context['exists'] = $this->fileAssetExists();
+        return $context;
+    }
+
 }
 
 ?>

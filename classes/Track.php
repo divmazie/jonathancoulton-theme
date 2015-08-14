@@ -142,6 +142,16 @@ class Track {
         return $this->trackSourceFileObject;
     }
 
+    public function getTrackContext() {
+        $context = array('title' => $this->getTrackTitle());
+        $context['encode_worthy'] = $this->isEncodeWorthy();
+        $context['encodes'] = array();
+        foreach ($this->getAllChildEncodes() as $encode) {
+            $context['encodes'][] = $encode->getEncodeContext();
+        }
+        return $context;
+    }
+
 }
 
 

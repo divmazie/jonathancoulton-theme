@@ -141,4 +141,11 @@ class AlbumZip extends WordpressFileAsset {
     public function getEncodeCLIFlags() {
         return $this->encodeCLIFlags;
     }
+
+    public function getZipContext() {
+        $context = array('format' => $this->getEncodeFormat(), 'flags' => $this->getEncodeCLIFlags());
+        $context['zip_worthy'] = $this->isZipWorthy();
+        $context['exists'] = $this->fileAssetExists();
+        return $context;
+    }
 }

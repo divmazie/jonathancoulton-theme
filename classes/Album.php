@@ -42,6 +42,28 @@ class Album {
         }
     }
 
+    static function getAllAlbums() {
+        $albums = array();
+        $album_posts = get_posts(array('post_type' => 'album'));
+        foreach ($album_posts as $album_post) {
+            $albums[] = new Album($album_post);
+        }
+        return $albums;
+    }
+
+    public function getAlbumContext() {
+        $context = array('title' => $this->getAlbumTitle(), 'encode_worthy' => $this->isEncodeWorthy());
+        $context['album_zips'] = array();
+        foreach ($this->getAllChildZips() as $zip) {
+            $context['album_zips'][] = $zip->getZipContext();
+        }
+        $context['tracks'] = array();
+        foreach ($this->getAlbumTracks() as $track) {
+            $context['tracks'][$track->getTrackNumber()] = $track->getTrackContext();
+        }
+        return $context;
+    }
+
     public function isEncodeWorthy() {
         $worthy = false;
         if ($this->albumShow && $this->albumTitle && $this->albumArtist && $this->albumArtObject) {
