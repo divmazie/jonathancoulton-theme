@@ -6,6 +6,22 @@
     <body class="{{body_class}}" data-template="base.twig">
         <div class="container">
             This is the music admin page!
+            {% for album in albums %}
+                <div class="admin_album">
+                    Title: {{ album.title }} <br />
+                    Artist: {{ album.artist }} <br />
+                    Art: {% if album.art.exists %} {{ album.art.filename }} {% else %} ART MISSING! {% endif %} <br />
+                    {% if not album.encode_worthy %} NOT ENCODE WORTHY! {% endif %}
+                    {% if not album.show_album %} NOT MARKED AS READY! {% endif %}
+                    Tracks:
+                    {% for track in album.tracks %}
+                        <div class="admin_track">
+                            Title: {{ track.title }} <br />
+                            Source: {% if track.source.exists %} {{ track.source.filename }} {% else %} SOURCE MISSING! {% endif %} <br />
+                        </div>
+                    {% endfor %}
+                </div> <br />
+            {% endfor %}
             <pre>{{ albums|print_r }}</pre>
         </div>
     </body>
