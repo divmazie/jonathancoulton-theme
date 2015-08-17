@@ -42,7 +42,7 @@
                     Zips:
                     {% for zip in album.album_zips %}
                         <div class="admin_zip">
-                            {% if zip.exists %}{{ zip.format }} zip good to go{% endif %}
+                            {% if zip.exists %} {{ macros.good_warning(zip.format," zip good to go.") }} {% endif %}
                             {% if not zip.zip_worthy %} {{ macros.go_warning(zip.format," zip not zip-worthy!") }} {% endif %}
                             {% if zip.missing_encodes %} {{ macros.go_warning(zip.format," encodes missing!") }} {% endif %}
                         </div>
@@ -76,9 +76,9 @@
                 </div> <br />
             {% endfor %}
             <div>
-                Red warnings above require editing albums and tracks in Wordpress. <br />
-                Orange warnings can be fixed by <button>create encodes and zips</button> <br />
-                Only green messages mean you are free to <button>Sync to store</button> <br />
+                {{ macros.stop_warning("Red warnings") }} above require editing albums and tracks in Wordpress. <br />
+                {{ macros.go_warning("Orange warnings") }} can be fixed by <button onclick="window.location.href='{{ site.url }}/api/code/postencodes/1'">create encodes and zips</button> <br />
+                Only {{ macros.good_warning("green messages") }} mean you are free to <button>Sync to store</button> <br />
             </div>
             <br /><br />
             <pre>{{ albums|print_r }}</pre>
