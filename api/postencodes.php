@@ -32,7 +32,7 @@ $data_string = json_encode($content);
 
 $post_encodes_link = get_field('post_encodes_link', 'option');
 putenv('REMOTE_ENCODE_SECRET_URL='.$post_encodes_link);
-echo getenv('REMOTE_ENCODE_SECRET_URL');
+//echo getenv('REMOTE_ENCODE_SECRET_URL');
 $ch = curl_init(getenv('REMOTE_ENCODE_SECRET_URL'));
 curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "POST");
 curl_setopt($ch, CURLOPT_POSTFIELDS, $data_string);
@@ -45,5 +45,9 @@ curl_setopt($ch, CURLOPT_HTTPHEADER, [
                ]
 );
 
-echo "<pre>" . htmlentities(curl_exec($ch));
+if ($_GET['verbose']) {
+    echo "<pre>" . htmlentities(curl_exec($ch));
+} else {
+    \header("Location: ".site_url()."/music_admin");
+}
 ?>
