@@ -1,5 +1,11 @@
-{% macro warning(text,text2) %}
+{% macro stop_warning(text,text2) %}
     <span style="color: red;">{{ text|default('Warning!') }}{{ text2 }}</span>
+{% endmacro %}
+{% macro go_warning(text,text2) %}
+    <span style="color: #c80;">{{ text|default('Warning!') }}{{ text2 }}</span>
+{% endmacro %}
+{% macro good_warning(text,text2) %}
+    <span style="color: green;">{{ text|default('Warning!') }}{{ text2 }}</span>
 {% endmacro %}
 {% import _self as macros %}
 {% include 'html-header.twig' %}
@@ -30,15 +36,15 @@
                 <div class="admin_album">
                     Title: {{ album.title }} <br />
                     Artist: {{ album.artist }} <br />
-                    Art: {% if album.art.exists %} {{ album.art.filename }} {% else %} {{ macros.warning('ART MISSING!') }} {% endif %} <br />
-                    {% if not album.encode_worthy %} {{ macros.warning('NOT ENCODE WORTHY!') }} <br /> {% endif %}
-                    {% if not album.show_album %} {{ macros.warning('NOT MARKED AS READY!') }} <br /> {% endif %}
+                    Art: {% if album.art.exists %} {{ album.art.filename }} {% else %} {{ macros.stop_warning('ART MISSING!') }} {% endif %} <br />
+                    {% if not album.encode_worthy %} {{ macros.stop_warning('NOT ENCODE WORTHY!') }} <br /> {% endif %}
+                    {% if not album.show_album %} {{ macros.stop_warning('NOT MARKED AS READY!') }} <br /> {% endif %}
                     Zips:
                     {% for zip in album.album_zips %}
                         <div class="admin_zip">
                             {% if zip.exists %}{{ zip.format }} zip good to go{% endif %}
-                            {% if not zip.zip_worthy %} {{ macros.warning(zip.format," zip not zip-worthy!") }} {% endif %}
-                            {% if zip.missing_encodes %} {{ macros.warning(zip.format," encodes missing!") }} {% endif %}
+                            {% if not zip.zip_worthy %} {{ macros.go_warning(zip.format," zip not zip-worthy!") }} {% endif %}
+                            {% if zip.missing_encodes %} {{ macros.go_warning(zip.format," encodes missing!") }} {% endif %}
                         </div>
                     {% endfor  %}
                     Tracks:
@@ -46,14 +52,14 @@
                         <div class="admin_track">
                             Title: {{ track.title }} <br />
                             Artist: {{ track.artist }} <br />
-                            Art: {% if track.art.exists %} {{ track.art.filename }} {% else %} {{ macros.warning('ART MISSING!') }} {% endif %} <br />
-                            Source: {% if track.source.exists %} {{ track.source.filename }} {% else %} {{ macros.warning('SOURCE MISSING!') }} {% endif %} <br />
-                            {% if not track.encode_worthy %} {{ macros.warning('NOT ENCODE WORTHY!') }} <br /> {% endif %}
+                            Art: {% if track.art.exists %} {{ track.art.filename }} {% else %} {{ macros.stop_warning('ART MISSING!') }} {% endif %} <br />
+                            Source: {% if track.source.exists %} {{ track.source.filename }} {% else %} {{ macros.stop_warning('SOURCE MISSING!') }} {% endif %} <br />
+                            {% if not track.encode_worthy %} {{ macros.stop_warning('NOT ENCODE WORTHY!') }} <br /> {% endif %}
                             Encodes:
                             {% for encode in track.encodes %}
                                 <div class="admin_encode">
-                                    {% if encode.exists %}{{ encode.format }} encode good to go{% endif %}
-                                    {% if not encode.exists %} {{ macros.warning(encode.format," encode missing!") }} {% endif %}
+                                    {% if encode.exists %} {{ macros.good_warning(encode.format," encode good to go.") }} {% endif %}
+                                    {% if not encode.exists %} {{ macros.go_warning(encode.format," encode missing!") }} {% endif %}
                                 </div>
                             {% endfor  %}
                         </div>
@@ -69,6 +75,12 @@
                     {% endfor %}
                 </div> <br />
             {% endfor %}
+            <div>
+                Red warnings above require editing albums and tracks in Wordpress. <br />
+                Orange warnings can be fixed by <button>create encodes and zips</button> <br />
+                Only green messages mean you are free to <button>Sync to store</button> <br />
+            </div>
+            <br /><br />
             <pre>{{ albums|print_r }}</pre>
         </div>
     </body>
