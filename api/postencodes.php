@@ -30,7 +30,8 @@ $content['encodes'] = array_map(function ($enc) {
 // adapted from http://www.lornajane.net/posts/2011/posting-json-data-with-php-curl
 $data_string = json_encode($content);
 
-putenv('REMOTE_ENCODE_SECRET_URL=http://192.168.59.103:81/?ak=testingtesting');
+$post_encodes_link = get_field('post_encodes_link', 'option');
+putenv('REMOTE_ENCODE_SECRET_URL='.$post_encodes_link);
 echo getenv('REMOTE_ENCODE_SECRET_URL');
 $ch = curl_init(getenv('REMOTE_ENCODE_SECRET_URL'));
 curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "POST");

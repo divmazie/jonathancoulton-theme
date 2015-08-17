@@ -43,6 +43,22 @@
             "maxlength": "",
             "readonly": 0,
             "disabled": 0
+        },
+        {
+            "key": "field_55d24b8ab4685",
+            "label": "Post encodes link",
+            "name": "post_encodes_link",
+            "type": "url",
+            "instructions": "Music admin page uses this to send encodes to a docker container.",
+            "required": 1,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "",
+                "class": "",
+                "id": ""
+            },
+            "default_value": "",
+            "placeholder": ""
         }
     ],
     "location": [
@@ -60,5 +76,7 @@
     "label_placement": "top",
     "instruction_placement": "label",
     "hide_on_screen": "",
-    "modified": 1437518730
+    "active": 1,
+    "description": "",
+    "modified": 1439845504
 }
