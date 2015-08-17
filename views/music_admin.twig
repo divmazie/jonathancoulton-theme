@@ -5,6 +5,22 @@
 {% include 'html-header.twig' %}
 	{% block head %}
     {% endblock %}
+    <style>
+        .admin_album, .admin_zip, .admin_track, .admin_encode, .admin_bonus {
+            margin-left: 20px;
+        }
+        .admin_album, .admin_track, .admin_bonus {
+            padding: 5px;
+        }
+        .admin_album {
+            margin-bottom: 20px;
+            background-color: #ddd;
+        }
+        .admin_track {
+            margin-bottom: 10px;
+            background-color: #bbb;
+        }
+    </style>
     </head>
 
     <body class="{{body_class}}" data-template="base.twig">
@@ -33,7 +49,7 @@
                             Art: {% if track.art.exists %} {{ track.art.filename }} {% else %} {{ macros.warning('ART MISSING!') }} {% endif %} <br />
                             Source: {% if track.source.exists %} {{ track.source.filename }} {% else %} {{ macros.warning('SOURCE MISSING!') }} {% endif %} <br />
                             {% if not track.encode_worthy %} {{ macros.warning('NOT ENCODE WORTHY!') }} <br /> {% endif %}
-                            Zips:
+                            Encodes:
                             {% for encode in track.encodes %}
                                 <div class="admin_encode">
                                     {% if encode.exists %}{{ encode.format }} encode good to go{% endif %}
@@ -43,7 +59,9 @@
                         </div>
                     {% endfor %}
                     Bonus assets:
-                    {% if album.bonus_assets|length == 0 %}<br /> No bunus assets. {% endif %}
+                    {% if album.bonus_assets|length == 0 %}
+                        <div class="admin_bonus">No bunus assets.</div>
+                    {% endif %}
                     {% for bonus in album.bonus_assets %}
                         <div class="admin_bonus">
                             Source: {% if bonus.exists %} {{ bonus.filename }} {% else %} {{ macros.warning('SOURCE MISSING!') }} {% endif %} <br />
