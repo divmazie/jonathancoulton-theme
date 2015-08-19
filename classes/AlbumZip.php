@@ -9,7 +9,7 @@
 namespace jct;
 
 
-class AlbumZip extends WordpressFileAsset {
+class AlbumZip extends KeyedWPAttachment {
 
     private $parentAlbum;
     // encode format === file extension!

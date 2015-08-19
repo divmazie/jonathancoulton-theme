@@ -48,6 +48,7 @@ curl_setopt($ch, CURLOPT_HTTPHEADER, [
 if ($_GET['verbose']) {
     echo "<pre>" . htmlentities(curl_exec($ch));
 } else {
+    curl_exec($ch);
     \header("Location: ".site_url()."/music_admin");
 }
 ?>

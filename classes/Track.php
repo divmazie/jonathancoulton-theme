@@ -28,8 +28,8 @@ class Track {
         $this->trackGenre = get_field('track_genre',$post_id);
         $this->trackYear = get_field('track_year',$post_id);
         $this->trackComment = get_field('track_comment',$post_id);
-        $this->trackArtObject = get_field('track_art',$post_id) ? new WordpressACFFile(get_field('track_art',$post_id)) : false;
-        $this->trackSourceFileObject = get_field('track_source',$post_id) ? new WordpressACFFile(get_field('track_source',$post_id)) : false;
+        $this->trackArtObject = get_field('track_art',$post_id) ? new WPAttachment(get_field('track_art',$post_id)) : false;
+        $this->trackSourceFileObject = get_field('track_source',$post_id) ? new WPAttachment(get_field('track_source',$post_id)) : false;
         $this->encode_types = include(get_template_directory().'/config/encode_types.php');
     }
 

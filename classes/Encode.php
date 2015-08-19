@@ -2,7 +2,7 @@
 
 namespace jct;
 
-class Encode extends WordpressFileAsset {
+class Encode extends KeyedWPAttachment {
 
     private $parentTrack;
     // encode format === file extension!

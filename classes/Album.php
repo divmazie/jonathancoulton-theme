@@ -26,12 +26,12 @@ class Album {
         $this->albumYear = get_field('album_year',$post_id);
         $this->albumGenre = get_field('album_genre',$post_id);
         $this->albumComment = get_field('album_comment',$post_id);
-        $this->albumArtObject = get_field('album_art',$post_id) ? new WordpressACFFile(get_field('album_art',$post_id)) : false;
+        $this->albumArtObject = get_field('album_art',$post_id) ? new WPAttachment(get_field('album_art',$post_id)) : false;
         $this->albumBonusAssetObjects = array();
         $bonus_asset_rows = get_field('bonus_assets',$post_id);
         if (is_array($bonus_asset_rows)) {
             foreach ($bonus_asset_rows as $row) {
-                $this->albumBonusAssetObjects[] = new WordpressACFFile($row['bonus_asset']);
+                $this->albumBonusAssetObjects[] = new WPAttachment($row['bonus_asset']);
             }
         }
         $this->albumShow = get_field('show_album_in_store',$post_id);
