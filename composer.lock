@@ -4,8 +4,46 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "3d7fce2bad06c5df4621c82d1affe0f7",
+    "hash": "334bd1f8a802a1b4b0ca89d91dbd9327",
     "packages": [
+        {
+            "name": "fetchapp/fetchapp",
+            "version": "dev-master",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/fetchapp/fetchapp-php-2.0.git",
+                "reference": "4d7b477c8e6f35018d1b79a0a7fb4b580da99b7a"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/fetchapp/fetchapp-php-2.0/zipball/4d7b477c8e6f35018d1b79a0a7fb4b580da99b7a",
+                "reference": "4d7b477c8e6f35018d1b79a0a7fb4b580da99b7a",
+                "shasum": ""
+            },
+            "type": "library",
+            "autoload": {
+                "psr-0": {
+                    "FetchApp": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "authors": [
+                {
+                    "name": "Brendon Dugan",
+                    "email": "wishingforayer@gmail.com"
+                },
+                {
+                    "name": "Patrick Conant",
+                    "email": "conantp@gmail.com"
+                },
+                {
+                    "name": "Michael Larkin",
+                    "email": "mjlarkin@gmail.com"
+                }
+            ],
+            "description": "A PHP library for access to version 2.0 of the FetchApp API",
+            "time": "2015-01-29 18:06:05"
+        },
         {
             "name": "tgmpa/tgm-plugin-activation",
             "version": "dev-master",
@@ -266,12 +304,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/jarednova/timber.git",
-                "reference": "dd42738879d35beab2d6ca0217ffc49ee194dc86"
+                "reference": "b58e356fab8e26fc608743205598e09c348b5d8c"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/jarednova/timber/zipball/dd42738879d35beab2d6ca0217ffc49ee194dc86",
-                "reference": "dd42738879d35beab2d6ca0217ffc49ee194dc86",
+                "url": "https://api.github.com/repos/jarednova/timber/zipball/b58e356fab8e26fc608743205598e09c348b5d8c",
+                "reference": "b58e356fab8e26fc608743205598e09c348b5d8c",
                 "shasum": ""
             },
             "require": {
@@ -282,7 +320,7 @@
                 "upstatement/routes": "0.3"
             },
             "require-dev": {
-                "evert/phpdoc-md": "~0.1.1",
+                "jarednova/markdowndocs": "dev-master",
                 "phpdocumentor/phpdocumentor": "2.*",
                 "phpunit/phpunit": "~4.0",
                 "satooshi/php-coveralls": "dev-master",
@@ -314,7 +352,7 @@
                 "timber",
                 "twig"
             ],
-            "time": "2015-07-21 20:58:55"
+            "time": "2015-08-18 20:28:40"
         },
         {
             "name": "twig/twig",
@@ -322,21 +360,25 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/twigphp/Twig.git",
-                "reference": "1ded65daeb8da1fb0d22016e53c2e7026557f040"
+                "reference": "d4aa0238c358aea7f40403d3d13d0b171f0ff07a"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/twigphp/Twig/zipball/1ded65daeb8da1fb0d22016e53c2e7026557f040",
-                "reference": "1ded65daeb8da1fb0d22016e53c2e7026557f040",
+                "url": "https://api.github.com/repos/twigphp/Twig/zipball/d4aa0238c358aea7f40403d3d13d0b171f0ff07a",
+                "reference": "d4aa0238c358aea7f40403d3d13d0b171f0ff07a",
                 "shasum": ""
             },
             "require": {
                 "php": ">=5.2.7"
             },
+            "require-dev": {
+                "symfony/debug": "~2.7",
+                "symfony/phpunit-bridge": "~2.7"
+            },
             "type": "library",
             "extra": {
                 "branch-alias": {
-                    "dev-master": "1.19-dev"
+                    "dev-master": "1.21-dev"
                 }
             },
             "autoload": {
@@ -371,7 +413,7 @@
             "keywords": [
                 "templating"
             ],
-            "time": "2015-07-05 08:50:23"
+            "time": "2015-08-18 13:28:19"
         },
         {
             "name": "upstatement/routes",
@@ -429,6 +471,7 @@
     "minimum-stability": "dev",
     "stability-flags": {
         "tgmpa/tgm-plugin-activation": 20,
+        "fetchapp/fetchapp": 20,
         "jarednova/timber": 20
     },
     "prefer-stable": false,
