@@ -5,7 +5,7 @@ namespace jct;
 class Album {
 
 
-    private $postID, $albumTitle, $albumArtist, $albumYear, $albumGenre, $albumComment, $albumArtObject, $albumBonusAssetObjects, $albumShow;
+    private $postID, $albumTitle, $albumArtist, $albumPrice, $albumYear, $albumGenre, $albumComment, $albumArtObject, $albumBonusAssetObjects, $albumShow;
     // the parent post object
     private $encode_types,$wpPost;
     //
@@ -23,6 +23,7 @@ class Album {
         $this->wpPost = $post;
         $this->albumTitle = $post->post_title;
         $this->albumArtist = get_field('album_artist',$post_id);
+        $this->albumPrice = get_field('album_price',$post_id);
         $this->albumYear = get_field('album_year',$post_id);
         $this->albumGenre = get_field('album_genre',$post_id);
         $this->albumComment = get_field('album_comment',$post_id);
@@ -141,6 +142,10 @@ class Album {
      */
     public function getAlbumArtist() {
         return $this->albumArtist;
+    }
+
+    public function getAlbumPrice() {
+        return abs(intval($this->albumPrice));
     }
 
     /**

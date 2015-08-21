@@ -18,9 +18,7 @@
             "post_type": [
                 "album"
             ],
-            "taxonomy": [
-
-            ],
+            "taxonomy": [],
             "allow_null": 0,
             "multiple": 0,
             "return_format": "object",
@@ -63,6 +61,29 @@
             "prepend": "",
             "append": "",
             "min": "",
+            "max": "",
+            "step": "",
+            "readonly": 0,
+            "disabled": 0
+        },
+        {
+            "key": "field_55d7846ae775a",
+            "label": "Track price",
+            "name": "track_price",
+            "type": "number",
+            "instructions": "",
+            "required": 1,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "",
+                "class": "",
+                "id": ""
+            },
+            "default_value": 1,
+            "placeholder": "",
+            "prepend": "$",
+            "append": "",
+            "min": 0,
             "max": "",
             "step": "",
             "readonly": 0,
@@ -177,6 +198,29 @@
             "maxlength": "",
             "readonly": 0,
             "disabled": 0
+        },
+        {
+            "key": "field_55d7846ae775a",
+            "label": "Track price",
+            "name": "track_price",
+            "type": "number",
+            "instructions": "",
+            "required": 1,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "",
+                "class": "",
+                "id": ""
+            },
+            "default_value": 1,
+            "placeholder": "",
+            "prepend": "",
+            "append": "",
+            "min": "",
+            "max": "",
+            "step": "",
+            "readonly": 0,
+            "disabled": 0
         }
     ],
     "location": [
@@ -210,5 +254,7 @@
         "tags",
         "send-trackbacks"
     ],
-    "modified": 1438972003
+    "active": 1,
+    "description": "",
+    "modified": 1440187739
 }

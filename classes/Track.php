@@ -4,7 +4,7 @@ namespace jct;
 
 class Track {
 
-    private $postID, $trackNumber, $trackTitle, $trackArtist, $trackGenre, $trackYear, $trackComment, $trackArtObject, $trackSourceFileObject;
+    private $postID, $trackNumber, $trackPrice, $trackTitle, $trackArtist, $trackGenre, $trackYear, $trackComment, $trackArtObject, $trackSourceFileObject;
     private $wpPost, $encode_types;
     private $parentAlbum;
 
@@ -24,6 +24,7 @@ class Track {
         $this->parentAlbum = $parentAlbum;
         $this->trackTitle = $post->post_title;
         $this->trackNumber = get_field('track_number',$post_id);
+        $this->trackPrice = get_field('track_price',$post_id);
         $this->trackArtist = get_field('track_artist',$post_id);
         $this->trackGenre = get_field('track_genre',$post_id);
         $this->trackYear = get_field('track_year',$post_id);
@@ -100,6 +101,10 @@ class Track {
      */
     public function getTrackNumber() {
         return abs(intval($this->trackNumber));
+    }
+
+    public function getTrackPrice() {
+        return abs(intval($this->trackPrice));
     }
 
 

@@ -3,12 +3,35 @@
     "title": "Album",
     "fields": [
         {
+            "key": "field_55d784dacfb6d",
+            "label": "Album price",
+            "name": "album_price",
+            "type": "number",
+            "instructions": "",
+            "required": 0,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "",
+                "class": "",
+                "id": ""
+            },
+            "default_value": 10,
+            "placeholder": "",
+            "prepend": "$",
+            "append": "",
+            "min": 0,
+            "max": "",
+            "step": "",
+            "readonly": 0,
+            "disabled": 0
+        },
+        {
             "key": "field_55b27a8ab7b2b",
             "label": "Album artist",
             "name": "album_artist",
             "type": "text",
             "instructions": "",
-            "required": 0,
+            "required": 1,
             "conditional_logic": 0,
             "wrapper": {
                 "width": "",
@@ -201,5 +224,5 @@
     ],
     "active": 1,
     "description": "",
-    "modified": 1439483064
+    "modified": 1440187700
 }
