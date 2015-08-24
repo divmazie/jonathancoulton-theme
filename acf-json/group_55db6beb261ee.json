@@ -1,0 +1,54 @@
+{
+    "key": "group_55db6beb261ee",
+    "title": "Showecase Tile",
+    "fields": [
+        {
+            "key": "field_55db6c10079c2",
+            "label": "Background color",
+            "name": "background_color",
+            "type": "color_picker",
+            "instructions": "",
+            "required": 0,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "",
+                "class": "",
+                "id": ""
+            },
+            "default_value": "#6795EF"
+        },
+        {
+            "key": "field_55db6da044958",
+            "label": "Bottom border color",
+            "name": "bottom_border_color",
+            "type": "color_picker",
+            "instructions": "Leave blank for no bottom border.",
+            "required": 0,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "",
+                "class": "",
+                "id": ""
+            },
+            "default_value": ""
+        }
+    ],
+    "location": [
+        [
+            {
+                "param": "post_type",
+                "operator": "==",
+                "value": "showcase_tile"
+            }
+        ]
+    ],
+    "menu_order": 0,
+    "position": "normal",
+    "style": "seamless",
+    "label_placement": "top",
+    "instruction_placement": "label",
+    "hide_on_screen": "",
+    "active": 1,
+    "description": "",
+    "modified": 1440444221
+}
