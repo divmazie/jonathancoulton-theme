@@ -26,22 +26,26 @@ add_action( 'tgmpa_register', function() {
     $plugins = array(
 
         array(
-            'name'      => 'Timber',
-            'slug'      => 'timber-library',
+            'name' => 'Timber',
+            'slug' => 'timber-library',
         ),
         array(
-            'name'      => 'Post Types Order',
-            'slug'      => 'post-types-order',
+            'name' => 'Post Types Order',
+            'slug' => 'post-types-order',
         ),
         array(
-            'name'      => 'Disable Google Fonts',
-            'slug'      => 'disable-google-fonts',
+            'name' => 'Disable Google Fonts',
+            'slug' => 'disable-google-fonts',
         ),
         array(
-            'name'      => 'ACF',
-            'slug'      => 'advanced-custom-fields-pro',
-            'source'    => 'http://connect.advancedcustomfields.com/index.php?p=pro&a=download&k=b3JkZXJfaWQ9Mzc1MDd8dHlwZT1kZXZlbG9wZXJ8ZGF0ZT0yMDE0LTA4LTE2IDE5OjM0OjI3'
+            'name' => 'ACF',
+            'slug' => 'advanced-custom-fields-pro',
+            'source' => 'http://connect.advancedcustomfields.com/index.php?p=pro&a=download&k=b3JkZXJfaWQ9Mzc1MDd8dHlwZT1kZXZlbG9wZXJ8ZGF0ZT0yMDE0LTA4LTE2IDE5OjM0OjI3'
         ),
+        //array(
+            //'name'      => 'ACF: Google Font Selector',
+            //'slug'      => 'acf-google-font-selector-field'
+        //)
     );
 
     /*
