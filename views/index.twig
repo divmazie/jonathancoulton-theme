@@ -29,12 +29,10 @@
 		<div>
 			{% if twitter.tweets %}
 				{% for tweet in twitter.tweets %}
-					{{ tweet.text }}
-					<br />
-					<a href="{{ tweet.url }}" target="_blank">{{ tweet.ago }} ago</a>
-					<br /><br />
+					<div class="tweet_text">{{ tweet.text }}</div>
+					<a href="{{ tweet.url }}" target="_blank" class="tweet_link">{{ tweet.ago }} ago</a> <br />
 				{% endfor %}
-				<a href="{{ twitter.url }}" target="_blank">@{{ twitter.handle }}</a>
+				<a href="{{ twitter.url }}" target="_blank" class="twitter_link">@{{ twitter.handle }}</a>
 			{% endif %}
 		</div>
 		<!--<div><script type="text/javascript" src="https://cashmusic.org/public/cashmusic.js"></script><script type="text/javascript"> window.cashmusic.embed('https://cashmusic.org/public','6959');</script></div>-->
