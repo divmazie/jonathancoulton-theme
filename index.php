@@ -20,6 +20,8 @@ if ( ! class_exists( 'Timber' ) ) {
 $context = Timber::get_context();
 $context['post'] = new TimberPost();
 $context['showcase_tiles'] = Timber::get_posts('post_type=showcase_tile');
+$twitter = include_once(get_template_directory().'/config/twitter.php');
+$context['twitter'] = $twitter;
 $context['foo'] = 'bar';
 $templates = array( 'index.twig' );
 if ( is_home() ) {

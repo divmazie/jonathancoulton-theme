@@ -59,6 +59,69 @@
             },
             "default_value": "",
             "placeholder": ""
+        },
+        {
+            "key": "field_55dccb46edf9b",
+            "label": "Twitter consumer key",
+            "name": "twitter_consumer_key",
+            "type": "text",
+            "instructions": "See https:\/\/dev.twitter.com\/oauth\/overview",
+            "required": 1,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "",
+                "class": "",
+                "id": ""
+            },
+            "default_value": "",
+            "placeholder": "",
+            "prepend": "",
+            "append": "",
+            "maxlength": "",
+            "readonly": 0,
+            "disabled": 0
+        },
+        {
+            "key": "field_55dccbc2edf9c",
+            "label": "Twitter consumer secret",
+            "name": "twitter_consumer_secret",
+            "type": "text",
+            "instructions": "See https:\/\/dev.twitter.com\/oauth\/overview",
+            "required": 1,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "",
+                "class": "",
+                "id": ""
+            },
+            "default_value": "",
+            "placeholder": "",
+            "prepend": "",
+            "append": "",
+            "maxlength": "",
+            "readonly": 0,
+            "disabled": 0
+        },
+        {
+            "key": "field_55dcccc551829",
+            "label": "Twitter handle",
+            "name": "twitter_handle",
+            "type": "text",
+            "instructions": "",
+            "required": 1,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "",
+                "class": "",
+                "id": ""
+            },
+            "default_value": "jonathancoulton",
+            "placeholder": "",
+            "prepend": "",
+            "append": "",
+            "maxlength": "",
+            "readonly": 0,
+            "disabled": 0
         }
     ],
     "location": [
@@ -78,5 +141,5 @@
     "hide_on_screen": "",
     "active": 1,
     "description": "",
-    "modified": 1439845504
+    "modified": 1440533718
 }

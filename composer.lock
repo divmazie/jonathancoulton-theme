@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "334bd1f8a802a1b4b0ca89d91dbd9327",
+    "hash": "1b47e9467ca0287d8d317649bdcab805",
     "packages": [
         {
             "name": "fetchapp/fetchapp",
@@ -43,6 +43,54 @@
             ],
             "description": "A PHP library for access to version 2.0 of the FetchApp API",
             "time": "2015-01-29 18:06:05"
+        },
+        {
+            "name": "ricardoper/twitteroauth",
+            "version": "2.x-dev",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/ricardoper/TwitterOAuth.git",
+                "reference": "cc2e36233c1e20124866a0f639df230d47560bd8"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/ricardoper/TwitterOAuth/zipball/cc2e36233c1e20124866a0f639df230d47560bd8",
+                "reference": "cc2e36233c1e20124866a0f639df230d47560bd8",
+                "shasum": ""
+            },
+            "require": {
+                "ext-curl": "*",
+                "ext-json": "*",
+                "lib-curl": "*",
+                "lib-openssl": "*",
+                "php": ">=5.3"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "TwitterOAuth\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Ricardo Pereira",
+                    "email": "github@ricardopereira.es",
+                    "homepage": "http://ricardopereira.es"
+                }
+            ],
+            "description": "PHP library to communicate with Twitter OAuth API version 1.1",
+            "homepage": "https://github.com/ricardoper",
+            "keywords": [
+                "API v1.1",
+                "oauth",
+                "php",
+                "twitter"
+            ],
+            "time": "2015-07-06 15:18:51"
         },
         {
             "name": "tgmpa/tgm-plugin-activation",
@@ -304,12 +352,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/jarednova/timber.git",
-                "reference": "b58e356fab8e26fc608743205598e09c348b5d8c"
+                "reference": "79d1d150543b3188a921402c82315a98013fc6b4"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/jarednova/timber/zipball/b58e356fab8e26fc608743205598e09c348b5d8c",
-                "reference": "b58e356fab8e26fc608743205598e09c348b5d8c",
+                "url": "https://api.github.com/repos/jarednova/timber/zipball/79d1d150543b3188a921402c82315a98013fc6b4",
+                "reference": "79d1d150543b3188a921402c82315a98013fc6b4",
                 "shasum": ""
             },
             "require": {
@@ -352,7 +400,7 @@
                 "timber",
                 "twig"
             ],
-            "time": "2015-08-18 20:28:40"
+            "time": "2015-08-25 03:54:49"
         },
         {
             "name": "twig/twig",
@@ -360,12 +408,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/twigphp/Twig.git",
-                "reference": "d4aa0238c358aea7f40403d3d13d0b171f0ff07a"
+                "reference": "71b4dc2572eb822552e394a254a7bdf16be15448"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/twigphp/Twig/zipball/d4aa0238c358aea7f40403d3d13d0b171f0ff07a",
-                "reference": "d4aa0238c358aea7f40403d3d13d0b171f0ff07a",
+                "url": "https://api.github.com/repos/twigphp/Twig/zipball/71b4dc2572eb822552e394a254a7bdf16be15448",
+                "reference": "71b4dc2572eb822552e394a254a7bdf16be15448",
                 "shasum": ""
             },
             "require": {
@@ -413,7 +461,7 @@
             "keywords": [
                 "templating"
             ],
-            "time": "2015-08-18 13:28:19"
+            "time": "2015-08-24 09:58:37"
         },
         {
             "name": "upstatement/routes",
