@@ -3,6 +3,22 @@
     "title": "Showecase Tile",
     "fields": [
         {
+            "key": "field_55dcd4ece842e",
+            "label": "Tile link",
+            "name": "tile_link",
+            "type": "url",
+            "instructions": "Link to thing you are promoting.",
+            "required": 1,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "",
+                "class": "",
+                "id": ""
+            },
+            "default_value": "",
+            "placeholder": ""
+        },
+        {
             "key": "field_55db6c10079c2",
             "label": "Background color",
             "name": "background_color",
@@ -47,8 +63,22 @@
     "style": "seamless",
     "label_placement": "top",
     "instruction_placement": "label",
-    "hide_on_screen": "",
+    "hide_on_screen": [
+        "permalink",
+        "excerpt",
+        "custom_fields",
+        "discussion",
+        "comments",
+        "revisions",
+        "slug",
+        "author",
+        "format",
+        "page_attributes",
+        "categories",
+        "tags",
+        "send-trackbacks"
+    ],
     "active": 1,
     "description": "",
-    "modified": 1440446631
+    "modified": 1440536070
 }
