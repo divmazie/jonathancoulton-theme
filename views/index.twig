@@ -5,7 +5,7 @@
 		<div data-slick='{"slidesToShow": 4, "slidesToScroll": 1}' class="slick-element showcase_tiles">
 			{% for tile in showcase_tiles %}
 				<div class="showcase_tile">
-					<a href="{{ tile.tile_link }}">
+					{% if tile.tile_link %}<a href="{{ tile.tile_link }}">{% endif %}
 						<div class="joco-promo" style="
 								{% if tile.background_color %}background-color: {{ tile.background_color }};{% endif %}
 								{% if tile.bottom_border_color %}border-bottom: solid 10px {{ tile.bottom_border_color }};{% endif %}
@@ -13,11 +13,13 @@
 							{% if tile.thumbnail %}
 								<img src="{{ tile.thumbnail.src }}" class="promo-image" />
 							{% else %}
-								<h2>{{ tile.title }}</h2>
-								<p>{{ tile.post_content }}</p>
+								<div class="promo-text">
+									<h2 class="{{ tile.header_font }}"{% if tile.header_color %} style="color: {{ tile.header_color }}"{% endif %}>{{ tile.title }}</h2>
+									<p class="{{ tile.body_font }}"{% if tile.body_color %} style="color: {{ tile.body_color }}"{% endif %}>{{ tile.post_content }}</p>
+								</div>
 							{% endif %}
 						</div>
-					</a>
+					{% if tile.tile_link %}</a>{% endif %}
 				</div>
 			{% endfor %}
 		</div>

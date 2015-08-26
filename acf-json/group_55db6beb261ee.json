@@ -7,8 +7,8 @@
             "label": "Tile link",
             "name": "tile_link",
             "type": "url",
-            "instructions": "Link to thing you are promoting.",
-            "required": 1,
+            "instructions": "Whole tile will be link if this field in not blank, will over-ride any links within the body of the tile.",
+            "required": 0,
             "conditional_logic": 0,
             "wrapper": {
                 "width": "",
@@ -47,6 +47,94 @@
                 "id": ""
             },
             "default_value": ""
+        },
+        {
+            "key": "field_55de338257468",
+            "label": "Header color",
+            "name": "header_color",
+            "type": "color_picker",
+            "instructions": "",
+            "required": 0,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "",
+                "class": "",
+                "id": ""
+            },
+            "default_value": ""
+        },
+        {
+            "key": "field_55de3126aa3ad",
+            "label": "Header font",
+            "name": "header_font",
+            "type": "select",
+            "instructions": "",
+            "required": 0,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "",
+                "class": "",
+                "id": ""
+            },
+            "choices": {
+                "promo_default": "Default",
+                "promo_serif": "Serif",
+                "promo_fixed": "Fixed-width"
+            },
+            "default_value": {
+                "promo_default": "promo_default"
+            },
+            "allow_null": 0,
+            "multiple": 0,
+            "ui": 0,
+            "ajax": 0,
+            "placeholder": "",
+            "disabled": 0,
+            "readonly": 0
+        },
+        {
+            "key": "field_55de339357469",
+            "label": "Body color",
+            "name": "body_color",
+            "type": "color_picker",
+            "instructions": "",
+            "required": 0,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "",
+                "class": "",
+                "id": ""
+            },
+            "default_value": ""
+        },
+        {
+            "key": "field_55de3330df0e7",
+            "label": "Body font",
+            "name": "body_font",
+            "type": "select",
+            "instructions": "",
+            "required": 0,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "",
+                "class": "",
+                "id": ""
+            },
+            "choices": {
+                "promo_default": "Default",
+                "promo_serif": "Serif",
+                "promo_fixed": "Fixed-width"
+            },
+            "default_value": {
+                "promo_default": "promo_default"
+            },
+            "allow_null": 0,
+            "multiple": 0,
+            "ui": 0,
+            "ajax": 0,
+            "placeholder": "",
+            "disabled": 0,
+            "readonly": 0
         }
     ],
     "location": [
@@ -80,5 +168,5 @@
     ],
     "active": 1,
     "description": "",
-    "modified": 1440536070
+    "modified": 1440625674
 }
