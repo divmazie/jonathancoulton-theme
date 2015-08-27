@@ -1,44 +1,52 @@
 {% extends "base.twig" %}
 
 {% block content %}
-	<div class="col-xs-12">
-		<div data-slick='{"slidesToShow": 4, "slidesToScroll": 1}' class="slick-element showcase_tiles">
-			{% for tile in showcase_tiles %}
-				<div class="showcase_tile">
-					{% if tile.tile_link %}<a href="{{ tile.tile_link }}">{% endif %}
-						<div class="joco-promo" style="
-								{% if tile.background_color %}background-color: {{ tile.background_color }};{% endif %}
-								{% if tile.bottom_border_color %}border-bottom: solid 10px {{ tile.bottom_border_color }};{% endif %}
-								">
-							{% if tile.thumbnail %}
-								<img src="{{ tile.thumbnail.src }}" class="promo-image" />
-							{% else %}
-								<div class="promo-text">
-									<h2 class="{{ tile.header_font }}"{% if tile.header_color %} style="color: {{ tile.header_color }}"{% endif %}>{{ tile.title }}</h2>
-									<p class="{{ tile.body_font }}"{% if tile.body_color %} style="color: {{ tile.body_color }}"{% endif %}>{{ tile.post_content }}</p>
-								</div>
-							{% endif %}
-						</div>
-					{% if tile.tile_link %}</a>{% endif %}
-				</div>
-			{% endfor %}
-		</div>
-	</div>
-	<div class="col-xs-12 col-sm-8">
-		{% include ['tease-'~post.post_type~'.twig', 'tease.twig'] %}
-	</div>
-	<div class="hidden-xs col-sm-4">
-		<div>
-			{% if twitter.tweets %}
-				{% for tweet in twitter.tweets %}
-					<div class="tweet_text">{{ tweet.text }}</div>
-					<a href="{{ tweet.url }}" target="_blank" class="tweet_link">{{ tweet.ago }} ago</a> <br />
+	<div class="container top_content">
+		<div class="col-xs-12">
+			<div data-slick='{"slidesToShow": 4, "slidesToScroll": 1}' class="slick-element showcase_tiles">
+				{% for tile in showcase_tiles %}
+					<div class="showcase_tile">
+						{% if tile.tile_link %}<a href="{{ tile.tile_link }}">{% endif %}
+							<div class="joco-promo" style="
+									{% if tile.background_color %}background-color: {{ tile.background_color }};{% endif %}
+									{% if tile.bottom_border_color %}border-bottom: solid 10px {{ tile.bottom_border_color }};{% endif %}
+									">
+								{% if tile.thumbnail %}
+									<img src="{{ tile.thumbnail.src }}" class="promo-image" />
+								{% else %}
+									<div class="promo-text">
+										<h2 class="{{ tile.header_font }}"{% if tile.header_color %} style="color: {{ tile.header_color }}"{% endif %}>{{ tile.title }}</h2>
+										<p class="{{ tile.body_font }}"{% if tile.body_color %} style="color: {{ tile.body_color }}"{% endif %}>{{ tile.post_content }}</p>
+									</div>
+								{% endif %}
+							</div>
+						{% if tile.tile_link %}</a>{% endif %}
+					</div>
 				{% endfor %}
-				<a href="{{ twitter.url }}" target="_blank" class="twitter_link">@{{ twitter.handle }}</a>
-			{% endif %}
+			</div>
 		</div>
-		<!--<div><script type="text/javascript" src="https://cashmusic.org/public/cashmusic.js"></script><script type="text/javascript"> window.cashmusic.embed('https://cashmusic.org/public','6959');</script></div>-->
-		<div>Social media links</div>
+		<div class="col-xs-12 col-sm-8">
+			{% include ['tease-'~post.post_type~'.twig', 'tease.twig'] %}
+		</div>
+		<div class="hidden-xs col-sm-4">
+			<div class="twitter">
+				{% if twitter.tweets %}
+					{% for tweet in twitter.tweets %}
+						<div class="tweet_text">{{ tweet.text }}</div>
+						<a href="{{ tweet.url }}" target="_blank" class="tweet_link">{{ tweet.ago }} ago</a>
+					{% endfor %}
+					<a href="{{ twitter.url }}" target="_blank" class="twitter_link">@{{ twitter.handle }}</a>
+				{% endif %}
+			</div>
+			<!--<div><script type="text/javascript" src="https://cashmusic.org/public/cashmusic.js"></script><script type="text/javascript"> window.cashmusic.embed('https://cashmusic.org/public','6959');</script></div>-->
+			<div>Social media links</div>
+		</div>
+		<div class="clearfix"></div>
 	</div>
-	<div class="clearfix"></div>
+	<div class="light_content">
+		<div class="container">
+			<h1>In 2005 I left my day job...</h1>
+			<p>To keep myself busy I released...</p>
+		</div>
+	</div>
 {% endblock %}

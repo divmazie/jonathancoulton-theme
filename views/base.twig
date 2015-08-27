@@ -7,10 +7,10 @@
 {% endblock %}
 
 	<body class="{{body_class}}" data-template="base.twig">
-		<div class="container">
+		<div class="container-fluid">
 		<header class="header" >
 			{% block header %}
-				<div class="wrapper">
+				<div class="container">
 					<h1 class="hdr-logo" role="banner">
 						<a class="hdr-logo-link" href="{{ site.url }}" rel="home">{{site.name}}</a>
 					</h1>
@@ -52,17 +52,19 @@
 		</section>
 
 		{% block footer %}
-			<div class="col-xs-12 col-sm-4">
-				<h4>{{ theme_options.footer_left_header }}</h4>
-				<p>{{ theme_options.footer_left_text }}</p>
+			<div class="container">
+				<div class="col-xs-12 col-sm-4">
+					<h4>{{ theme_options.footer_left_header }}</h4>
+					<p>{{ theme_options.footer_left_text }}</p>
+				</div>
+				<div class="col-xs-12 col-sm-4">Search area</div>
+				<div class="col-xs-12 col-sm-4">Basic contact info</div>
+				<div class="clearfix"></div>
+				<footer id="footer">
+					{% include 'footer.twig' %}
+				</footer>
+				{{ function('wp_footer') }}
 			</div>
-			<div class="col-xs-12 col-sm-4">Search area</div>
-			<div class="col-xs-12 col-sm-4">Basic contact info</div>
-			<div class="clearfix"></div>
-			<footer id="footer">
-				{% include 'footer.twig' %}
-			</footer>
-			{{ function('wp_footer') }}
 		{% endblock %}
 		</div>
 	</body>
