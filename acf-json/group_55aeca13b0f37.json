@@ -3,6 +3,22 @@
     "title": "Theme options",
     "fields": [
         {
+            "key": "field_55df763b93c26",
+            "label": "Displayed content",
+            "name": "",
+            "type": "tab",
+            "instructions": "",
+            "required": 0,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "",
+                "class": "",
+                "id": ""
+            },
+            "placement": "top",
+            "endpoint": 1
+        },
+        {
             "key": "field_55aeca2c038c7",
             "label": "Footer left header",
             "name": "footer_left_header",
@@ -45,6 +61,96 @@
             "disabled": 0
         },
         {
+            "key": "field_55df765a93c27",
+            "label": "Social Media Connections",
+            "name": "",
+            "type": "tab",
+            "instructions": "",
+            "required": 0,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "",
+                "class": "",
+                "id": ""
+            },
+            "placement": "top",
+            "endpoint": 1
+        },
+        {
+            "key": "field_55dcccc551829",
+            "label": "Twitter handle",
+            "name": "twitter_handle",
+            "type": "text",
+            "instructions": "",
+            "required": 1,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "",
+                "class": "",
+                "id": ""
+            },
+            "default_value": "jonathancoulton",
+            "placeholder": "",
+            "prepend": "",
+            "append": "",
+            "maxlength": "",
+            "readonly": 0,
+            "disabled": 0
+        },
+        {
+            "key": "field_55df773904cde",
+            "label": "Instagram handle",
+            "name": "instagram_handle",
+            "type": "text",
+            "instructions": "",
+            "required": 0,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "",
+                "class": "",
+                "id": ""
+            },
+            "default_value": "realjonathancoulton",
+            "placeholder": "",
+            "prepend": "",
+            "append": "",
+            "maxlength": "",
+            "readonly": 0,
+            "disabled": 0
+        },
+        {
+            "key": "field_55df77d04a165",
+            "label": "Facebook link",
+            "name": "facebook_link",
+            "type": "url",
+            "instructions": "",
+            "required": 0,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "",
+                "class": "",
+                "id": ""
+            },
+            "default_value": "https:\/\/www.facebook.com\/jonathancoultonofficial",
+            "placeholder": ""
+        },
+        {
+            "key": "field_55df75c393c25",
+            "label": "APIs",
+            "name": "",
+            "type": "tab",
+            "instructions": "",
+            "required": 0,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "",
+                "class": "",
+                "id": ""
+            },
+            "placement": "top",
+            "endpoint": 1
+        },
+        {
             "key": "field_55d24b8ab4685",
             "label": "Post encodes link",
             "name": "post_encodes_link",
@@ -59,27 +165,6 @@
             },
             "default_value": "",
             "placeholder": ""
-        },
-        {
-            "key": "field_55dccb46edf9b",
-            "label": "Twitter consumer key",
-            "name": "twitter_consumer_key",
-            "type": "text",
-            "instructions": "See https:\/\/dev.twitter.com\/oauth\/overview",
-            "required": 1,
-            "conditional_logic": 0,
-            "wrapper": {
-                "width": "",
-                "class": "",
-                "id": ""
-            },
-            "default_value": "",
-            "placeholder": "",
-            "prepend": "",
-            "append": "",
-            "maxlength": "",
-            "readonly": 0,
-            "disabled": 0
         },
         {
             "key": "field_55dccbc2edf9c",
@@ -103,11 +188,11 @@
             "disabled": 0
         },
         {
-            "key": "field_55dcccc551829",
-            "label": "Twitter handle",
-            "name": "twitter_handle",
+            "key": "field_55dccb46edf9b",
+            "label": "Twitter consumer key",
+            "name": "twitter_consumer_key",
             "type": "text",
-            "instructions": "",
+            "instructions": "See https:\/\/dev.twitter.com\/oauth\/overview",
             "required": 1,
             "conditional_logic": 0,
             "wrapper": {
@@ -115,7 +200,7 @@
                 "class": "",
                 "id": ""
             },
-            "default_value": "jonathancoulton",
+            "default_value": "",
             "placeholder": "",
             "prepend": "",
             "append": "",
@@ -141,5 +226,5 @@
     "hide_on_screen": "",
     "active": 1,
     "description": "",
-    "modified": 1440533718
+    "modified": 1440708600
 }

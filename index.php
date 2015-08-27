@@ -22,6 +22,8 @@ $context['post'] = new TimberPost();
 $context['showcase_tiles'] = Timber::get_posts('post_type=showcase_tile');
 $twitter = include_once(get_template_directory().'/config/twitter.php');
 $context['twitter'] = $twitter;
+$context['instagram_handle'] = get_field('instagram_handle','options');
+$context['facebook_link'] = get_field('facebook_link','options');
 $context['foo'] = 'bar';
 $templates = array( 'index.twig' );
 if ( is_home() ) {

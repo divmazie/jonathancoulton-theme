@@ -29,7 +29,8 @@
 			{% include ['tease-'~post.post_type~'.twig', 'tease.twig'] %}
 		</div>
 		<div class="hidden-xs col-sm-4">
-			<div class="twitter">
+			<div class="side_box twitter">
+				<h4>Previously, on Twitter</h4>
 				{% if twitter.tweets %}
 					{% for tweet in twitter.tweets %}
 						<div class="tweet_text">{{ tweet.text }}</div>
@@ -38,8 +39,17 @@
 					<a href="{{ twitter.url }}" target="_blank" class="twitter_link">@{{ twitter.handle }}</a>
 				{% endif %}
 			</div>
+			<div class="side_box instagram">
+				<h4>On Instagram</h4>
+				[content]
+			</div>
 			<!--<div><script type="text/javascript" src="https://cashmusic.org/public/cashmusic.js"></script><script type="text/javascript"> window.cashmusic.embed('https://cashmusic.org/public','6959');</script></div>-->
-			<div>Social media links</div>
+			<div class="side_box social_media">
+				<h4>Follow Jonathan</h4>
+				{% if twitter.url %}<a href="{{ twitter.url }}" target="_blank">Twitter</a>{% endif %}
+				{% if instagram_handle %}<a href="https://instagram.com/{{ instagram_handle }}" target="_blank">Instagram</a>{% endif %}
+				{% if facebook_link %}<a href="{{ facebook_link }}" target="_blank">Facebook</a>{% endif %}
+			</div>
 		</div>
 		<div class="clearfix"></div>
 	</div>
