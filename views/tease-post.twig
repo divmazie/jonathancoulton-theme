@@ -2,8 +2,27 @@
 
 {% block content %}
 	<h2 class="h2"><a href="{{post.link}}">{{post.title}}</a></h2>
-		<p>{{post.get_preview(25)}}</p>
+		<p>{{post.get_preview(250,false,'<br /><br />(click here to read more)',false)}}</p>
 		{% if post.thumbnail.src %}
 			<img src="{{post.thumbnail.src}}" />
 		{% endif %}
+	<div class="post_info">
+		<div class="col-xs-4">
+			<div class="post_date">{{ post.date }}</div>
+			<div class="post_author_name">{{ post.author.name }}</div>
+		</div>
+		<div class="col-xs-3">
+			<div class="post_comment_link">
+				<a href="{{ post.link }}#comments">{{ post.comment_count }} comments</a>
+			</div>
+		</div>
+		<div class="col-xs-5">
+			<div class="post_share">
+				Share:
+				<a href="http://twitter.com/share?text='{{ post.title }}' from @jonathancoulton&url={{ post.link }}" target="_blank">Tweet</a>
+				<a href="https://www.facebook.com/sharer/sharer.php?u={{ post.link }}">Facebook</a> <!--Must implement OG tags for more info-->
+			</div>
+		</div>
+	</div>
+	<div class="clearfix"></div>
 {% endblock %}

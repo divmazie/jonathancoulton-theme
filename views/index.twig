@@ -25,7 +25,7 @@
 		</div>
 	</div>
 	<div class="col-xs-12 col-sm-8">
-		{% include 'full_article.twig' %}
+		{% include ['tease-'~post.post_type~'.twig', 'tease.twig'] %}
 	</div>
 	<div class="hidden-xs col-sm-4">
 		<div>
