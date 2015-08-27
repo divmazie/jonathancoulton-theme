@@ -42,6 +42,10 @@ add_action( 'tgmpa_register', function() {
             'slug' => 'advanced-custom-fields-pro',
             'source' => 'http://connect.advancedcustomfields.com/index.php?p=pro&a=download&k=b3JkZXJfaWQ9Mzc1MDd8dHlwZT1kZXZlbG9wZXJ8ZGF0ZT0yMDE0LTA4LTE2IDE5OjM0OjI3'
         ),
+        array(
+            'name' => 'Tour Dates',
+            'slug' => 'bandsintown'
+        )
         //array(
             //'name'      => 'ACF: Google Font Selector',
             //'slug'      => 'acf-google-font-selector-field'

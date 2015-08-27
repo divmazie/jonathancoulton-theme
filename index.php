@@ -31,4 +31,9 @@ $templates = array( 'index.twig' );
 if ( is_home() ) {
 	array_unshift( $templates, 'home.twig' );
 }
+ob_start();
+the_bandsintown_events(array('artist' => 'Jonathan Coulton', 'display_limit' => 10));
+$bandsintown = ob_get_contents();
+ob_end_clean();
+$context['bandsintown'] = $bandsintown;
 Timber::render( $templates, $context );
