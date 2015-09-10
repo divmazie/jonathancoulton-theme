@@ -67,9 +67,13 @@
 	<div class="light_content">
 		<div class="container">
 			<h2>Upcoming shows</h2>
-			{{ bandsintown }}
-			<!--<script type='text/javascript' src='http://www.bandsintown.com/javascripts/bit_widget.js'></script>
-			<a href='http://www.bandsintown.com' class='bit-widget-initializer' data-artist='jonathancoulton' data-display-limit="6" data-notify-me="false">Bandsintown<a>-->
+			{% for show in bandsintown|slice(0,6) %}
+				<div class="col-sm-2 col-sm-offset-1"><a href="{{ show.url }}">{{ show.datetime|date("M j") }}</a></div>
+				<div class="col-sm-6"><a href="{{ show.venue.url }}">
+					<!--Cute way of adding an "I'm feeling lucky" link for the venue: <a href="http://www.google.com/search?q={{ show.venue.name|url_encode }}+{{ show.venue.city|url_encode }}+{{ show.venue.region|url_encode }}&btnI=1">-->
+						{{ show.venue.name }}<br />{{ show.venue.city }}, {{ show.venue.region }}</a></div>
+				<div class="col-xs-2"><a href="{{ show.ticket_url }}">Tickets {{ show.ticket_status }}</a> </div>
+			{% endfor %}
 		</div>
 	</div>
 {% endblock %}

@@ -32,9 +32,14 @@ $templates = array( 'index.twig' );
 if ( is_home() ) {
 	array_unshift( $templates, 'home.twig' );
 }
-ob_start();
-the_bandsintown_events(array('artist' => 'Jonathan Coulton', 'display_limit' => 10));
-$bandsintown = ob_get_contents();
-ob_end_clean();
+$bandsintown = get_transient('bandsintown');
+if (!$bandsintown) {
+	$bandsintown = json_decode(file_get_contents("http://api.bandsintown.com/artists/jonathancoulton/events.json"));
+	set_transient('bandsintown',$bandsintown,600);
+}
+//ob_start();
+//the_bandsintown_events(array('artist' => 'Jonathan Coulton', 'display_limit' => 10));
+//$bandsintown = ob_get_contents();
+//ob_end_clean();
 $context['bandsintown'] = $bandsintown;
 Timber::render( $templates, $context );
