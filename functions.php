@@ -67,6 +67,7 @@ if( function_exists('acf_add_options_page') ) {
 
 include __DIR__.'/include/cpt.php';
 include __DIR__.'/include/routes.php';
+include __DIR__.'/include/prepopulate.php';
 
 function check_encodes_on_post_save($post_id) {
 	$post_type = get_post_type($post_id);

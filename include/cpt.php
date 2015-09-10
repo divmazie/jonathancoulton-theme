@@ -73,3 +73,8 @@ function register_my_cpt_track() {
     register_generic_cpt("Track");
 }
 add_action('init', 'register_my_cpt_track'); // fields: artist, album, source
+
+function register_my_cpt_faq() {
+    register_generic_cpt("FAQ");
+}
+add_action('init', 'register_my_cpt_faq'); // fields: artist, album, source

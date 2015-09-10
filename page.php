@@ -24,4 +24,7 @@
 $context = Timber::get_context();
 $post = new TimberPost();
 $context['post'] = $post;
+if ($post->slug == "faq") {
+    $context['faqs'] = Timber::get_posts('post_type=faq');
+}
 Timber::render( array( 'page-' . $post->post_name . '.twig', 'page.twig' ), $context );

@@ -20,6 +20,7 @@ if ( ! class_exists( 'Timber' ) ) {
 $context = Timber::get_context();
 $context['post'] = new TimberPost();
 $context['showcase_tiles'] = Timber::get_posts('post_type=showcase_tile');
+$context['faqs'] = Timber::get_posts('post_type=faq');
 $context['blurb_header'] = get_field('front_page_blurb_header','options');
 $context['blurb_content'] = get_field('front_page_blurb_content','options');
 $twitter = include_once(get_template_directory().'/config/twitter.php');
