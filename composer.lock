@@ -4,8 +4,56 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "1b47e9467ca0287d8d317649bdcab805",
+    "hash": "647dd869cd35633544799953c1d606a5",
     "packages": [
+        {
+            "name": "cosenary/instagram",
+            "version": "dev-master",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/cosenary/Instagram-PHP-API.git",
+                "reference": "607fd77eee2761490b67e4bdee82ff12611bcac3"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/cosenary/Instagram-PHP-API/zipball/607fd77eee2761490b67e4bdee82ff12611bcac3",
+                "reference": "607fd77eee2761490b67e4bdee82ff12611bcac3",
+                "shasum": ""
+            },
+            "require": {
+                "ext-curl": "*",
+                "php": ">=5.3.0"
+            },
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "2.4-dev"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "MetzWeb\\Instagram\\": "src"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "BSD"
+            ],
+            "authors": [
+                {
+                    "name": "Christian Metz",
+                    "email": "christian-metz1@gmx.net",
+                    "homepage": "http://metzweb.net"
+                }
+            ],
+            "description": "An easy-to-use PHP Class for accessing Instagram's API.",
+            "homepage": "https://github.com/cosenary/Instagram-PHP-API",
+            "keywords": [
+                "api",
+                "instagram"
+            ],
+            "time": "2015-08-27 15:32:04"
+        },
         {
             "name": "fetchapp/fetchapp",
             "version": "dev-master",
@@ -352,12 +400,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/jarednova/timber.git",
-                "reference": "79d1d150543b3188a921402c82315a98013fc6b4"
+                "reference": "0afe842ceaef4dd845f89b2aa34756fdb3a8dec6"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/jarednova/timber/zipball/79d1d150543b3188a921402c82315a98013fc6b4",
-                "reference": "79d1d150543b3188a921402c82315a98013fc6b4",
+                "url": "https://api.github.com/repos/jarednova/timber/zipball/0afe842ceaef4dd845f89b2aa34756fdb3a8dec6",
+                "reference": "0afe842ceaef4dd845f89b2aa34756fdb3a8dec6",
                 "shasum": ""
             },
             "require": {
@@ -400,7 +448,7 @@
                 "timber",
                 "twig"
             ],
-            "time": "2015-08-25 03:54:49"
+            "time": "2015-09-02 02:35:56"
         },
         {
             "name": "twig/twig",
@@ -408,12 +456,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/twigphp/Twig.git",
-                "reference": "71b4dc2572eb822552e394a254a7bdf16be15448"
+                "reference": "336a319246421f19ab3ce9791dcaf142f499af28"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/twigphp/Twig/zipball/71b4dc2572eb822552e394a254a7bdf16be15448",
-                "reference": "71b4dc2572eb822552e394a254a7bdf16be15448",
+                "url": "https://api.github.com/repos/twigphp/Twig/zipball/336a319246421f19ab3ce9791dcaf142f499af28",
+                "reference": "336a319246421f19ab3ce9791dcaf142f499af28",
                 "shasum": ""
             },
             "require": {
@@ -426,7 +474,7 @@
             "type": "library",
             "extra": {
                 "branch-alias": {
-                    "dev-master": "1.21-dev"
+                    "dev-master": "1.22-dev"
                 }
             },
             "autoload": {
@@ -461,7 +509,7 @@
             "keywords": [
                 "templating"
             ],
-            "time": "2015-08-24 09:58:37"
+            "time": "2015-09-11 15:57:54"
         },
         {
             "name": "upstatement/routes",
@@ -520,6 +568,7 @@
     "stability-flags": {
         "tgmpa/tgm-plugin-activation": 20,
         "fetchapp/fetchapp": 20,
+        "cosenary/instagram": 20,
         "jarednova/timber": 20
     },
     "prefer-stable": false,
