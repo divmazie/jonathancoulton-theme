@@ -1,0 +1,36 @@
+{% extends "base.twig" %}
+
+{% block content %}
+<div class="container">
+    {% for album in albums %}
+        <div class="col-xs-12 col-sm-4">
+            <div class="album_square">
+                <img src="{{ album.art.url }}" class="album_image" />
+            </div>
+        </div>
+        <div class="col-xs-12 col-sm-8">
+            <h3>{{ album.title }}</h3>
+            <span class="album_year">{{ album.year }}</span>
+            <div class="track_row">
+                <span class="track_icon_left"></span>
+                <span class="track_icon_left"></span>
+                <span class="track_title">Full album</span>
+                <span class="track_icon_right">cart</span>
+                <span class="track_icon_right">${{ album.price }}</span>
+                <span class="track_icon_right">&#x24D8;</span>
+            </div>
+            {% for track in album.tracks %}
+                <div class="track_row">
+                    <span class="track_icon_left">{{ track.number }}</span>
+                    <span class="track_icon_left">&#9654;</span>
+                    <span class="track_title">{{ track.title }}</span>
+                    <span class="track_icon_right">cart</span>
+                    <span class="track_icon_right">${{ track.price }}</span>
+                    <span class="track_icon_right">&#x24D8;</span>
+                </div>
+            {% endfor %}
+        </div>
+        <div class="clearfix"></div>
+    {% endfor %}
+</div>
+{% endblock %}

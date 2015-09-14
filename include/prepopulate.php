@@ -13,6 +13,12 @@ $pieces = array(// ORIGINAL PREPOP ARRAY, WILL DISCARD
         'post_content' => "Questions you may have.",
         'post_type' => 'page',
     ),
+    array(
+        'post_name' => 'store',
+        'post_title' => 'Store',
+        'post_content' => "",
+        'post_type' => 'page',
+    )
 );
 
 foreach($pieces as $piece) {

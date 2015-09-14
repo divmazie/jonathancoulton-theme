@@ -56,7 +56,11 @@ class Album {
         $context = array('title' => $this->getAlbumTitle(), 'artist' => $this->getAlbumArtist());
         $context['show_album'] = $this->albumShow ? true : false;
         $context['encode_worthy'] = $this->isEncodeWorthy() ? true : false;
-        $context['art'] = array('filename'=>basename($this->getAlbumArtObject()->getPath()),'exists'=>file_exists($this->getAlbumArtObject()->getPath()));
+        $context['year'] = $this->getAlbumYear();
+        $context['price'] = $this->getAlbumPrice();
+        $context['art'] = array('filename'=>basename($this->getAlbumArtObject()->getPath()),
+            'url'=>$this->getAlbumArtObject()->getURL(),
+            'exists'=>file_exists($this->getAlbumArtObject()->getPath()));
         $context['album_zips'] = array();
         foreach ($this->getAllChildZips() as $zip) {
             $context['album_zips'][] = $zip->getZipContext();
