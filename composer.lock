@@ -400,12 +400,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/jarednova/timber.git",
-                "reference": "0afe842ceaef4dd845f89b2aa34756fdb3a8dec6"
+                "reference": "d8711f98a441be5ce612ce38ab98649c5e0d999b"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/jarednova/timber/zipball/0afe842ceaef4dd845f89b2aa34756fdb3a8dec6",
-                "reference": "0afe842ceaef4dd845f89b2aa34756fdb3a8dec6",
+                "url": "https://api.github.com/repos/jarednova/timber/zipball/d8711f98a441be5ce612ce38ab98649c5e0d999b",
+                "reference": "d8711f98a441be5ce612ce38ab98649c5e0d999b",
                 "shasum": ""
             },
             "require": {
@@ -448,7 +448,7 @@
                 "timber",
                 "twig"
             ],
-            "time": "2015-09-02 02:35:56"
+            "time": "2015-09-15 14:56:45"
         },
         {
             "name": "twig/twig",
@@ -456,12 +456,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/twigphp/Twig.git",
-                "reference": "336a319246421f19ab3ce9791dcaf142f499af28"
+                "reference": "7ffa3a2ae1f27a75f9dd66efde2b4c408f65f3c4"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/twigphp/Twig/zipball/336a319246421f19ab3ce9791dcaf142f499af28",
-                "reference": "336a319246421f19ab3ce9791dcaf142f499af28",
+                "url": "https://api.github.com/repos/twigphp/Twig/zipball/7ffa3a2ae1f27a75f9dd66efde2b4c408f65f3c4",
+                "reference": "7ffa3a2ae1f27a75f9dd66efde2b4c408f65f3c4",
                 "shasum": ""
             },
             "require": {
@@ -509,7 +509,7 @@
             "keywords": [
                 "templating"
             ],
-            "time": "2015-09-11 15:57:54"
+            "time": "2015-09-15 06:52:30"
         },
         {
             "name": "upstatement/routes",

@@ -2,10 +2,10 @@
 
 {% block content %}
 	<h2 class="h2"><a href="{{post.link}}">{{post.title}}</a></h2>
-		<p>{{post.get_preview(250,false,'<br /><br />(click here to read more)',false)}}</p>
-		{% if post.thumbnail.src %}
-			<img src="{{post.thumbnail.src}}" />
-		{% endif %}
+	<p>{{post.get_preview(250,false,'<br /><br />(click here to read more)',false)}}</p>
+	{% if post.thumbnail.src %}
+		<img src="{{post.thumbnail.src}}" />
+	{% endif %}
 	<div class="post_info">
 		<div class="col-xs-4">
 			<div class="post_date">{{ post.date }}</div>
@@ -23,6 +23,9 @@
 				<a href="https://www.facebook.com/sharer/sharer.php?u={{ post.link }}">Facebook</a> <!--Must implement OG tags for more info-->
 			</div>
 		</div>
+	</div>
+	<div style="float: right">
+		<div class="blue_arrow_right">Click for more</div>
 	</div>
 	<div class="clearfix"></div>
 {% endblock %}
