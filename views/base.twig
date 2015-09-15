@@ -65,7 +65,16 @@
 						{% endfor %}
 					</p>
 				</div>
-				<div class="col-xs-12 col-sm-4">Basic contact info</div>
+				<div class="col-xs-12 col-sm-4">
+					<h4>Archives</h4>
+					<p>
+						{% for archive in archives %}
+							<a href="{{ archive.link }}">{{ archive.title }}</a><br />
+							{{ archive.display_date }}<br />
+							<br />
+						{% endfor %}
+					</p>
+				</div>
 				<div class="clearfix"></div>
 			</div>
 			<div class="copyright">

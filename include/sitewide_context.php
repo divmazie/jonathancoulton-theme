@@ -11,3 +11,4 @@ if (!isset($context)) {
 }
 
 $context['faqs'] = Timber::get_posts('post_type=faq');
+$context['archives'] = Timber::get_posts('numberposts=3');
