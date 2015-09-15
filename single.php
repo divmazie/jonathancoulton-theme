@@ -10,6 +10,7 @@
  */
 
 $context = Timber::get_context();
+include_once(get_template_directory().'/include/sitewide_context.php');
 $post = Timber::query_post();
 $context['post'] = $post;
 $context['comment_form'] = TimberHelper::get_comment_form();

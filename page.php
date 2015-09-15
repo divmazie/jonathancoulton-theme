@@ -22,6 +22,7 @@
  */
 
 $context = Timber::get_context();
+include_once(get_template_directory().'/include/sitewide_context.php');
 $post = new TimberPost();
 $context['post'] = $post;
 if ($post->slug == "faq") {

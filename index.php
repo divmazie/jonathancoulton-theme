@@ -18,28 +18,23 @@ if ( ! class_exists( 'Timber' ) ) {
 	return;
 }
 $context = Timber::get_context();
+include_once(get_template_directory().'/include/sitewide_context.php');
 $context['post'] = new TimberPost();
 $context['showcase_tiles'] = Timber::get_posts('post_type=showcase_tile');
-$context['faqs'] = Timber::get_posts('post_type=faq');
 $context['blurb_header'] = get_field('front_page_blurb_header','options');
 $context['blurb_content'] = get_field('front_page_blurb_content','options');
-$twitter = include_once(get_template_directory().'/config/twitter.php');
-$context['twitter'] = $twitter;
+$context['twitter'] = include(get_template_directory().'/config/twitter.php');
 $context['instagram'] = include(get_template_directory().'/config/instagram.php');
 $context['facebook_link'] = get_field('facebook_link','options');
-$context['foo'] = 'bar';
-$templates = array( 'index.twig' );
-if ( is_home() ) {
-	array_unshift( $templates, 'home.twig' );
-}
 $bandsintown = get_transient('bandsintown');
 if (!$bandsintown) {
 	$bandsintown = json_decode(file_get_contents("http://api.bandsintown.com/artists/jonathancoulton/events.json"));
 	set_transient('bandsintown',$bandsintown,600);
 }
-//ob_start();
-//the_bandsintown_events(array('artist' => 'Jonathan Coulton', 'display_limit' => 10));
-//$bandsintown = ob_get_contents();
-//ob_end_clean();
 $context['bandsintown'] = $bandsintown;
+
+$templates = array( 'index.twig' );
+if ( is_home() ) {
+	array_unshift( $templates, 'home.twig' );
+}
 Timber::render( $templates, $context );
