@@ -6,7 +6,7 @@
 	</head>
 {% endblock %}
 
-	<body class="{{body_class}}" data-template="base.twig">
+	<body class="{{body_class}}" id="body" data-template="base.twig">
 		<div class="container-fluid">
 		<header class="header" >
 			{% block header %}
@@ -87,5 +87,13 @@
 			</div>
 		{% endblock %}
 		</div>
+		<script type="text/javascript">
+			// open external links in new tab
+			jQuery('#body').find('a').filter(function() {
+				return this.hostname && this.hostname.indexOf(location.hostname)===-1
+			}).attr({
+				target : "_blank"
+			});
+		</script>
 	</body>
 </html>
