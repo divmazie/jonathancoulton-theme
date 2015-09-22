@@ -7,7 +7,7 @@ class Track {
     private $postID, $trackNumber, $trackPrice, $trackTitle, $trackArtist, $trackGenre, $trackYear, $trackComment, $trackArtObject, $trackSourceFileObject;
     private $wpPost, $encode_types;
     private $parentAlbum;
-    private $shopify_id;
+    private $shopify_id, $shopify_variant_ids;
 
     /**
      * @param \WP_Post $post the parent post object whence the fields
@@ -34,6 +34,7 @@ class Track {
         $this->trackSourceFileObject = get_field('track_source',$post_id) ? new WPAttachment(get_field('track_source',$post_id)) : false;
         $this->encode_types = include(get_template_directory().'/config/encode_types.php');
         $this->shopify_id = get_post_meta($post_id,'shopify_id',false)[0];
+        $this->shopify_variant_ids = unserialize(get_post_meta($post_id,'shopify_variant_ids',false)[0]);
     }
 
     public function isEncodeWorthy() {
@@ -157,6 +158,16 @@ class Track {
     public function setShopifyId($id) {
         if (update_post_meta($this->getPostID(),'shopify_id',$id)) {
             $this->shopify_id = $id;
+        }
+    }
+
+    public function getShopifyVariantIds() {
+        return $this->shopify_variant_ids;
+    }
+
+    public function setShopifyVariantIds($ids) {
+        if (update_post_meta($this->getPostID(),'shopify_variant_ids',serialize($ids))) {
+            $this->shopify_variant_ids = $ids;
         }
     }
 

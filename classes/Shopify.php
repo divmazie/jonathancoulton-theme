@@ -93,15 +93,27 @@ class Shopify {
     }
 
     public function createProduct($object) {
-        $args = $this->getProductArgs($object);
+        $args = $this->getProductArgs($object,false);
         $response = $this->makeCall("admin/products","POST",$args);
         if ($response->product->id) {
             $object->setShopifyId($response->product->id);
+            $variant_ids = array();
+            foreach ($response->product->variants as $variant) {
+                $variant_ids[$variant->option1] = $variant->id;
+            }
+            $object->setShopifyVariantIds($variant_ids);
         }
         return $response;
     }
 
-    public function getProductArgs($object) {
+    public function updateProduct($object) {
+        $id = $object->getShopifyId();
+        $args = $this->getProductArgs($object,true);
+        $response = $this->makeCall("admin/products/$id","PUT",$args);
+        return $response;
+    }
+
+    public function getProductArgs($object,$update) {
         $title = "";
         $body = "";
         $image = "";
@@ -135,13 +147,17 @@ class Shopify {
         }
         $variants = array();
         foreach ($var_vars as $vars) {
-            $variants[] = array(
+            $v = array(
                 'option1' => $vars['option1'],
                 'price' => $vars['price'],
                 'sku' => $vars['sku'],
                 'taxable' => false,
                 'requires_shipping' => false
             );
+            if ($update) {
+                $v['id'] = $object->getShopifyVariantIds()[$vars['option1']];
+            }
+            $variants[] = $v;
         }
         $args = array("product" => array(
             'title' => $title,
@@ -153,6 +169,9 @@ class Shopify {
             ),
             'variants' => $variants
         ));
+        if ($update) {
+            $args['product']['id'] = $object->getShopifyId();
+        }
         return $args;
     }
 
