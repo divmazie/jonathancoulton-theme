@@ -11,8 +11,8 @@ namespace jct;
 
 class Shopify {
     private $apiKey, $apiPassword, $handle;
-    private $fetch;
     private $allProducts;
+    private $fetch, $allFetchProducts, $allFetchFiles;
 
     public function __construct($apiKey, $apiPassword, $handle) {
         $this->apiKey = $apiKey;
@@ -219,9 +219,31 @@ class Shopify {
     }
 
     public function getFetchFiles() {
+        if (isset($this->allFetchFiles)) {
+            return $this->allFetchFiles;
+        }
         try{
-            $files = $this->fetch->getFiles(); // Grabs all files
-            return $files;
+            $fetch_files = $this->fetch->getFiles(); // Grabs all files
+            $fetch_files_array = array();
+            foreach ($fetch_files as $file) {
+                $fetch_files_array[$file->getFileID()->asXML()] = $file->getFileName()->asXML();
+            }
+            $this->allFetchFiles = $fetch_files_array;
+            return $this->allFetchFiles;
+        }
+        catch (Exception $e){
+            // This will occur on any call if the AuthenticationKey and AuthenticationToken are not set.
+            return $e->getMessage();
+        }
+    }
+
+    public function getFetchProducts() {
+        if (isset($this->allFetchProducts)) {
+            return $this->allFetchProducts;
+        }
+        try{
+            $this->allFetchProducts = $this->fetch->getProducts(); // Grabs all products (potentially HUGE!)
+            return $this->allFetchProducts;
         }
         catch (Exception $e){
             // This will occur on any call if the AuthenticationKey and AuthenticationToken are not set.
