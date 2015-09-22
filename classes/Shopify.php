@@ -124,7 +124,12 @@ class Shopify {
                 break;
             }
         }
-        if (strtotime($product->updated_at) < strtotime($timber_post->get_modified_time())) {
+        $wp_time = strtotime($timber_post->get_modified_time());
+        if (get_class($object)=="jct\\Track") {
+            $timber_post = new \TimberPost($object->getAlbum()->getPostID());
+            $wp_time = max($wp_time,strtotime($timber_post->get_modified_time()));
+        }
+        if (strtotime($product->updated_at) < $wp_time) {
             $args = $this->getProductArgs($object, true);
             $response = $this->makeCall("admin/products/$shopify_id", "PUT", $args);
             return $response;
