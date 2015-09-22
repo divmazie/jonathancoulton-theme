@@ -42,14 +42,18 @@ class Shopify {
     }
 
     public function forceGetAllProducts() {
-        $this->allProducts = $this->makeCall("admin/products")->products;
+        $response = $this->makeCall("admin/products");
+        $this->allProducts = $response->products;
         return $this->allProducts;
     }
 
     public function productExists($product_id) {
-        foreach ($this->getAllProducts() as $product) {
-            if ($product->id == $product_id) {
-                return true;
+        $products = $this->getAllProducts();
+        if (is_array($products)) {
+            foreach ($products as $product) {
+                if ($product->id == $product_id) {
+                    return true;
+                }
             }
         }
         return false;
@@ -75,14 +79,14 @@ class Shopify {
         $ch = curl_init($url);
         curl_setopt($ch, CURLOPT_CUSTOMREQUEST, $requestType);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($ch, CURLOPT_HTTPHEADER, [
-                'Content-Type: application/json',
-                'Content-Length: ' . strlen($data_string),
-                'Expect:'
-            ]
-        );
         if ($requestType != "GET") {
             curl_setopt($ch, CURLOPT_POSTFIELDS, $data_string);
+            curl_setopt($ch, CURLOPT_HTTPHEADER, [
+                    'Content-Type: application/json',
+                    'Content-Length: ' . strlen($data_string),
+                    'Expect:'
+                ]
+            );
         }
         $response = curl_exec($ch);
         return json_decode($response);
@@ -91,6 +95,9 @@ class Shopify {
     public function createProduct($object) {
         $args = $this->getProductArgs($object);
         $response = $this->makeCall("admin/products","POST",$args);
+        if ($response->product->id) {
+            $object->setShopifyId($response->product->id);
+        }
         return $response;
     }
 

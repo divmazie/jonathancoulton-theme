@@ -12,7 +12,7 @@ $handle = get_field('shopify_handle','options');
 $shopify = new jct\Shopify($apiKey,$apiPassword,$handle);
 
 echo "<pre>";
-//print_r($shopify->getProducts());
+//print_r($shopify->getAllProducts());
 
 $albums = \jct\Album::getAllAlbums();
 foreach ($albums as $album) {
