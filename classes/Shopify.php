@@ -42,7 +42,7 @@ class Shopify {
     }
 
     public function forceGetAllProducts() {
-        $response = $this->makeCall("admin/products");
+        $response = $this->makeCall("admin/products",'GET',array('product_type' => 'Music download'));
         $this->allProducts = $response->products;
         return $this->allProducts;
     }
@@ -177,6 +177,25 @@ class Shopify {
             $args['product']['id'] = $object->getShopifyId();
         }
         return $args;
+    }
+
+    public function deleteUnusedProducts($allAlbums = false) {
+        $this->forceGetAllProducts();
+        if (!$allAlbums) {
+            $allAlbums = \jct\Album::getAllAlbums();
+        }
+        $usedIds = array();
+        foreach ($allAlbums as $album) {
+            $usedIds[] = $album->getShopifyId();
+            foreach ($album->getAlbumTracks() as $track) {
+                $usedIds[] = $track->getShopifyId();
+            }
+        }
+        foreach ($this->allProducts as $product) {
+            if (!in_array($product->id,$usedIds)) {
+                $this->makeCall("admin/products/$product->id","DELETE");
+            }
+        }
     }
 
 }
