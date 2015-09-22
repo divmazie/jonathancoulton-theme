@@ -98,10 +98,13 @@ class Shopify {
         if ($response->product->id) {
             $object->setShopifyId($response->product->id);
             $variant_ids = array();
+            $variant_skus = array();
             foreach ($response->product->variants as $variant) {
                 $variant_ids[$variant->option1] = $variant->id;
+                $variant_skus[$variant->option1] = $variant->sku;
             }
             $object->setShopifyVariantIds($variant_ids);
+            $object->setShopifyVariantSkus($variant_skus);
         }
         return $response;
     }
@@ -156,6 +159,7 @@ class Shopify {
             );
             if ($update) {
                 $v['id'] = $object->getShopifyVariantIds()[$vars['option1']];
+                $v['sku'] = $object->getShopifyVariantSkus()[$vars['option1']];
             }
             $variants[] = $v;
         }

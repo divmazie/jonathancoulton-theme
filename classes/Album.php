@@ -2,15 +2,14 @@
 
 namespace jct;
 
-class Album {
+class Album extends ShopifyProduct {
 
 
-    private $postID, $albumTitle, $albumArtist, $albumPrice, $albumYear, $albumGenre, $albumComment, $albumArtObject, $albumBonusAssetObjects, $albumShow;
+    private $albumTitle, $albumArtist, $albumPrice, $albumYear, $albumGenre, $albumComment, $albumArtObject, $albumBonusAssetObjects, $albumShow;
     // the parent post object
     private $encode_types,$wpPost;
     //
     private $albumTracks = array();
-    private $shopify_id, $shopify_variant_ids;
 
     /**
      * @param \WP_Post $postObject the post in the blog that forms the base of this
@@ -40,6 +39,7 @@ class Album {
         $this->encode_types = include(get_template_directory().'/config/encode_types.php');
         $this->shopify_id = get_post_meta($post_id,'shopify_id',false)[0];
         $this->shopify_variant_ids = unserialize(get_post_meta($post_id,'shopify_variant_ids',false)[0]);
+        $this->shopify_variant_skus = unserialize(get_post_meta($post_id,'shopify_variant_skus',false)[0]);
         $tracks = get_posts(array('post_type' => 'track', 'meta_key' => 'track_album', 'meta_value' => $post_id)); // Constructor probs shouldn't do this lookup
         foreach ($tracks as $track) {
             $this->albumTracks[get_field('track_number',$track->id)] = new Track($track,$this);
@@ -189,26 +189,6 @@ class Album {
      */
     public function getAlbumComment() {
         return $this->albumComment;
-    }
-
-    public function getShopifyId() {
-        return $this->shopify_id;
-    }
-
-    public function setShopifyId($id) {
-        if (update_post_meta($this->getPostID(),'shopify_id',$id)) {
-            $this->shopify_id = $id;
-        }
-    }
-
-    public function getShopifyVariantIds() {
-        return $this->shopify_variant_ids;
-    }
-
-    public function setShopifyVariantIds($ids) {
-        if (update_post_meta($this->getPostID(),'shopify_variant_ids',serialize($ids))) {
-            $this->shopify_variant_ids = $ids;
-        }
     }
 
     public function syncToStore($shopify) {
