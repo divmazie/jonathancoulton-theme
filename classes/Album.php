@@ -190,10 +190,10 @@ class Album {
 
     public function syncToStore($shopify) {
         $toprint = "";
-        $toprint .= print_r($shopify->createAlbumProduct($this),true);
+        $toprint .= print_r($shopify->createProduct($this),true);
         $tracks = $this->getAlbumTracks();
         foreach ($tracks as $track) {
-            $toprint .= print_r($shopify->createTrackProduct($track),true);
+            $toprint .= print_r($shopify->createProduct($track),true);
         }
         return $toprint;
     }

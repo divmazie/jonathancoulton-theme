@@ -11,6 +11,7 @@ namespace jct;
 
 class Shopify {
     private $apiKey, $apiPassword, $handle;
+    private $allProducts;
 
     public function __construct($apiKey, $apiPassword, $handle) {
         $this->apiKey = $apiKey;
@@ -30,6 +31,28 @@ class Shopify {
 
         // track number underscore track title underscore short hash dot extension
         return strtolower(sprintf('%s-%s:%s', $album, $track, $format));
+    }
+
+    public function getAllProducts() {
+        if (isset($this->allProducts)) {
+            return $this->allProducts;
+        } else {
+            return $this->forceGetAllProducts();
+        }
+    }
+
+    public function forceGetAllProducts() {
+        $this->allProducts = $this->makeCall("admin/products")->products;
+        return $this->allProducts;
+    }
+
+    public function productExists($product_id) {
+        foreach ($this->getAllProducts() as $product) {
+            if ($product->id == $product_id) {
+                return true;
+            }
+        }
+        return false;
     }
 
     public function makeCall($resource, $requestType = "GET", $args=array()) {
@@ -65,65 +88,65 @@ class Shopify {
         return json_decode($response);
     }
 
-    public function getProducts() {
-        return $this->makeCall("admin/products");
-    }
-
-    public function createProduct($args) {
+    public function createProduct($object) {
+        $args = $this->getProductArgs($object);
         $response = $this->makeCall("admin/products","POST",$args);
         return $response;
     }
 
-    public function createAlbumProduct($album) {
+    public function getProductArgs($object) {
+        $title = "";
+        $body = "";
+        $image = "";
+        $var_vars = array();
+        //die(get_class($object));
+        switch (get_class($object)) {
+            case "jct\\Album":
+                $title = $object->getAlbumTitle()." (Full Album)";
+                $body = $object->getAlbumTitle()." (Full Album) by ".$object->getAlbumArtist()." ".$object->getAlbumYear();
+                $image = base64_encode(file_get_contents($object->getAlbumArtObject()->getPath()));
+                foreach ($object->getAllChildZips() as $zip) {
+                    $var_vars[] = array(
+                        'sku' => $this::sku($object->getAlbumTitle(),"full album",$zip->getEncodeLabel()),
+                        'option1' => $zip->getEncodeLabel(),
+                        'price' => strval($object->getAlbumPrice()),
+                    );
+                }
+                break;
+            case "jct\\Track":
+                $title = $object->getTrackTitle();
+                $body = "From ".$object->getAlbum()->getAlbumTitle()." by ".$object->getTrackArtist()." ".$object->getTrackYear();
+                $image = base64_encode(file_get_contents($object->getTrackArtObject()->getPath()));
+                foreach ($object->getAllChildEncodes() as $encode) {
+                    $var_vars[] = array(
+                        'sku' => $this::sku($object->getAlbum()->getAlbumTitle(),$object->getTrackTitle(),$encode->getEncodeLabel()),
+                        'option1' => $encode->getEncodeLabel(),
+                        'price' => strval($object->getTrackPrice()),
+                    );
+                }
+                break;
+        }
         $variants = array();
-        foreach ($album->getAllChildZips() as $zip) {
-            $sku = $this::sku($album->getAlbumTitle(),"full album",$zip->getEncodeLabel());
+        foreach ($var_vars as $vars) {
             $variants[] = array(
-                //'title' => $album->getAlbumTitle()." (Full Album) ".$zip->getEncodeLabel(),
-                'option1' => $zip->getEncodeLabel(),
-                'price' => strval($album->getAlbumPrice()),
-                'sku' => $sku,
+                'option1' => $vars['option1'],
+                'price' => $vars['price'],
+                'sku' => $vars['sku'],
                 'taxable' => false,
                 'requires_shipping' => false
             );
         }
         $args = array("product" => array(
-            'title' => $album->getAlbumTitle()." (Full Album)",
-            'body_html' => $album->getAlbumTitle()." (Full Album) by ".$album->getAlbumArtist()." ".$album->getAlbumYear(),
+            'title' => $title,
+            'body_html' => $body,
             'vendor' => "Jonathan Coulton",
             'product_type' => 'Music download',
             'images' => array(
-                array('attachment' => base64_encode(file_get_contents($album->getAlbumArtObject()->getPath())))
+                array('attachment' => $image)
             ),
             'variants' => $variants
         ));
-        return $this->createProduct($args);
-    }
-
-    public function createTrackProduct($track) {
-        $variants = array();
-        foreach ($track->getAllChildEncodes() as $encode) {
-            $sku = $this::sku($track->getAlbum()->getAlbumTitle(),$track->getTrackTitle(),$encode->getEncodeLabel());
-            $variants[] = array(
-                //'title' => $track->getTrackTitle()." ".$encode->getEncodeLabel(),
-                'option1' => $encode->getEncodeLabel(),
-                'price' => strval($track->getTrackPrice()),
-                'sku' => $sku,
-                'taxable' => false,
-                'requires_shipping' => false
-            );
-        }
-        $args = array("product" => array(
-            'title' => $track->getTrackTitle(),
-            'body_html' => "From ".$track->getAlbum()->getAlbumTitle()." by ".$track->getTrackArtist()." ".$track->getTrackYear(),
-            'vendor' => "Jonathan Coulton",
-            'product_type' => 'Music download',
-            'images' => array(
-                array('attachment' => base64_encode(file_get_contents($track->getTrackArtObject()->getPath())))
-            ),
-            'variants' => $variants
-        ));
-        return $this->createProduct($args);
+        return $args;
     }
 
 }
