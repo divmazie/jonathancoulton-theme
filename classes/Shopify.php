@@ -106,14 +106,25 @@ class Shopify {
             $object->setShopifyVariantIds($variant_ids);
             $object->setShopifyVariantSkus($variant_skus);
         }
+        $this->forceGetAllProducts();
         return $response;
     }
 
     public function updateProduct($object) {
-        $id = $object->getShopifyId();
-        $args = $this->getProductArgs($object,true);
-        $response = $this->makeCall("admin/products/$id","PUT",$args);
-        return $response;
+        $timber_post = new \TimberPost($object->getPostID());
+        $shopify_id = $object->getShopifyId();
+        $shopify_product = "";
+        foreach ($this->getAllProducts() as $product) {
+            if ($product->id == $shopify_id) {
+                $shopify_product = $product;
+                break;
+            }
+        }
+        if (strtotime($product->updated_at) < strtotime($timber_post->get_modified_time())) {
+            $args = $this->getProductArgs($object, true);
+            $response = $this->makeCall("admin/products/$shopify_id", "PUT", $args);
+            return $response;
+        }
     }
 
     public function getProductArgs($object,$update) {
