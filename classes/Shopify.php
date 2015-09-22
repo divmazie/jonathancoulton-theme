@@ -55,7 +55,7 @@ class Shopify {
         return $this->makeCall("admin/products");
     }
 
-    public function createProduct($title,$image_src,$price,$formats) {
+    public function createProduct($title,$image_encoded,$price,$formats) {
         $sku = "999";
         $variants = array();
         foreach ($formats as $format) {
@@ -73,19 +73,12 @@ class Shopify {
             'vendor' => "Jonathan Coulton",
             'product_type' => 'Music download',
             'images' => array(
-                array('src' => $image_src)
+                array('attachment' => $image_encoded)
             ),
             'variants' => $variants
         ));
-        //return json_encode($args);
         $response = $this->makeCall("admin/products","POST",$args);
-        //$this->attachImage($response->product->id,$image_src);
         return $response;
-        if ($response->product->id) { // I'm in the middle of working out an image upload bug here
-            return $this->attachImage($response->product->id,$image_src);
-        } else {
-            return $response;
-        }
     }
 
     public function attachImage($productId,$image_src) {

@@ -47,16 +47,17 @@ class Track {
 
     public function getAllChildEncodes() {
         $encodes = array();
-        foreach ($this->encode_types as $encode_type) {
+        foreach ($this->encode_types as $key => $encode_type) {
+            $label = $key;
             $format = $encode_type[0];
             $flags = $encode_type[1];
-            $encodes[] = $this->getChildEncode($format,$flags);
+            $encodes[] = $this->getChildEncode($format,$flags,$label);
         }
         return $encodes;
     }
 
-    public function getChildEncode($format,$flags) {
-        $encode = new Encode($this, $format, $flags);
+    public function getChildEncode($format,$flags,$label) {
+        $encode = new Encode($this, $format, $flags, $label);
         return $encode;
     }
 

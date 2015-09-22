@@ -6,7 +6,7 @@ class Encode extends KeyedWPAttachment {
 
     private $parentTrack;
     // encode format === file extension!
-    private $encodeFormat, $encodeCLIFlags;
+    private $encodeLabel,$encodeFormat, $encodeCLIFlags;
 
     static function recoverFromTransient($transient_key) {
         $encode_details = get_transient($transient_key);
@@ -14,16 +14,18 @@ class Encode extends KeyedWPAttachment {
         $track_post_id = $encode_details[0];
         $encode_format = $encode_details[1];
         $encode_flags = $encode_details[2];
+        $encode_label = $encode_details[3];
         $track_post = get_post($track_post_id);
         $track = new Track($track_post);
-        return new Encode($track,$encode_format,$encode_flags);
+        return new Encode($track,$encode_format,$encode_flags,$encode_label);
     }
 
-    public function __construct(Track $parentTrack, $encodeFormat, $encodeCLIFlags) {
+    public function __construct(Track $parentTrack, $encodeFormat, $encodeCLIFlags, $encodeLabel) {
         $this->parentTrack = $parentTrack;
         $this->parent_post_id = $parentTrack->getPostID();
         $this->encodeCLIFlags = $encodeCLIFlags;
         $this->encodeFormat = $encodeFormat;
+        $this->encodeLabel = $encodeLabel;
     }
 
     public function getFileAssetFileName() {
@@ -38,6 +40,10 @@ class Encode extends KeyedWPAttachment {
         return sprintf('%d_%s_%s.%s', $this->parentTrack->getTrackNumber(),
                         $title,$this->getShortUniqueKey(),
                         $this->encodeFormat);
+    }
+
+    public function getEncodeLabel() {
+        return $this->encodeLabel;
     }
 
     public function getEncodeFormat() {
@@ -87,7 +93,7 @@ class Encode extends KeyedWPAttachment {
     public function setEncodeTransient() {
         $unique_key = $this->getUniqueKey();
         if (!get_transient($unique_key)) {
-            set_transient($unique_key,array($this->parentTrack->getPostID(),$this->getEncodeFormat(),$this->getEncodeCLIFlags()),60*60*24);
+            set_transient($unique_key,array($this->parentTrack->getPostID(),$this->getEncodeFormat(),$this->getEncodeCLIFlags(),$this->getEncodeLabel()),60*60*24);
         }
     }
 

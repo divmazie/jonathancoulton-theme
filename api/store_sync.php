@@ -20,8 +20,8 @@ foreach ($albums as $album) {
     foreach ($tracks as $track) {
         $formats = array();
         foreach ($track->getAllChildEncodes() as $encode) {
-            $formats[] = $encode->getEncodeFormat();
+            $formats[] = $encode->getEncodeLabel();
         }
-        print_r($shopify->createProduct($track->getTrackTitle(),$track->getTrackArtObject()->getURL(),$track->getTrackPrice(),$formats));
+        print_r($shopify->createProduct($track->getTrackTitle(),base64_encode(file_get_contents($track->getTrackArtObject()->getPath())),$track->getTrackPrice(),$formats));
     }
 }
