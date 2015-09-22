@@ -100,16 +100,17 @@ class Album {
 
     public function getAllChildZips() {
         $zips = array();
-        foreach ($this->encode_types as $encode_type) {
+        foreach ($this->encode_types as $key => $encode_type) {
+            $label = $key;
             $format = $encode_type[0];
             $flags = $encode_type[1];
-            $zips[$format] = $this->getChildZip($format,$flags);
+            $zips[$format] = $this->getChildZip($format,$flags,$label);
         }
         return $zips;
     }
 
-    public function getChildZip($format,$flags) {
-        $zip = new AlbumZip($this,$format,$flags);
+    public function getChildZip($format,$flags,$label) {
+        $zip = new AlbumZip($this,$format,$flags,$label);
         return $zip;
     }
 
@@ -185,6 +186,16 @@ class Album {
      */
     public function getAlbumComment() {
         return $this->albumComment;
+    }
+
+    public function syncToStore($shopify) {
+        $toprint = "";
+        $toprint .= print_r($shopify->createAlbumProduct($this),true);
+        $tracks = $this->getAlbumTracks();
+        foreach ($tracks as $track) {
+            $toprint .= print_r($shopify->createTrackProduct($track),true);
+        }
+        return $toprint;
     }
 
 }

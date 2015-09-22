@@ -16,12 +16,5 @@ echo "<pre>";
 
 $albums = \jct\Album::getAllAlbums();
 foreach ($albums as $album) {
-    $tracks = $album->getAlbumTracks();
-    foreach ($tracks as $track) {
-        $formats = array();
-        foreach ($track->getAllChildEncodes() as $encode) {
-            $formats[] = $encode->getEncodeLabel();
-        }
-        print_r($shopify->createProduct($track->getTrackTitle(),base64_encode(file_get_contents($track->getTrackArtObject()->getPath())),$track->getTrackPrice(),$formats));
-    }
+    print_r($album->syncToStore($shopify));
 }

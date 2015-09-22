@@ -13,13 +13,14 @@ class AlbumZip extends KeyedWPAttachment {
 
     private $parentAlbum;
     // encode format === file extension!
-    private $encodeFormat, $encodeCLIFlags;
+    private $encodeFormat, $encodeCLIFlags, $encodeLabel;
 
-    public function __construct(Album $parentAlbum, $encodeFormat, $encodeCLIFlags) {
+    public function __construct(Album $parentAlbum, $encodeFormat, $encodeCLIFlags, $encodeLabel) {
         $this->parentAlbum = $parentAlbum;
         $this->parent_post_id = $parentAlbum->getPostID();
         $this->encodeCLIFlags = $encodeCLIFlags;
         $this->encodeFormat = $encodeFormat;
+        $this->encodeLabel = $encodeLabel;
     }
 
     public function getUniqueKey() {
@@ -54,7 +55,7 @@ class AlbumZip extends KeyedWPAttachment {
         $tracks = $parent_album->getAlbumTracks();
         $encodes = array();
         foreach ($tracks as $track) {
-            $encodes[] = $track->getChildEncode($this->encodeFormat,$this->encodeCLIFlags);
+            $encodes[] = $track->getChildEncode($this->encodeFormat,$this->encodeCLIFlags,$this->encodeLabel);
         }
         return $encodes;
     }
@@ -145,6 +146,10 @@ class AlbumZip extends KeyedWPAttachment {
 
     public function getEncodeCLIFlags() {
         return $this->encodeCLIFlags;
+    }
+
+    public  function getEncodeLabel() {
+        return $this->encodeLabel;
     }
 
     public function getZipContext() {

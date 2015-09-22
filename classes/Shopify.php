@@ -18,6 +18,20 @@ class Shopify {
         $this->handle = $handle;
     }
 
+    static function sku($album,$track,$format) {
+        // replace spaces with underscore
+        $album = preg_replace('/\s/u', '_', $album);
+        $track = preg_replace('/\s/u', '_', $track);
+        $format = preg_replace('/\s/u', '_', $format);
+        // remove non ascii alnum_ with
+        $album = preg_replace('/[^\da-z_]/i', '', $album);
+        $track = preg_replace('/[^\da-z_]/i', '', $track);
+        $format = preg_replace('/[^\da-z_]/i', '', $format);
+
+        // track number underscore track title underscore short hash dot extension
+        return strtolower(sprintf('%s-%s:%s', $album, $track, $format));
+    }
+
     public function makeCall($resource, $requestType = "GET", $args=array()) {
         $url = "https://".$this->apiKey.":".$this->apiPassword."@".$this->handle.".myshopify.com/".$resource.".json";
         if ($requestType == "GET") {
@@ -55,35 +69,61 @@ class Shopify {
         return $this->makeCall("admin/products");
     }
 
-    public function createProduct($title,$image_encoded,$price,$formats) {
-        $sku = "999";
+    public function createProduct($args) {
+        $response = $this->makeCall("admin/products","POST",$args);
+        return $response;
+    }
+
+    public function createAlbumProduct($album) {
         $variants = array();
-        foreach ($formats as $format) {
+        foreach ($album->getAllChildZips() as $zip) {
+            $sku = $this::sku($album->getAlbumTitle(),"full album",$zip->getEncodeLabel());
             $variants[] = array(
-                'option1' => $format,
-                'price' => strval($price),
+                //'title' => $album->getAlbumTitle()." (Full Album) ".$zip->getEncodeLabel(),
+                'option1' => $zip->getEncodeLabel(),
+                'price' => strval($album->getAlbumPrice()),
                 'sku' => $sku,
                 'taxable' => false,
                 'requires_shipping' => false
             );
         }
         $args = array("product" => array(
-            'title' => $title,
-            'body_html' => "$title by Jonathan Coulton",
+            'title' => $album->getAlbumTitle()." (Full Album)",
+            'body_html' => $album->getAlbumTitle()." (Full Album) by ".$album->getAlbumArtist()." ".$album->getAlbumYear(),
             'vendor' => "Jonathan Coulton",
             'product_type' => 'Music download',
             'images' => array(
-                array('attachment' => $image_encoded)
+                array('attachment' => base64_encode(file_get_contents($album->getAlbumArtObject()->getPath())))
             ),
             'variants' => $variants
         ));
-        $response = $this->makeCall("admin/products","POST",$args);
-        return $response;
+        return $this->createProduct($args);
     }
 
-    public function attachImage($productId,$image_src) {
-        $args = array('image' => array('src' => $image_src));
-        return $this->makeCall("admin/products/#$productId/images","POST",$args);
+    public function createTrackProduct($track) {
+        $variants = array();
+        foreach ($track->getAllChildEncodes() as $encode) {
+            $sku = $this::sku($track->getAlbum()->getAlbumTitle(),$track->getTrackTitle(),$encode->getEncodeLabel());
+            $variants[] = array(
+                //'title' => $track->getTrackTitle()." ".$encode->getEncodeLabel(),
+                'option1' => $encode->getEncodeLabel(),
+                'price' => strval($track->getTrackPrice()),
+                'sku' => $sku,
+                'taxable' => false,
+                'requires_shipping' => false
+            );
+        }
+        $args = array("product" => array(
+            'title' => $track->getTrackTitle(),
+            'body_html' => "From ".$track->getAlbum()->getAlbumTitle()." by ".$track->getTrackArtist()." ".$track->getTrackYear(),
+            'vendor' => "Jonathan Coulton",
+            'product_type' => 'Music download',
+            'images' => array(
+                array('attachment' => base64_encode(file_get_contents($track->getTrackArtObject()->getPath())))
+            ),
+            'variants' => $variants
+        ));
+        return $this->createProduct($args);
     }
 
 }
