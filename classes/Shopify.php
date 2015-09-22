@@ -11,12 +11,16 @@ namespace jct;
 
 class Shopify {
     private $apiKey, $apiPassword, $handle;
+    private $fetch;
     private $allProducts;
 
     public function __construct($apiKey, $apiPassword, $handle) {
         $this->apiKey = $apiKey;
         $this->apiPassword = $apiPassword;
         $this->handle = $handle;
+        $this->fetch = new \FetchApp\API\FetchApp();
+        $this->fetch->setAuthenticationKey(get_field('fetch_key','options'));
+        $this->fetch->setAuthenticationToken(get_field('fetch_token','options'));
     }
 
     static function sku($album,$track,$format) {
@@ -206,6 +210,17 @@ class Shopify {
             if (!in_array($product->id,$usedIds)) {
                 $this->makeCall("admin/products/$product->id","DELETE");
             }
+        }
+    }
+
+    public function getFetchFiles() {
+        try{
+            $files = $this->fetch->getFiles(); // Grabs all files
+            return $files;
+        }
+        catch (Exception $e){
+            // This will occur on any call if the AuthenticationKey and AuthenticationToken are not set.
+            return $e->getMessage();
         }
     }
 

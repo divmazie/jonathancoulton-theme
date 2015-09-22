@@ -34,7 +34,8 @@
         "tgmpa/tgm-plugin-activation": "dev-master",
 	  "fetchapp/fetchapp": "dev-master",
 	  "ricardoper/twitteroauth": "2.*",
-        "cosenary/instagram": "^2.4@dev"
+        "cosenary/instagram": "^2.4@dev",
+	  "fetchapp/fetchapp": "dev-master"
 	},
   "autoload": {
 	"psr-4": {"jct\\": "classes/"}

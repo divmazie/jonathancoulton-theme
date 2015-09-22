@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "647dd869cd35633544799953c1d606a5",
+    "hash": "8f473d3eb8d41d79e5238966eb6abfe2",
     "packages": [
         {
             "name": "cosenary/instagram",
@@ -400,12 +400,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/jarednova/timber.git",
-                "reference": "d8711f98a441be5ce612ce38ab98649c5e0d999b"
+                "reference": "301950c008cb4c191f954148ba7306a0a352ccb1"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/jarednova/timber/zipball/d8711f98a441be5ce612ce38ab98649c5e0d999b",
-                "reference": "d8711f98a441be5ce612ce38ab98649c5e0d999b",
+                "url": "https://api.github.com/repos/jarednova/timber/zipball/301950c008cb4c191f954148ba7306a0a352ccb1",
+                "reference": "301950c008cb4c191f954148ba7306a0a352ccb1",
                 "shasum": ""
             },
             "require": {
@@ -448,7 +448,7 @@
                 "timber",
                 "twig"
             ],
-            "time": "2015-09-15 14:56:45"
+            "time": "2015-09-16 20:47:15"
         },
         {
             "name": "twig/twig",
@@ -456,12 +456,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/twigphp/Twig.git",
-                "reference": "7ffa3a2ae1f27a75f9dd66efde2b4c408f65f3c4"
+                "reference": "f0b5b8ce8e9905d88c33524e0294149fda6121e2"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/twigphp/Twig/zipball/7ffa3a2ae1f27a75f9dd66efde2b4c408f65f3c4",
-                "reference": "7ffa3a2ae1f27a75f9dd66efde2b4c408f65f3c4",
+                "url": "https://api.github.com/repos/twigphp/Twig/zipball/f0b5b8ce8e9905d88c33524e0294149fda6121e2",
+                "reference": "f0b5b8ce8e9905d88c33524e0294149fda6121e2",
                 "shasum": ""
             },
             "require": {
@@ -509,7 +509,7 @@
             "keywords": [
                 "templating"
             ],
-            "time": "2015-09-15 06:52:30"
+            "time": "2015-09-22 14:03:12"
         },
         {
             "name": "upstatement/routes",
