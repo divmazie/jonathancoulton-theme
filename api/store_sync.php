@@ -19,4 +19,5 @@ $albums = \jct\Album::getAllAlbums();
 foreach ($albums as $album) {
     print_r($album->syncToStore($shopify));
 }
-//$shopify->deleteUnusedProducts($albums);
+print_r($shopify->deleteUnusedProducts($albums));
+print_r($shopify->deleteUnusedFetchProducts($albums));

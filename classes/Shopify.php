@@ -154,7 +154,7 @@ class Shopify {
             $wp_time = max($wp_time,strtotime($timber_post->get_modified_time()));
         }
         //die($wp_time." - ".strtotime($shopify_product->updated_at));
-        if (strtotime($shopify_product->updated_at) < $wp_time) {
+        if (strtotime($shopify_product->updated_at) < $wp_time) { // This test may have bug in it, but it's harmless for now
             $args = $this->getProductArgs($object, true);
             $response = $this->makeCall("admin/products/$shopify_id", "PUT", $args);
             return $response;
@@ -279,6 +279,10 @@ class Shopify {
         if (isset($this->allFetchProducts)) {
             return $this->allFetchProducts;
         }
+        return $this->forceGetFetchProducts();
+    }
+
+    public function forceGetFetchProducts() {
         try{
             $this->allFetchProducts = $this->fetch->getProducts(); // Grabs all products (potentially HUGE!)
             return $this->allFetchProducts;
@@ -334,6 +338,22 @@ class Shopify {
             }
         }
         return false;
+    }
+
+    public function deleteUnusedFetchProducts($allAlbums = false) {
+        $this->forceGetFetchProducts();
+        $used_skus = array();
+        foreach ($allAlbums as $album) {
+            $used_skus = array_merge($used_skus,array_values($album->getShopifyVariantSkus()));
+            foreach ($album->getAlbumTracks() as $track) {
+                $used_skus = array_merge($used_skus,array_values($track->getShopifyVariantSkus()));
+            }
+        }
+        foreach ($this->getFetchProducts() as $product) {
+            if (!in_array((string) $product->getSKU(),$used_skus)) {
+                $product->delete();
+            }
+        }
     }
 
 }
