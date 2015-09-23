@@ -27,6 +27,10 @@ class WPAttachment {
         return $this->attachment_id;
     }
 
+    public function getFilename() {
+        return basename($this->getPath());
+    }
+
     public function getPath() {
         return get_attached_file($this->getAttachmentID());
     }

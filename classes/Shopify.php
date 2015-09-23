@@ -7,6 +7,9 @@
  */
 
 namespace jct;
+use FetchApp\API\Currency;
+use FetchApp\API\FetchApp;
+use FetchApp\API\Product;
 
 
 class Shopify {
@@ -18,7 +21,7 @@ class Shopify {
         $this->apiKey = $apiKey;
         $this->apiPassword = $apiPassword;
         $this->handle = $handle;
-        $this->fetch = new \FetchApp\API\FetchApp();
+        $this->fetch = new FetchApp();
         $this->fetch->setAuthenticationKey(get_field('fetch_key','options'));
         $this->fetch->setAuthenticationToken(get_field('fetch_token','options'));
     }
@@ -96,6 +99,27 @@ class Shopify {
         return json_decode($response);
     }
 
+    public function syncProduct($object) {
+        $response = false;
+        if (!$object->getShopifyId() || !$this->productExists($object->getShopifyId())) {
+            $response = $this->createProduct($object);
+        } else {
+            $response = $this->updateProduct($object);
+        }
+        if ($response && is_array($response->product->variants)) {
+            $object_variants = array();
+            $title = "";
+            switch (get_class($object)) {
+                case "jct\\Album": $object_variants = $object->getAllChildZips(); $title = $object->getAlbumTitle(); break;
+                case "jct\\Track": $object_variants = $object->getAllChildEncodes(); $title = $object->getTrackTitle(); break;
+            }
+            foreach ($response->product->variants as $variant) {
+                $this->syncFetchProduct($variant->sku,$title." ".$variant->option1,$variant->price,$object_variants[$variant->option1]);
+            }
+        }
+        return $response;
+    }
+
     public function createProduct($object) {
         $args = $this->getProductArgs($object,false);
         $response = $this->makeCall("admin/products","POST",$args);
@@ -129,10 +153,15 @@ class Shopify {
             $timber_post = new \TimberPost($object->getAlbum()->getPostID());
             $wp_time = max($wp_time,strtotime($timber_post->get_modified_time()));
         }
-        if (strtotime($product->updated_at) < $wp_time) {
+        //die($wp_time." - ".strtotime($shopify_product->updated_at));
+        if (strtotime($shopify_product->updated_at) < $wp_time) {
             $args = $this->getProductArgs($object, true);
             $response = $this->makeCall("admin/products/$shopify_id", "PUT", $args);
             return $response;
+        } else {
+            $fake_response = new \stdClass();
+            $fake_response->product = $shopify_product;
+            return $fake_response;
         }
     }
 
@@ -152,6 +181,9 @@ class Shopify {
                         'sku' => $this::sku($object->getAlbumTitle(),"full album",$zip->getEncodeLabel()),
                         'option1' => $zip->getEncodeLabel(),
                         'price' => strval($object->getAlbumPrice()),
+                        'metafields' => array(array(
+                            'key'=>'filename','value_type'=>'string','namespace'=>'filenames',
+                            'value'=>$zip->getFilename()))
                     );
                 }
                 break;
@@ -164,6 +196,9 @@ class Shopify {
                         'sku' => $this::sku($object->getAlbum()->getAlbumTitle(),$object->getTrackTitle(),$encode->getEncodeLabel()),
                         'option1' => $encode->getEncodeLabel(),
                         'price' => strval($object->getTrackPrice()),
+                        'metafields' => array(array(
+                            'key'=>'filename','value_type'=>'string','namespace'=>'filenames',
+                            'value'=>$encode->getFilename()))
                     );
                 }
                 break;
@@ -224,12 +259,15 @@ class Shopify {
         }
         try{
             $fetch_files = $this->fetch->getFiles(); // Grabs all files
+            return $fetch_files;
+            /*
             $fetch_files_array = array();
             foreach ($fetch_files as $file) {
-                $fetch_files_array[$file->getFileID()->asXML()] = $file->getFileName()->asXML();
+                $fetch_files_array[(int) $file->getFileID()] = (string) $file->getFileName();
             }
             $this->allFetchFiles = $fetch_files_array;
             return $this->allFetchFiles;
+            */
         }
         catch (Exception $e){
             // This will occur on any call if the AuthenticationKey and AuthenticationToken are not set.
@@ -249,6 +287,53 @@ class Shopify {
             // This will occur on any call if the AuthenticationKey and AuthenticationToken are not set.
             return $e->getMessage();
         }
+    }
+
+    public function syncFetchProduct($sku,$name,$price,$filename) {
+        $fetch_product = false;
+        foreach ($this->getFetchProducts() as $product) {
+            if ((string) $product->getSKU() == $sku) {
+                $fetch_product = $product;
+            }
+        }
+        if (!$fetch_product) {
+            $fetch_product = new Product();
+            $fetch_product->setSKU($sku);
+            $fetch_product->setName($name);
+            $fetch_product->setPrice($price);
+            $fetch_product->setCurrency(Currency::USD);
+            $files = array();
+            if ($file = $this->getFetchFile($filename)) {
+                $files[] = $file;
+            }
+            try {
+                $response = $fetch_product->create($files, false);
+                return $response;
+            } catch (Exception $e) {
+                return $e->getMessage();
+            }
+        } else {
+            $fetch_product->setName($name);
+            $fetch_product->setPrice($price);
+            $files = array();
+            if ($file = $this->getFetchFile($filename)) {
+                $files[] = $file;
+            }
+            try {
+                $fetch_product->update($files);
+            } catch (Exception $e) {
+                return $e->getMessage();
+            }
+        }
+    }
+
+    public function getFetchFile($filename) {
+        foreach ($this->getFetchFiles() as $file) {
+            if ((string) $file->getFileName() == $filename) {
+                return $file;
+            }
+        }
+        return false;
     }
 
 }

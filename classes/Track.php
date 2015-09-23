@@ -54,7 +54,7 @@ class Track extends ShopifyProduct {
             $label = $key;
             $format = $encode_type[0];
             $flags = $encode_type[1];
-            $encodes[] = $this->getChildEncode($format,$flags,$label);
+            $encodes[$label] = $this->getChildEncode($format,$flags,$label);
         }
         return $encodes;
     }
@@ -166,7 +166,7 @@ class Track extends ShopifyProduct {
     }
 
     public function syncToStore($shopify) {
-
+        return $shopify->syncProduct($this);
     }
 
 }

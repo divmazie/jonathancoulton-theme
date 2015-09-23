@@ -107,7 +107,7 @@ class Album extends ShopifyProduct {
             $label = $key;
             $format = $encode_type[0];
             $flags = $encode_type[1];
-            $zips[$format] = $this->getChildZip($format,$flags,$label);
+            $zips[$label] = $this->getChildZip($format,$flags,$label);
         }
         return $zips;
     }
@@ -192,19 +192,11 @@ class Album extends ShopifyProduct {
     }
 
     public function syncToStore($shopify) {
-        $toprint = "";
-        if (!$this->getShopifyId() || !$shopify->productExists($this->getShopifyId())) {
-            $toprint .= print_r($shopify->createProduct($this), true);
-        } else {
-            $toprint .= print_r($shopify->updateProduct($this), true);
-        }
+        $toprint = array();
+        $toprint[] = $shopify->syncProduct($this);
         $tracks = $this->getAlbumTracks();
         foreach ($tracks as $track) {
-            if (!$track->getShopifyId() || !$shopify->productExists($track->getShopifyId())) {
-                $toprint .= print_r($shopify->createProduct($track), true);
-            } else {
-                $toprint .= print_r($shopify->updateProduct($track),true);
-            }
+            $toprint[] = $track->syncToStore($shopify);
         }
         return $toprint;
     }

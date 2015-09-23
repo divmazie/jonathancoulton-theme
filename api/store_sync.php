@@ -13,10 +13,10 @@ $shopify = new jct\Shopify($apiKey,$apiPassword,$handle);
 
 echo "<pre>";
 //print_r($shopify->getAllProducts());
-print_r($shopify->getFetchFiles());
+//print_r( $shopify->getFetchProducts());//[0]->getFiles()[0]->getFileName());
 
 $albums = \jct\Album::getAllAlbums();
 foreach ($albums as $album) {
-    //print_r($album->syncToStore($shopify));
+    print_r($album->syncToStore($shopify));
 }
-//$shopify->deleteUnusedProducts();
+//$shopify->deleteUnusedProducts($albums);
