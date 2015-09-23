@@ -193,12 +193,23 @@ class Album extends ShopifyProduct {
 
     public function syncToStore($shopify) {
         $toprint = array();
-        $toprint[] = $shopify->syncProduct($this);
+        $response = $shopify->syncProduct($this);
+        $missing_files = $response['missing_files'];
         $tracks = $this->getAlbumTracks();
         foreach ($tracks as $track) {
-            $toprint[] = $track->syncToStore($shopify);
+            $response = $track->syncToStore($shopify);
+            $missing_files = array_merge($missing_files,$response['missing_files']);
         }
-        return $toprint;
+        $missing_files_context = array();
+        foreach ($missing_files as $missing_file) {
+            $format = $missing_file['format'];
+            if (!isset($missing_files_context[$format])) {
+                $zip = $this->getAllChildZips()[$format];
+                $missing_files_context[$format] = array('zip'=>array('filename'=>$zip->getFileAssetFileName(),'url'=>$zip->getURL()),'files'=>array());
+            }
+            $missing_files_context[$format]['files'][] = $missing_file['filename'];
+        }
+        return $missing_files_context;
     }
 
 }

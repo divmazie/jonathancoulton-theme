@@ -113,11 +113,14 @@ class Shopify {
                 case "jct\\Album": $object_variants = $object->getAllChildZips(); $title = $object->getAlbumTitle(); break;
                 case "jct\\Track": $object_variants = $object->getAllChildEncodes(); $title = $object->getTrackTitle(); break;
             }
+            $missing_files = array();
             foreach ($response->product->variants as $variant) {
-                $this->syncFetchProduct($variant->sku,$title." ".$variant->option1,$variant->price,$object_variants[$variant->option1]);
+                if ($missing = $this->syncFetchProduct($variant->sku,$title." ".$variant->option1,$variant->price,$object_variants[$variant->option1]->getFileAssetFileName())) {
+                    $missing_files[] = array('format'=>$variant->option1,'filename'=>$missing);
+                }
             }
         }
-        return $response;
+        return array('missing_files'=>$missing_files,'response'=>$response);
     }
 
     public function createProduct($object) {
@@ -300,26 +303,24 @@ class Shopify {
                 $fetch_product = $product;
             }
         }
+        $files = array();
         if (!$fetch_product) {
             $fetch_product = new Product();
             $fetch_product->setSKU($sku);
             $fetch_product->setName($name);
             $fetch_product->setPrice($price);
             $fetch_product->setCurrency(Currency::USD);
-            $files = array();
             if ($file = $this->getFetchFile($filename)) {
                 $files[] = $file;
             }
             try {
-                $response = $fetch_product->create($files, false);
-                return $response;
+                $fetch_product->create($files, false);
             } catch (Exception $e) {
                 return $e->getMessage();
             }
         } else {
             $fetch_product->setName($name);
             $fetch_product->setPrice($price);
-            $files = array();
             if ($file = $this->getFetchFile($filename)) {
                 $files[] = $file;
             }
@@ -328,6 +329,11 @@ class Shopify {
             } catch (Exception $e) {
                 return $e->getMessage();
             }
+        }
+        if (count($files)<1) {
+            return $filename;
+        } else {
+            return false;
         }
     }
 
