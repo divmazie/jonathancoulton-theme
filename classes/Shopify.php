@@ -151,13 +151,12 @@ class Shopify {
                 break;
             }
         }
-        $wp_time = strtotime($timber_post->get_modified_time());
+        $wp_time = strtotime($timber_post->post_modified);
         if (get_class($object)=="jct\\Track") {
             $timber_post = new \TimberPost($object->getAlbum()->getPostID());
-            $wp_time = max($wp_time,strtotime($timber_post->get_modified_time()));
+            $wp_time = max($wp_time,strtotime($timber_post->post_modified));
         }
-        //die($wp_time." - ".strtotime($shopify_product->updated_at));
-        if (strtotime($shopify_product->updated_at) < $wp_time) { // This test may have bug in it, but it's harmless for now
+        if (strtotime($shopify_product->updated_at) < $wp_time) {
             $args = $this->getProductArgs($object, true);
             $response = $this->makeCall("admin/products/$shopify_id", "PUT", $args);
             return $response;
