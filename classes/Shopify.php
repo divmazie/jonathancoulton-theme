@@ -437,14 +437,17 @@ class Shopify {
         $this->forceGetFetchProducts();
         $unused = array();
         foreach ($this->getFetchFiles() as $file) {
+            $filename = (string) $file->getFileName();
             $matching_product = false;
             foreach ($this->getFetchProducts() as $product) {
-                if (in_array($file,$product->getFiles())) {
-                    $matching_product = $product;
+                foreach ($product->getFiles() as $product_file) {
+                    if ($filename == (string) $product_file->getFileName()) {
+                        $matching_product = true;
+                    }
                 }
             }
             if (!$matching_product) {
-                $unused[] = (string) $file->getFileName();
+                $unused[] = $filename;
             }
         }
         return $unused;

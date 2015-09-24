@@ -240,7 +240,7 @@ class Album extends ShopifyProduct {
             }
             $missing_files_context[$format]['files'][] = $missing_file['filename'];
         }
-        $context['missing_files'] = $missing_files;
+        $context['missing_files'] = $missing_files_context;
         return $context;
     }
 
