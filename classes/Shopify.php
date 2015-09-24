@@ -132,6 +132,7 @@ class Shopify {
         } else {
             $response = $this->updateProduct($object);
         }
+        $missing_files = array();
         if ($response && is_array($response->product->variants)) {
             $object_variants = array();
             $title = "";
@@ -139,7 +140,6 @@ class Shopify {
                 case "jct\\Album": $object_variants = $object->getAllChildZips(); $title = $object->getAlbumTitle(); break;
                 case "jct\\Track": $object_variants = $object->getAllChildEncodes(); $title = $object->getTrackTitle(); break;
             }
-            $missing_files = array();
             foreach ($response->product->variants as $variant) {
                 if ($missing = $this->syncFetchProduct($variant->sku,$title." ".$variant->option1,$variant->price,$object_variants[$variant->option1]->getFileAssetFileName())) {
                     $missing_files[] = array('format'=>$variant->option1,'filename'=>$missing);
@@ -386,9 +386,10 @@ class Shopify {
             }
         } else {
             $file_object = $this->getFetchFile($filename);
-            if ($name != (string) $fetch_product->getName()
-                    || strval($price) != (string) $fetch_product->getPrice()
-                    || ($file_object && $file_object != $fetch_product->getFiles()[0]) ) {
+            if ($file_object // Only update Fetch product if file asset is ready to deliver
+                    && ($name != (string) $fetch_product->getName()
+                        || strval($price) != (string) $fetch_product->getPrice()
+                        || $file_object != $fetch_product->getFiles()[0]) ) {
                 $fetch_product->setName($name);
                 $fetch_product->setPrice($price);
                 if ($file = $file_object) {
