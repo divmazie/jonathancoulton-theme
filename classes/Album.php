@@ -42,8 +42,9 @@ class Album extends ShopifyProduct {
         $this->shopify_variant_skus = unserialize(get_post_meta($post_id,'shopify_variant_skus',false)[0]);
         $tracks = get_posts(array('post_type' => 'track', 'meta_key' => 'track_album', 'meta_value' => $post_id)); // Constructor probs shouldn't do this lookup
         foreach ($tracks as $track) {
-            $this->albumTracks[get_field('track_number',$track->id)] = new Track($track,$this);
+            $this->albumTracks[intval(get_field('track_number',$track->ID))] = new Track($track,$this);
         }
+        ksort($this->albumTracks);
     }
 
     static function getAllAlbums() {
