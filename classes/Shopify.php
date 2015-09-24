@@ -318,15 +318,20 @@ class Shopify {
                 return $e->getMessage();
             }
         } else {
-            $fetch_product->setName($name);
-            $fetch_product->setPrice($price);
-            if ($file = $this->getFetchFile($filename)) {
-                $files[] = $file;
-            }
-            try {
-                $fetch_product->update($files);
-            } catch (Exception $e) {
-                return $e->getMessage();
+            $file_object = $this->getFetchFile($filename);
+            if ($name != (string) $fetch_product->getName()
+                    || strval($price) != (string) $fetch_product->getPrice()
+                    || ($file_object && $file_object != $fetch_product->getFiles()[0]) ) {
+                $fetch_product->setName($name);
+                $fetch_product->setPrice($price);
+                if ($file = $file_object) {
+                    $files[] = $file;
+                }
+                try {
+                    $fetch_product->update($files);
+                } catch (Exception $e) {
+                    return $e->getMessage();
+                }
             }
         }
         if (count($files)<1) {
