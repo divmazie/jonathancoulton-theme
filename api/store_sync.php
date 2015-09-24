@@ -11,15 +11,19 @@ $apiPassword = get_field('shopify_api_password','options');
 $handle = get_field('shopify_handle','options');
 $shopify = new jct\Shopify($apiKey,$apiPassword,$handle);
 
-echo "<pre>";
+$context = Timber::get_context();
 //print_r($shopify->getAllProducts());
 //print_r( $shopify->getFetchProducts());//[0]->getFiles()[0]->getFileName());
 
 $albums = \jct\Album::getAllAlbums();
+$context['missing_files'] = array();
 foreach ($albums as $album) {
     $album->cleanAttachments();
-    print_r($album->syncToStore($shopify));
+    $response = $album->syncToStore($shopify);
+    $context['missing_files'] = array_merge($context['missing_files'],array_values($response['missing_files']));
 }
-print_r($shopify->deleteUnusedProducts($albums));
-print_r($shopify->deleteUnusedFetchProducts($albums));
-print_r($shopify->getUnusedFetchFiles());
+$shopify->deleteUnusedProducts($albums);
+$shopify->deleteUnusedFetchProducts($albums);
+$context['unused_files'] = $shopify->getUnusedFetchFiles();
+
+Timber::render("store_sync.twig",$context);

@@ -1,0 +1,47 @@
+{% include 'html-header.twig' %}
+	{% block head %}
+    {% endblock %}
+    <style>
+        .admin_album, .admin_zip, .admin_track, .admin_encode, .admin_bonus {
+            margin-left: 20px;
+        }
+        .admin_album, .admin_track, .admin_bonus {
+            padding: 5px;
+        }
+        .admin_album {
+            margin-bottom: 20px;
+            background-color: #ddd;
+        }
+        .admin_track {
+            margin-bottom: 10px;
+            background-color: #bbb;
+        }
+    </style>
+    </head>
+
+    <body class="{{body_class}}" data-template="base.twig">
+        <div class="container">
+            <h2>Store Sync Info!</h2>
+            <br />
+            {% for fileset in missing_files %}
+                {% if fileset.zip.url == "" %}
+                    Please go back to the <a href="{{ site.url }}/music_admin">music admin page</a> and run the encoder to make the zip file: {{ fileset.zip.filename }}.<br /><br />
+                {% else %}
+                    Download this ZIP file: <a href="{{ fileset.zip.url }}" download>{{ fileset.zip.filename }}</a><br />
+                    And upload the following files to the Jonathan Coulton Fetch account: <br />
+                    {% for file in fileset.files %}
+                        <strong>{{ file }}</strong>
+                        {% if file == fileset.zip.filename %}(the zip file itself){% endif %}
+                        <br />
+                    {% endfor %}
+                {% endif %}
+                <br />
+            {% endfor %}
+            <br />
+            It is safe to delete the following files from Fetch, provided there is only one of each name:<br />
+            {% for file in unused_files %}
+                <strong>{{ file }}</strong><br />
+            {% endfor %}
+        </div>
+    </body>
+</html>
