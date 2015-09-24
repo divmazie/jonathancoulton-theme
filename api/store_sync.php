@@ -17,7 +17,9 @@ echo "<pre>";
 
 $albums = \jct\Album::getAllAlbums();
 foreach ($albums as $album) {
+    $album->cleanAttachments();
     print_r($album->syncToStore($shopify));
 }
 print_r($shopify->deleteUnusedProducts($albums));
 print_r($shopify->deleteUnusedFetchProducts($albums));
+print_r($shopify->getUnusedFetchFiles());

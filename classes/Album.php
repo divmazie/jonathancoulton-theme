@@ -118,6 +118,14 @@ class Album extends ShopifyProduct {
         return $zip;
     }
 
+    public function cleanAttachments() {
+        $deleted = $this->deleteOldZips();
+        foreach ($this->getAlbumTracks() as $track) {
+            $deleted = array_merge($deleted,$track->deleteOldEncodes());
+        }
+        return $deleted;
+    }
+
     public function deleteOldZips() {
         $goodKeys = array();
         foreach ($this->getAllChildZips() as $zip) {

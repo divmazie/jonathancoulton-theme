@@ -362,4 +362,21 @@ class Shopify {
         }
     }
 
+    public function getUnusedFetchFiles() { // Must be called after all products are synced
+        $this->forceGetFetchProducts();
+        $unused = array();
+        foreach ($this->getFetchFiles() as $file) {
+            $matching_product = false;
+            foreach ($this->getFetchProducts() as $product) {
+                if (in_array($file,$product->getFiles())) {
+                    $matching_product = $product;
+                }
+            }
+            if (!$matching_product) {
+                $unused[] = (string) $file->getFileName();
+            }
+        }
+        return $unused;
+    }
+
 }
