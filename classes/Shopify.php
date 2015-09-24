@@ -14,7 +14,7 @@ use FetchApp\API\Product;
 
 class Shopify {
     private $apiKey, $apiPassword, $handle;
-    private $allProducts;
+    private $allProducts, $allCollections;
     private $fetch, $allFetchProducts, $allFetchFiles;
 
     public function __construct($apiKey, $apiPassword, $handle) {
@@ -54,11 +54,37 @@ class Shopify {
         return $this->allProducts;
     }
 
+    public function getAllCollections() {
+        if (isset($this->allCollections)) {
+            return $this->allCollections;
+        } else {
+            return $this->forceGetAllCollections();
+        }
+    }
+
+    public function forceGetAllCollections() {
+        $response = $this->makeCall('admin/custom_collections');
+        $this->allCollections = $response->custom_collections;
+        return $this->allCollections;
+    }
+
     public function productExists($product_id) {
         $products = $this->getAllProducts();
         if (is_array($products)) {
             foreach ($products as $product) {
                 if ($product->id == $product_id) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    public function collectionExists($collection_id) {
+        $collections = $this->getAllCollections();
+        if (is_array($collections)) {
+            foreach ($collections as $collection) {
+                if ($collection->id == $collection_id) {
                     return true;
                 }
             }
@@ -234,6 +260,47 @@ class Shopify {
             $args['product']['id'] = $object->getShopifyId();
         }
         return $args;
+    }
+
+    public function syncAlbumCollection($album,$ids) {
+        $image = base64_encode(file_get_contents($album->getAlbumArtObject()->getPath()));
+        $collects = array();
+        foreach ($ids as $num => $id) {
+            $collects[] = array('product_id' => $id, 'sort_value' => $num);
+        }
+        $args = array('custom_collection'=>array(
+            'title' => $album->getAlbumTitle(),
+            'body_html' => $album->getAlbumYear(),
+            'image' => array('attachment' => $image),
+            'sort_order' => 'manual',
+            'collects' => $collects
+        ));
+        $collection_id = $album->getShopifyCollectionId();
+        if ($collection_id && $this->collectionExists($collection_id)) {
+            $collect_dict = array();
+            $existing_collects = $this->makeCall('admin/collects','GET',array('collection_id'=>$collection_id));
+            foreach ($existing_collects->collects as $collect) {
+                $collect_dict[$collect->product_id] = $collect->id;
+                if (!in_array($collect->product_id,$ids)) {
+                    $this->makeCall('admin/collects/'.$collect->product_id,"DELETE");
+                }
+            }
+            foreach ($collects as $key => $collect) {
+                if ($collect_dict[$collect['product_id']]) {
+                    $collects[$key]['id'] = $collect_dict[$collect['product_id']];
+                }
+            }
+            $args['custom_collection']['collects'] = $collects;
+            $args['id'] = $collection_id;
+            $response = $this->makeCall('admin/custom_collections/'.$collection_id,'PUT',$args);
+            return $response;
+        } else {
+            $response = $this->makeCall('admin/custom_collections','POST',$args);
+            if ($response->custom_collection->id) {
+                $album->setShopifyCollectionId($response->custom_collection->id);
+            }
+            return $response;
+        }
     }
 
     public function deleteUnusedProducts($allAlbums = false) {

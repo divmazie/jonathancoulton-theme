@@ -10,6 +10,7 @@ class Album extends ShopifyProduct {
     private $encode_types,$wpPost;
     //
     private $albumTracks = array();
+    private $shopify_collection_id,$shopify_collect_ids;
 
     /**
      * @param \WP_Post $postObject the post in the blog that forms the base of this
@@ -40,6 +41,7 @@ class Album extends ShopifyProduct {
         $this->shopify_id = get_post_meta($post_id,'shopify_id',false)[0];
         $this->shopify_variant_ids = unserialize(get_post_meta($post_id,'shopify_variant_ids',false)[0]);
         $this->shopify_variant_skus = unserialize(get_post_meta($post_id,'shopify_variant_skus',false)[0]);
+        $this->shopify_collection_id = get_post_meta($post_id,'shopify_collection_id',false)[0];
         $tracks = get_posts(array('post_type' => 'track', 'meta_key' => 'track_album', 'meta_value' => $post_id)); // Constructor probs shouldn't do this lookup
         foreach ($tracks as $track) {
             $this->albumTracks[intval(get_field('track_number',$track->ID))] = new Track($track,$this);
@@ -200,15 +202,28 @@ class Album extends ShopifyProduct {
         return $this->albumComment;
     }
 
+    public function getShopifyCollectionId() {
+        return $this->shopify_collection_id;
+    }
+
+    public function setShopifyCollectionId($id) {
+        if (update_post_meta($this->postID,'shopify_collection_id',$id)) {
+            $this->shopify_collection_id = $id;
+        }
+    }
+
     public function syncToStore($shopify) {
-        $toprint = array();
+        $context = array();
         $response = $shopify->syncProduct($this);
         $missing_files = $response['missing_files'];
+        $track_product_ids = array(0=>$response['response']->product->id);
         $tracks = $this->getAlbumTracks();
         foreach ($tracks as $track) {
             $response = $track->syncToStore($shopify);
             $missing_files = array_merge($missing_files,$response['missing_files']);
+            $track_product_ids[intval($track->getTrackNumber())] = $response['response']->product->id;
         }
+        $context['collection_sync_response'] = $shopify->syncAlbumCollection($this,$track_product_ids);
         $missing_files_context = array();
         foreach ($missing_files as $missing_file) {
             $format = $missing_file['format'];
@@ -218,7 +233,8 @@ class Album extends ShopifyProduct {
             }
             $missing_files_context[$format]['files'][] = $missing_file['filename'];
         }
-        return $missing_files_context;
+        $context['missing_files'] = $missing_files;
+        return $context;
     }
 
 }
