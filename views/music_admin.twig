@@ -51,10 +51,12 @@
                     {% for track in album.tracks %}
                         <div class="admin_track">
                             Title: {{ track.title }} <br />
+                            Track number: {{ track.number }} <br />
                             Artist: {{ track.artist }} <br />
                             Art: {% if track.art.exists %} {{ track.art.filename }} {% else %} {{ macros.stop_warning('ART MISSING!') }} {% endif %} <br />
                             Source: {% if track.source.exists %} {{ track.source.filename }} {% else %} {{ macros.stop_warning('SOURCE MISSING!') }} {% endif %} <br />
                             {% if not track.encode_worthy %} {{ macros.stop_warning('NOT ENCODE WORTHY!') }} <br /> {% endif %}
+                            {% if track.track_num_conflict %} {{ macros.stop_warning('TRACK NUMBER CONFLICT!') }} <br /> {% endif %}
                             Encodes:
                             {% for encode in track.encodes %}
                                 <div class="admin_encode">

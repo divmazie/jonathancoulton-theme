@@ -44,7 +44,11 @@ class Album extends ShopifyProduct {
         $this->shopify_collection_id = get_post_meta($post_id,'shopify_collection_id',false)[0];
         $tracks = get_posts(array('post_type' => 'track', 'meta_key' => 'track_album', 'meta_value' => $post_id)); // Constructor probs shouldn't do this lookup
         foreach ($tracks as $track) {
-            $this->albumTracks[intval(get_field('track_number',$track->ID))] = new Track($track,$this);
+            $track_num = intval(get_field('track_number', $track->ID));
+            while (isset($this->albumTracks[$track_num])) {
+                $track_num = 1000 + $track_num;
+            }
+            $this->albumTracks[$track_num] = new Track($track, $this);
         }
         ksort($this->albumTracks);
     }
@@ -72,8 +76,11 @@ class Album extends ShopifyProduct {
             $context['album_zips'][] = $zip->getZipContext();
         }
         $context['tracks'] = array();
-        foreach ($this->getAlbumTracks() as $track) {
-            $context['tracks'][$track->getTrackNumber()] = $track->getTrackContext();
+        foreach ($this->getAlbumTracks() as $key => $track) {
+            $context['tracks'][$key] = $track->getTrackContext();
+            if ($key>1000) {
+                $context['tracks'][$key]['track_num_conflict'] = true;
+            }
         }
         $context['bonus_assets'] = array();
         foreach ($this->getAlbumBonusAssetObjects() as $bonus_asset) {
