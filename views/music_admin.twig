@@ -80,7 +80,7 @@
             <div>
                 {{ macros.stop_warning("Red warnings") }} above require editing albums and tracks in Wordpress. <br />
                 {{ macros.go_warning("Orange warnings") }} can be fixed by <button onclick="window.location.href='{{ site.url }}/api/code/postencodes/1'">create encodes and zips</button> <br />
-                Only {{ macros.good_warning("green messages") }} mean you are free to <button>Sync to store</button> <br />
+                Only {{ macros.good_warning("green messages") }} mean you are free to <button onclick="window.location.href='{{ site.url }}/api/code/store_sync/1'">Sync to store</button> <br />
             </div>
             <br /><br />
             <pre>{{ albums|print_r }}</pre>
