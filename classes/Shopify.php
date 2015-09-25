@@ -254,6 +254,9 @@ class Shopify {
             'images' => array(
                 array('attachment' => $image)
             ),
+            'metafields' => array(array(
+                'key'=>'track_number','value_type'=>'string','namespace'=>'global',
+                'value'=>get_class($object)=="jct\\Track"?$object->getTrackNumber():0)),
             'variants' => $variants
         ));
         if ($update) {
@@ -273,6 +276,9 @@ class Shopify {
             'body_html' => $album->getAlbumYear(),
             'image' => array('attachment' => $image),
             'sort_order' => 'manual',
+            'metafields' => array(array(
+                'key'=>'album_collection','value_type'=>'string','namespace'=>'global',
+                'value'=>'true')),
             'collects' => $collects
         ));
         $collection_id = $album->getShopifyCollectionId();
