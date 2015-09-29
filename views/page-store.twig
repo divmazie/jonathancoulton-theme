@@ -16,26 +16,54 @@
                     <span class="track_icon_left">{% if track.metafields.track_number > 0 %}{{ track.metafields.track_number }}{% endif %}</span>
                     <span class="track_icon_left">{% if track.metafields.track_number > 0 %}&#9654;{% endif %}</span>
                     <span class="track_title">{{ track.title }}</span>
-                    <span data-bind="style: { color: in_cart({ product_id: {{ track.id }} }) ? 'red' : 'blue' }">(in cart?)</span>
-                    <span class="track_icon_right"><a onclick="addToCart({ product_id: {{ track.id }}, variant_id: {{ track.variants[0].id }} })">cart</a></span>
+                    <span class="track_icon_right">
+                        <a data-bind="visible: !in_cart({ product_id: {{ track.id }} })" data-toggle="modal" data-target="#product_modal_{{ track.id }}">cart</a>
+                        <span data-bind="visible: in_cart({ product_id: {{ track.id }} })">&#x2713;</span>
+                    </span>
                     <span class="track_icon_right">${{ track.variants[0].price|number_format }}</span>
                     <span class="track_icon_right">&#x24D8;</span>
+                </div>
+                <div id="product_modal_{{ track.id }}" class="modal fade" role="dialog">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                                <h4 class="modal-title">Please select a file type for your download.</h4>
+                            </div>
+                            <div class="modal-body">
+                                {% for variant in track.variants %}
+                                <button onclick="addToCart({ product_id: {{ track.id }}, variant_id: {{ variant.id }}, price: {{ variant.price|number_format }} })">{{ variant.title }}</button>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>
                 </div>
             {% endfor %}
         </div>
         <div class="clearfix"></div>
     {% endfor %}
+    <button data-bind="visible: cart().length > 0" data-toggle="modal" data-target="#cart_modal">Show cart</button>
 </div>
-    <div id="debug">Debug!</div>
-    <div data-bind="text: bloop"></div>
-    CART:
-    <div data-bind="foreach: cart">
-        <div>
-            Product: <span data-bind="text: product_id"></span>
-            Variant: <span data-bind="text: variant_id"></span>
+<div id="cart_modal" class="modal fade" role="dialog">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h4 class="modal-title">SHOPPING CART!</h4>
+            </div>
+            <div class="modal-body">
+                <div data-bind="foreach: cart">
+                    <div>
+                        Product: <span data-bind="text: product_id"></span>
+                        Variant: <span data-bind="text: variant_id"></span>
+                        <a data-bind="click: $root.remove_product">Remove</a>
+                    </div>
+                </div>
+                <a data-bind="attr: { href: checkout_link }" target="_blank">CHECKOUT!</a>
+            </div>
         </div>
     </div>
-    <a data-bind="attr: { href: checkout_link }" target="_blank">CHECKOUT!</a>
+</div>
     <pre>{{ store|print_r }}</pre>
 
     <script type="application/javascript">
@@ -44,6 +72,10 @@
             var self = this;
             self.bloop = ko.observable("BLOOP!");
             self.cart = ko.observableArray(start_cart);
+            self.remove_product = function(product) {
+                self.cart.remove(product);
+                self.store_local();
+            }
             self.checkout_link = ko.computed(function() {
                 var link = shopify_domain + "/cart/";
                 var comma = "";
@@ -54,7 +86,7 @@
                 return link;
             });
 
-            self.in_cart = function (product) {
+            self.in_cart = function(product) {
                 for (var i=0; i<self.cart().length; i++) {
                     if (self.cart()[i].product_id == product.product_id) {
                         return true;
@@ -62,15 +94,26 @@
                 }
                 return false;
             }
+            self.store_local = function() {
+                if(typeof(Storage) !== "undefined") {
+                    sessionStorage.setItem('cart',ko.toJSON(self.cart()));
+                }
+            }
         };
 
-        var myViewModel = new ViewModel([]);
+        var start_cart = [];
+        if(typeof(Storage) !== "undefined") {
+            start_cart = JSON.parse(sessionStorage.getItem('cart'));
+        }
+        var myViewModel = new ViewModel(start_cart);
         ko.applyBindings(myViewModel);
 
         function addToCart(product) {
             if (!myViewModel.in_cart(product)) {
                 myViewModel.cart.push(product);
             }
+            $('#product_modal_'+product.product_id).modal('hide');
+            myViewModel.store_local();
         }
     </script>
 {% endblock %}
