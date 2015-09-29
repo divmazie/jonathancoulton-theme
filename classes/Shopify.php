@@ -460,4 +460,33 @@ class Shopify {
         return $unused;
     }
 
+    public function getStoreContext() {
+        $albums = array();
+        foreach ($this->getAllCollections() as $collection) {
+            $metafields = $this->makeCall('admin/custom_collections/'.$collection->id.'/metafields');
+            foreach ($metafields->metafields as $metafield) {
+                if ($metafield->key == 'album_collection' && $metafield->value) {
+                    $products = $this->makeCall('admin/products','GET',array('collection_id'=>$collection->id));
+                    $products_context = array();
+                    foreach ($products->products as $product) {
+                        $metafields = $this->makeCall('admin/products/'.$product->id.'/metafields');
+                        $metafields_context = array();
+                        $track_number = 0;
+                        foreach ($metafields->metafields as $field) {
+                            $metafields_context[$field->key] = $field->value;
+                            if ($field->key == "track_number") {
+                                $track_number = $field->value;
+                            }
+                        }
+                        $product->metafields = $metafields_context;
+                        $products_context[$track_number] = $product;
+                    }
+                    ksort($products_context);
+                    $albums[] = array('collection'=>$collection,'products'=>$products_context);
+                }
+            }
+        }
+        return $albums;
+    }
+
 }

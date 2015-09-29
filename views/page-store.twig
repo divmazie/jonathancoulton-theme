@@ -23,11 +23,11 @@
             -->
             {% for track in album.products %}
                 <div class="track_row">
-                    <span class="track_icon_left">{{ track.track_number }}</span>
-                    <span class="track_icon_left">&#9654;</span>
+                    <span class="track_icon_left">{% if track.metafields.track_number > 0 %}{{ track.metafields.track_number }}{% endif %}</span>
+                    <span class="track_icon_left">{% if track.metafields.track_number > 0 %}&#9654;{% endif %}</span>
                     <span class="track_title">{{ track.title }}</span>
                     <span class="track_icon_right">cart</span>
-                    <span class="track_icon_right">${{ track.price }}</span>
+                    <span class="track_icon_right">${{ track.variants[0].price|number_format }}</span>
                     <span class="track_icon_right">&#x24D8;</span>
                 </div>
             {% endfor %}
