@@ -1,6 +1,12 @@
 {% extends "base.twig" %}
 
 {% block content %}
+    <script type="application/javascript">
+        var shopify_domain = "http://jonathan-coulton.myshopify.com";
+        function addToCart(product_id) {
+
+        }
+    </script>
 <div class="container">
     {% for album in store %}
         <div class="col-xs-12 col-sm-4">
@@ -11,22 +17,12 @@
         <div class="col-xs-12 col-sm-8">
             <h3>{{ album.collection.title }}</h3>
             <span class="album_year">{{ album.collection.body_html }}</span>
-            <!--
-            <div class="track_row">
-                <span class="track_icon_left"></span>
-                <span class="track_icon_left"></span>
-                <span class="track_title">Full album</span>
-                <span class="track_icon_right">cart</span>
-                <span class="track_icon_right">${{ album.price }}</span>
-                <span class="track_icon_right">&#x24D8;</span>
-            </div>
-            -->
             {% for track in album.products %}
                 <div class="track_row">
                     <span class="track_icon_left">{% if track.metafields.track_number > 0 %}{{ track.metafields.track_number }}{% endif %}</span>
                     <span class="track_icon_left">{% if track.metafields.track_number > 0 %}&#9654;{% endif %}</span>
                     <span class="track_title">{{ track.title }}</span>
-                    <span class="track_icon_right">cart</span>
+                    <span class="track_icon_right"><a onclick="addToCart({{ track.variants[0].id }})">cart</a></span>
                     <span class="track_icon_right">${{ track.variants[0].price|number_format }}</span>
                     <span class="track_icon_right">&#x24D8;</span>
                 </div>
@@ -35,5 +31,6 @@
         <div class="clearfix"></div>
     {% endfor %}
 </div>
+    <div id="debug">Debug!</div>
     <pre>{{ store|print_r }}</pre>
 {% endblock %}
