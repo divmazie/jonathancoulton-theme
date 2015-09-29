@@ -1,12 +1,6 @@
 {% extends "base.twig" %}
 
 {% block content %}
-    <script type="application/javascript">
-        var shopify_domain = "http://jonathan-coulton.myshopify.com";
-        function addToCart(product_id) {
-
-        }
-    </script>
 <div class="container">
     {% for album in store %}
         <div class="col-xs-12 col-sm-4">
@@ -22,7 +16,8 @@
                     <span class="track_icon_left">{% if track.metafields.track_number > 0 %}{{ track.metafields.track_number }}{% endif %}</span>
                     <span class="track_icon_left">{% if track.metafields.track_number > 0 %}&#9654;{% endif %}</span>
                     <span class="track_title">{{ track.title }}</span>
-                    <span class="track_icon_right"><a onclick="addToCart({{ track.variants[0].id }})">cart</a></span>
+                    <span data-bind="style: { color: in_cart({ product_id: {{ track.id }} }) ? 'red' : 'blue' }">(in cart?)</span>
+                    <span class="track_icon_right"><a onclick="addToCart({ product_id: {{ track.id }}, variant_id: {{ track.variants[0].id }} })">cart</a></span>
                     <span class="track_icon_right">${{ track.variants[0].price|number_format }}</span>
                     <span class="track_icon_right">&#x24D8;</span>
                 </div>
@@ -32,5 +27,50 @@
     {% endfor %}
 </div>
     <div id="debug">Debug!</div>
+    <div data-bind="text: bloop"></div>
+    CART:
+    <div data-bind="foreach: cart">
+        <div>
+            Product: <span data-bind="text: product_id"></span>
+            Variant: <span data-bind="text: variant_id"></span>
+        </div>
+    </div>
+    <a data-bind="attr: { href: checkout_link }" target="_blank">CHECKOUT!</a>
     <pre>{{ store|print_r }}</pre>
+
+    <script type="application/javascript">
+        var shopify_domain = "http://jonathan-coulton.myshopify.com";
+        var ViewModel = function(start_cart) {
+            var self = this;
+            self.bloop = ko.observable("BLOOP!");
+            self.cart = ko.observableArray(start_cart);
+            self.checkout_link = ko.computed(function() {
+                var link = shopify_domain + "/cart/";
+                var comma = "";
+                for (var i=0; i<self.cart().length; i++) {
+                    link += comma + self.cart()[i].variant_id + ":1";
+                    comma = ",";
+                }
+                return link;
+            });
+
+            self.in_cart = function (product) {
+                for (var i=0; i<self.cart().length; i++) {
+                    if (self.cart()[i].product_id == product.product_id) {
+                        return true;
+                    }
+                }
+                return false;
+            }
+        };
+
+        var myViewModel = new ViewModel([]);
+        ko.applyBindings(myViewModel);
+
+        function addToCart(product) {
+            if (!myViewModel.in_cart(product)) {
+                myViewModel.cart.push(product);
+            }
+        }
+    </script>
 {% endblock %}
