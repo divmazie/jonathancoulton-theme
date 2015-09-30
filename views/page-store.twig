@@ -31,8 +31,12 @@
                                 <h4 class="modal-title">Please select a file type for your download.</h4>
                             </div>
                             <div class="modal-body">
+                                {% set variants_json = [] %}
                                 {% for variant in track.variants %}
-                                <button onclick="addToCart({ product_id: {{ track.id }}, variant_id: {{ variant.id }}, price: {{ variant.price|number_format }} })">{{ variant.title }}</button>
+                                    {% set variants_json = variants_json|merge([{ 'format': variant.title, 'id': variant.id }]) %}
+                                {% endfor %}
+                                {% for variant in track.variants %}
+                                    <button onclick='addToCart({{ track.id }},"{{ track.title }}",{{ variant.price|number_format }},{{ variants_json|json_encode() }},{{ variant.id }})'>{{ variant.title }}</button>
                                 {% endfor %}
                             </div>
                         </div>
@@ -54,12 +58,16 @@
             <div class="modal-body">
                 <div data-bind="foreach: cart">
                     <div>
+                        Name: <span data-bind="text: product_name"></span>
                         Product: <span data-bind="text: product_id"></span>
                         Variant: <span data-bind="text: variant_id"></span>
+                        Price: <span data-bind="text: price"></span>
+                        <select data-bind="options: variants, value: variant, optionsText: 'format'"></select>
                         <a data-bind="click: $root.remove_product">Remove</a>
                     </div>
                 </div>
-                <a data-bind="attr: { href: checkout_link }" target="_blank">CHECKOUT!</a>
+                Link: <span data-bind="text: checkout_link"></span>
+                <a data-bind="attr: { href: checkout_link }, visible: cart().length > 0">CHECKOUT!</a>
             </div>
         </div>
     </div>
@@ -68,9 +76,20 @@
 
     <script type="application/javascript">
         var shopify_domain = "http://jonathan-coulton.myshopify.com";
+        function CartItem(product_id,product_name,price,variants,variant) {
+            var self = this;
+            self.product_id = product_id;
+            self.product_name = product_name;
+            self.price = price;
+            self.variants = ko.observableArray(variants);
+            self.variant = ko.observable(variant);
+            self.variant_id = ko.computed(function() {
+                return self.variant().id;
+            });
+            self.quantity = ko.observable(1);
+        }
         var ViewModel = function(start_cart) {
             var self = this;
-            self.bloop = ko.observable("BLOOP!");
             self.cart = ko.observableArray(start_cart);
             self.remove_product = function(product) {
                 self.cart.remove(product);
@@ -80,7 +99,7 @@
                 var link = shopify_domain + "/cart/";
                 var comma = "";
                 for (var i=0; i<self.cart().length; i++) {
-                    link += comma + self.cart()[i].variant_id + ":1";
+                    link += comma + self.cart()[i].variant_id() + ":" + self.cart()[i].quantity();
                     comma = ",";
                 }
                 return link;
@@ -103,16 +122,26 @@
 
         var start_cart = [];
         if(typeof(Storage) !== "undefined") {
-            start_cart = JSON.parse(sessionStorage.getItem('cart'));
+            var stored_cart = JSON.parse(sessionStorage.getItem('cart'));
+            for (var i = 0; i < stored_cart.length; i++) {
+                start_cart.push(new CartItem(stored_cart[i].product_id,stored_cart[i].product_name,stored_cart[i].price,stored_cart[i].variants,stored_cart[i].variant));
+            }
         }
         var myViewModel = new ViewModel(start_cart);
         ko.applyBindings(myViewModel);
 
-        function addToCart(product) {
+        function addToCart(product_id,product_name,price,variants,variant_id) {
+            var variant = variants[0];
+            for (var i = 0; i < variants.length; i++) {
+                if (variants[i].id == variant_id) {
+                    variant = variants[i];
+                }
+            }
+            var product = new CartItem(product_id,product_name,price,variants,variant);
             if (!myViewModel.in_cart(product)) {
                 myViewModel.cart.push(product);
             }
-            $('#product_modal_'+product.product_id).modal('hide');
+            $('#product_modal_'+product_id).modal('hide');
             myViewModel.store_local();
         }
     </script>
