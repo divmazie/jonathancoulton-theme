@@ -1,25 +1,33 @@
 {% extends "base.twig" %}
 
 {% macro variants_modal(prompt,allow_multiple,id,name,variants) %}
-    <div id="product_modal_{{ id }}" class="modal fade" role="dialog">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <button type="button" class="close" data-dismiss="modal">&times;</button>
-                    <h4 class="modal-title">{{ prompt|default('Please select your preferred option.') }}</h4>
-                </div>
-                <div class="modal-body">
-                    {% set variants_json = [] %}
-                    {% for variant in variants %}
-                        {% set variants_json = variants_json|merge([{ 'option': variant.title, 'id': variant.id }]) %}
-                    {% endfor %}
-                    {% for variant in variants %}
-                        <button onclick='addToCart({{ id }},"{{ name }}",{{ variant.price|number_format }},{{ variants_json|json_encode() }},{{ variant.id }},{{ allow_multiple }})'>{{ variant.title }}</button>
-                    {% endfor %}
+    {% set variants_json = [] %}
+    {% for variant in variants %}
+        {% set variants_json = variants_json|merge([{ 'option': variant.title, 'id': variant.id }]) %}
+    {% endfor %}
+    {% if variants|length > 1 %}
+        <div id="product_modal_{{ id }}" class="modal fade" role="dialog">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal">&times;</button>
+                        <h4 class="modal-title">{{ prompt|default('Please select your preferred option.') }}</h4>
+                    </div>
+                    <div class="modal-body">
+                        {% for variant in variants %}
+                            <button onclick='addToCart({{ id }},"{{ name }}",{{ variant.price|number_format }},{{ variants_json|json_encode() }},{{ variant.id }},{{ allow_multiple }})'>{{ variant.title }}</button>
+                        {% endfor %}
+                    </div>
                 </div>
             </div>
         </div>
-    </div>
+    {% else %}
+        <script>
+            function add_{{ id }}_to_cart() {
+                addToCart({{ id }},"{{ name }}",{{ variants[0].price|number_format }},{{ variants_json|json_encode() }},{{ variants[0].id }},{{ allow_multiple }});
+            }
+        </script>
+    {% endif %}
 {% endmacro %}
 {% import _self as macros %}
 
@@ -52,7 +60,7 @@
                     <span class="track_icon_left">{% if track.metafields.track_number > 0 %}&#9654;{% endif %}</span>
                     <span class="track_title">{{ track.title }}</span>
                     <span class="track_icon_right">
-                        <a data-bind="visible: !in_cart({ product_id: {{ track.id }} })" data-toggle="modal" data-target="#product_modal_{{ track.id }}">cart</a>
+                        <a data-bind="visible: !in_cart({ product_id: {{ track.id }} })" onclick="option_modal({{ track.id }})">cart</a>
                         <span data-bind="visible: in_cart({ product_id: {{ track.id }} })">&#x2713;</span>
                     </span>
                     <span class="track_icon_right">${{ track.variants[0].price|number_format }}</span>
@@ -70,7 +78,8 @@
                 <img src="{{ shirt.image.src }}" class="album_image" /><br />
                 {{ shirt.title }}<br />
                 {{ shirt.body_html }}<br />
-                <a data-toggle="modal" data-target="#product_modal_{{ shirt.id }}">cart</a>
+                <a  onclick="option_modal('{{ shirt.id }}')">cart</a>
+                <span data-bind="visible: in_cart({ product_id: {{ shirt.id }} })">&#x2713;</span>
             </div>
             {{ macros.variants_modal('Please select your shirt size.','true',shirt.id,shirt.title,shirt.variants) }}
         {% endfor %}
@@ -92,12 +101,25 @@
                         Product: <span data-bind="text: product_id"></span>
                         Variant: <span data-bind="text: variant_id"></span>
                         Price: <span data-bind="text: price"></span>
-                        <select data-bind="options: variants, value: variant, optionsText: 'option'"></select>
+                        <select data-bind="options: variants, value: variant, optionsText: 'option', visible: variants().length > 1"></select>
                         <a data-bind="click: $root.remove_product">Remove</a>
                     </div>
                 </div>
                 Link: <span data-bind="text: checkout_link"></span>
                 <a data-bind="attr: { href: checkout_link }, visible: cart().length > 0">CHECKOUT!</a>
+            </div>
+        </div>
+    </div>
+</div>
+<div id="cart_confirm_modal" class="modal fade" role="dialog">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h4 class="modal-title">Item added to cart!</h4>
+            </div>
+            <div class="modal-body">
+                <span id="cart_confirm_product_name"></span> has been added to your shopping cart!
             </div>
         </div>
     </div>
@@ -120,7 +142,7 @@
         }
         var ViewModel = function(start_cart) {
             var self = this;
-            self.store_view = ko.observable('downloads');
+            self.store_view = ko.observable('shirts');
             self.cart = ko.observableArray(start_cart);
             self.remove_product = function(product) {
                 self.cart.remove(product);
@@ -166,6 +188,14 @@
             myViewModel.store_view(section);
         }
 
+        function option_modal(product_id) {
+            if ($('#product_modal_'+product_id).size()) {
+                $('#product_modal_'+product_id).modal('show');
+            } else {
+                window["add_"+product_id+"_to_cart"](product_id);
+            }
+        }
+
         function addToCart(product_id,product_name,price,variants,variant_id,allow_multiple) {
             var variant = variants[0];
             for (var i = 0; i < variants.length; i++) {
@@ -179,6 +209,9 @@
             }
             $('#product_modal_'+product_id).modal('hide');
             myViewModel.store_local();
+            $('#cart_confirm_product_name').html(product_name);
+            $('#cart_confirm_modal').modal('show');
+            setTimeout("$('#cart_confirm_modal').modal('hide')",1500);
         }
     </script>
 {% endblock %}
