@@ -1,8 +1,43 @@
 {% extends "base.twig" %}
 
+{% macro variants_modal(prompt,allow_multiple,id,name,variants) %}
+    <div id="product_modal_{{ id }}" class="modal fade" role="dialog">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    <h4 class="modal-title">{{ prompt|default('Please select your preferred option.') }}</h4>
+                </div>
+                <div class="modal-body">
+                    {% set variants_json = [] %}
+                    {% for variant in variants %}
+                        {% set variants_json = variants_json|merge([{ 'option': variant.title, 'id': variant.id }]) %}
+                    {% endfor %}
+                    {% for variant in variants %}
+                        <button onclick='addToCart({{ id }},"{{ name }}",{{ variant.price|number_format }},{{ variants_json|json_encode() }},{{ variant.id }},{{ allow_multiple }})'>{{ variant.title }}</button>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+{% endmacro %}
+{% import _self as macros %}
+
 {% block content %}
 <div class="container">
-    {% for album in store %}
+    <nav id="nav-store">
+        <ul>
+            <li class="menu-item">
+                <a onclick="store_nav('downloads')">Downloads</a>
+            </li>
+            <div class="menu_slash">/</div>
+            <li>
+                <a onclick="store_nav('shirts')">Shirts</a>
+            </li>
+        </ul>
+    </nav>
+    <div data-bind="visible: store_view() == 'downloads'">
+    {% for album in store.albums %}
         <div class="col-xs-12 col-sm-4">
             <div class="album_square">
                 <img src="{{ album.collection.image.src }}" class="album_image" />
@@ -23,29 +58,24 @@
                     <span class="track_icon_right">${{ track.variants[0].price|number_format }}</span>
                     <span class="track_icon_right">&#x24D8;</span>
                 </div>
-                <div id="product_modal_{{ track.id }}" class="modal fade" role="dialog">
-                    <div class="modal-dialog">
-                        <div class="modal-content">
-                            <div class="modal-header">
-                                <button type="button" class="close" data-dismiss="modal">&times;</button>
-                                <h4 class="modal-title">Please select a file type for your download.</h4>
-                            </div>
-                            <div class="modal-body">
-                                {% set variants_json = [] %}
-                                {% for variant in track.variants %}
-                                    {% set variants_json = variants_json|merge([{ 'format': variant.title, 'id': variant.id }]) %}
-                                {% endfor %}
-                                {% for variant in track.variants %}
-                                    <button onclick='addToCart({{ track.id }},"{{ track.title }}",{{ variant.price|number_format }},{{ variants_json|json_encode() }},{{ variant.id }})'>{{ variant.title }}</button>
-                                {% endfor %}
-                            </div>
-                        </div>
-                    </div>
-                </div>
+                {{ macros.variants_modal('Please select a file format for your download.','false',track.id,track.title,track.variants) }}
             {% endfor %}
         </div>
         <div class="clearfix"></div>
     {% endfor %}
+    </div>
+    <div data-bind="visible: store_view() == 'shirts'">
+        {% for shirt in store.shirts %}
+            <div class="col-lg-3">
+                <img src="{{ shirt.image.src }}" class="album_image" /><br />
+                {{ shirt.title }}<br />
+                {{ shirt.body_html }}<br />
+                <a data-toggle="modal" data-target="#product_modal_{{ shirt.id }}">cart</a>
+            </div>
+            {{ macros.variants_modal('Please select your shirt size.','true',shirt.id,shirt.title,shirt.variants) }}
+        {% endfor %}
+        <div class="clearfix"></div>
+    </div>
     <button data-bind="visible: cart().length > 0" data-toggle="modal" data-target="#cart_modal">Show cart</button>
 </div>
 <div id="cart_modal" class="modal fade" role="dialog">
@@ -62,7 +92,7 @@
                         Product: <span data-bind="text: product_id"></span>
                         Variant: <span data-bind="text: variant_id"></span>
                         Price: <span data-bind="text: price"></span>
-                        <select data-bind="options: variants, value: variant, optionsText: 'format'"></select>
+                        <select data-bind="options: variants, value: variant, optionsText: 'option'"></select>
                         <a data-bind="click: $root.remove_product">Remove</a>
                     </div>
                 </div>
@@ -90,6 +120,7 @@
         }
         var ViewModel = function(start_cart) {
             var self = this;
+            self.store_view = ko.observable('downloads');
             self.cart = ko.observableArray(start_cart);
             self.remove_product = function(product) {
                 self.cart.remove(product);
@@ -122,6 +153,7 @@
 
         var start_cart = [];
         if(typeof(Storage) !== "undefined") {
+            //sessionStorage.setItem('cart',[]);
             var stored_cart = JSON.parse(sessionStorage.getItem('cart'));
             for (var i = 0; i < stored_cart.length; i++) {
                 start_cart.push(new CartItem(stored_cart[i].product_id,stored_cart[i].product_name,stored_cart[i].price,stored_cart[i].variants,stored_cart[i].variant));
@@ -130,7 +162,11 @@
         var myViewModel = new ViewModel(start_cart);
         ko.applyBindings(myViewModel);
 
-        function addToCart(product_id,product_name,price,variants,variant_id) {
+        function store_nav(section) {
+            myViewModel.store_view(section);
+        }
+
+        function addToCart(product_id,product_name,price,variants,variant_id,allow_multiple) {
             var variant = variants[0];
             for (var i = 0; i < variants.length; i++) {
                 if (variants[i].id == variant_id) {
@@ -138,7 +174,7 @@
                 }
             }
             var product = new CartItem(product_id,product_name,price,variants,variant);
-            if (!myViewModel.in_cart(product)) {
+            if (allow_multiple || !myViewModel.in_cart(product)) {
                 myViewModel.cart.push(product);
             }
             $('#product_modal_'+product_id).modal('hide');

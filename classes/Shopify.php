@@ -486,7 +486,9 @@ class Shopify {
                 }
             }
         }
-        return $albums;
+        $shirts = $this->makeCall("admin/products",'GET',array('product_type' => 'Shirts'));
+        $shirts = $shirts->products;
+        return array('albums' => $albums, 'shirts' => $shirts);
     }
 
 }
