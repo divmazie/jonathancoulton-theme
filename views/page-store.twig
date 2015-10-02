@@ -127,6 +127,23 @@
         </div>
     </div>
 </div>
+    <div id="purchase_confirm_modal" class="modal fade" role="dialog">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    <h4 class="modal-title">Item added to cart!</h4>
+                </div>
+                <div class="modal-body">
+                    Thank you for your order from jonathancoulton.com!<br />
+                    <br />
+                    You are awesome.<br />
+                    <br />
+                    <a onclick="$('#purchase_confirm_modal').modal('hide')"><div class="blue_arrow_left">Back</div></a>
+                </div>
+            </div>
+        </div>
+    </div>
     <pre>{{ store|print_r }}</pre>
 
     <script type="application/javascript">
@@ -204,8 +221,9 @@
         }
 
         function option_modal(product_id) {
-            if ($('#product_modal_'+product_id).size()) {
-                $('#product_modal_'+product_id).modal('show');
+            var product_modal = $('#product_modal_'+product_id);
+            if (product_modal.size()) {
+                product_modal.modal('show');
             } else {
                 window["add_"+product_id+"_to_cart"](product_id);
             }
@@ -228,5 +246,13 @@
             $('#cart_confirm_modal').modal('show');
             setTimeout("$('#cart_confirm_modal').modal('hide')",1500);
         }
+
+        {% if get_vars.return_from_shopify %}
+        window.onload = function() {
+            myViewModel.cart([]);
+            sessionStorage.setItem('cart',ko.toJSON([]));
+            $('#purchase_confirm_modal').modal('show');
+        }
+        {% endif %}
     </script>
 {% endblock %}
