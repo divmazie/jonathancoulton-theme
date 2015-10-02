@@ -96,16 +96,19 @@
             </div>
             <div class="modal-body">
                 <div data-bind="foreach: cart">
-                    <div>
-                        Name: <span data-bind="text: product_name"></span>
-                        Product: <span data-bind="text: product_id"></span>
+                    <div class="cart_row">
+                        <span data-bind="text: product_name"></span>
+                        <span class="cart_icon_right"><a data-bind="click: $root.remove_product">&#x2715;</a></span>
+                        <span class="cart_icon_right">$<span data-bind="text: calculated_cost"></span></span>
+                        <span class="cart_icon_right"><select data-bind="options: variants, value: variant, optionsText: 'option', visible: variants().length > 1"></select></span>
+                        <span class="cart_icon_right"><input type="number" data-bind="value: quantity, visible: allow_multiple" min="0" style="width: 50px;" /></span>
+                        <!--Product: <span data-bind="text: product_id"></span>
                         Variant: <span data-bind="text: variant_id"></span>
-                        Price: <span data-bind="text: price"></span>
-                        <select data-bind="options: variants, value: variant, optionsText: 'option', visible: variants().length > 1"></select>
-                        <a data-bind="click: $root.remove_product">Remove</a>
+                        -->
                     </div>
                 </div>
-                Link: <span data-bind="text: checkout_link"></span>
+                Total: $<span data-bind="text: total_cost"></span><br />
+                (Shipping and tax calculated at checkout.)<br /><br />
                 <a data-bind="attr: { href: checkout_link }, visible: cart().length > 0">CHECKOUT!</a>
             </div>
         </div>
@@ -128,17 +131,21 @@
 
     <script type="application/javascript">
         var shopify_domain = "http://jonathan-coulton.myshopify.com";
-        function CartItem(product_id,product_name,price,variants,variant) {
+        function CartItem(product_id,product_name,price,variants,variant,quantity,allow_multiple) {
             var self = this;
             self.product_id = product_id;
             self.product_name = product_name;
             self.price = price;
+            self.quantity = ko.observable(quantity);
+            self.calculated_cost = ko.computed(function () {
+                return self.price * self.quantity();
+            });
             self.variants = ko.observableArray(variants);
             self.variant = ko.observable(variant);
             self.variant_id = ko.computed(function() {
                 return self.variant().id;
             });
-            self.quantity = ko.observable(1);
+            self.allow_multiple = allow_multiple;
         }
         var ViewModel = function(start_cart) {
             var self = this;
@@ -148,6 +155,13 @@
                 self.cart.remove(product);
                 self.store_local();
             }
+            self.total_cost = ko.computed(function() {
+                var total = 0;
+                for (var i=0; i<self.cart().length; i++) {
+                    total += self.cart()[i].calculated_cost();
+                }
+                return total;
+            });
             self.checkout_link = ko.computed(function() {
                 var link = shopify_domain + "/cart/";
                 var comma = "";
@@ -176,9 +190,10 @@
         var start_cart = [];
         if(typeof(Storage) !== "undefined") {
             //sessionStorage.setItem('cart',[]);
+            //var stored_cart = start_cart;
             var stored_cart = JSON.parse(sessionStorage.getItem('cart'));
             for (var i = 0; i < stored_cart.length; i++) {
-                start_cart.push(new CartItem(stored_cart[i].product_id,stored_cart[i].product_name,stored_cart[i].price,stored_cart[i].variants,stored_cart[i].variant));
+                start_cart.push(new CartItem(stored_cart[i].product_id,stored_cart[i].product_name,stored_cart[i].price,stored_cart[i].variants,stored_cart[i].variant,stored_cart[i].quantity,stored_cart[i].allow_multiple));
             }
         }
         var myViewModel = new ViewModel(start_cart);
@@ -203,7 +218,7 @@
                     variant = variants[i];
                 }
             }
-            var product = new CartItem(product_id,product_name,price,variants,variant);
+            var product = new CartItem(product_id,product_name,price,variants,variant,1,allow_multiple);
             if (allow_multiple || !myViewModel.in_cart(product)) {
                 myViewModel.cart.push(product);
             }
