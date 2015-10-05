@@ -10,8 +10,10 @@ use FetchApp\API\FetchApp;
 
 $fetch = new FetchApp();
 
+$fetch_key = get_field('fetch_key','options');
+$fetch_token = get_field('fetch_token','options');
 // Set the Authentication data (needed for all requests)
-$fetch->setAuthenticationKey("joco");
-$fetch->setAuthenticationToken("7e35d7e0fb27");
+$fetch->setAuthenticationKey($fetch_key);
+$fetch->setAuthenticationToken($fetch_token);
 
 return $fetch;
