@@ -101,8 +101,9 @@
                         <span class="cart_icon_right"><a data-bind="click: $root.remove_product">&#x2715;</a></span>
                         <span class="cart_icon_right">$<span data-bind="text: calculated_cost"></span></span>
                         <span class="cart_icon_right"><select data-bind="options: variants, value: variant, optionsText: 'option', visible: variants().length > 1"></select></span>
-                        <span class="cart_icon_right"><input type="number" data-bind="value: quantity, visible: allow_multiple" min="0" style="width: 50px;" /></span>
-                        <!--Product: <span data-bind="text: product_id"></span>
+                        <span class="cart_icon_right"><a data-bind="click: duplicate_item, visible: allow_multiple">Duplicate</a></span>
+                        <!--<span class="cart_icon_right"><input type="number" data-bind="value: quantity, visible: allow_multiple" min="0" style="width: 50px;" /></span>
+                        Product: <span data-bind="text: product_id"></span>
                         Variant: <span data-bind="text: variant_id"></span>
                         -->
                     </div>
@@ -144,6 +145,7 @@
             </div>
         </div>
     </div>
+    <pre id="debug"></pre>
     <pre>{{ store|print_r }}</pre>
 
     <script type="application/javascript">
@@ -163,6 +165,9 @@
                 return self.variant().id;
             });
             self.allow_multiple = allow_multiple;
+            self.duplicate_item = function() {
+                addToCart(self.product_id,self.product_name,self.price,self.variants(),self.variant_id(),self.allow_multiple);
+            }
         }
         var ViewModel = function(start_cart) {
             var self = this;
@@ -170,7 +175,6 @@
             self.cart = ko.observableArray(start_cart);
             self.remove_product = function(product) {
                 self.cart.remove(product);
-                self.store_local();
             }
             self.total_cost = ko.computed(function() {
                 var total = 0;
@@ -197,20 +201,22 @@
                 }
                 return false;
             }
-            self.store_local = function() {
+            self.store_local = ko.computed(function() {
                 if(typeof(Storage) !== "undefined") {
                     sessionStorage.setItem('cart',ko.toJSON(self.cart()));
                 }
-            }
+            });
         };
 
         var start_cart = [];
         if(typeof(Storage) !== "undefined") {
             //sessionStorage.setItem('cart',[]);
             //var stored_cart = start_cart;
+            $('#debug').html(sessionStorage.getItem('cart'));
             var stored_cart = JSON.parse(sessionStorage.getItem('cart'));
             for (var i = 0; i < stored_cart.length; i++) {
-                start_cart.push(new CartItem(stored_cart[i].product_id,stored_cart[i].product_name,stored_cart[i].price,stored_cart[i].variants,stored_cart[i].variant,stored_cart[i].quantity,stored_cart[i].allow_multiple));
+                var variant = find_variant(stored_cart[i].variants,stored_cart[i].variant_id);
+                start_cart.push(new CartItem(stored_cart[i].product_id,stored_cart[i].product_name,stored_cart[i].price,stored_cart[i].variants,variant,stored_cart[i].quantity,stored_cart[i].allow_multiple));
             }
         }
         var myViewModel = new ViewModel(start_cart);
@@ -230,21 +236,24 @@
         }
 
         function addToCart(product_id,product_name,price,variants,variant_id,allow_multiple) {
+            var variant = find_variant(variants,variant_id);
+            var product = new CartItem(product_id,product_name,price,variants,variant,1,allow_multiple);
+            if (allow_multiple || !myViewModel.in_cart(product)) {
+                myViewModel.cart.push(product);
+            }
+            $('#product_modal_'+product_id).modal('hide');
+            $('#cart_confirm_product_name').html(product_name);
+            $('#cart_confirm_modal').modal('show');
+            setTimeout("$('#cart_confirm_modal').modal('hide')",1500);
+        }
+        function find_variant(variants,variant_id) {
             var variant = variants[0];
             for (var i = 0; i < variants.length; i++) {
                 if (variants[i].id == variant_id) {
                     variant = variants[i];
                 }
             }
-            var product = new CartItem(product_id,product_name,price,variants,variant,1,allow_multiple);
-            if (allow_multiple || !myViewModel.in_cart(product)) {
-                myViewModel.cart.push(product);
-            }
-            $('#product_modal_'+product_id).modal('hide');
-            myViewModel.store_local();
-            $('#cart_confirm_product_name').html(product_name);
-            $('#cart_confirm_modal').modal('show');
-            setTimeout("$('#cart_confirm_modal').modal('hide')",1500);
+            return variant;
         }
 
         {% if get_vars.return_from_shopify %}
