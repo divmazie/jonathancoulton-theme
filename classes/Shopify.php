@@ -246,6 +246,11 @@ class Shopify {
             }
             $variants[] = $v;
         }
+        $wiki_link = get_field('wiki_link',$object->getPostID());
+        if (!$wiki_link) {
+            $obj_title = get_class($object)=="jct\\Track"?$object->getTrackTitle():$object->getAlbumTitle();
+            $wiki_link = get_field('joco_wiki_base_url','options').urlencode(preg_replace('/\s+/', '_',$obj_title));
+        }
         $args = array("product" => array(
             'title' => $title,
             'body_html' => $body,
@@ -254,9 +259,11 @@ class Shopify {
             'images' => array(
                 array('attachment' => $image)
             ),
-            'metafields' => array(array(
-                'key'=>'track_number','value_type'=>'string','namespace'=>'global',
-                'value'=>get_class($object)=="jct\\Track"?$object->getTrackNumber():0)),
+            'metafields' => array(
+                array('key'=>'track_number','value_type'=>'string','namespace'=>'global',
+                    'value'=>get_class($object)=="jct\\Track"?$object->getTrackNumber():0),
+                array('key'=>'wiki_link','value_type'=>'string','namespace'=>'global',
+                    'value'=>$wiki_link)),
             'variants' => $variants
         ));
         if ($update) {

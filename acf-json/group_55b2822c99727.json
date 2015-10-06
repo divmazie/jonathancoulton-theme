@@ -221,6 +221,22 @@
             "step": "",
             "readonly": 0,
             "disabled": 0
+        },
+        {
+            "key": "field_56142c05edb9b",
+            "label": "Wiki Link",
+            "name": "wiki_link",
+            "type": "url",
+            "instructions": "If left blank, defaults to [JoCo Wiki Base Link] \/ [track name with underscores and urlencoded]",
+            "required": 0,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "",
+                "class": "",
+                "id": ""
+            },
+            "default_value": "",
+            "placeholder": ""
         }
     ],
     "location": [
@@ -256,5 +272,5 @@
     ],
     "active": 1,
     "description": "",
-    "modified": 1440187739
+    "modified": 1444162639
 }

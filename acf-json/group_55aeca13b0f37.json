@@ -177,6 +177,27 @@
             "placeholder": ""
         },
         {
+            "key": "field_56142806b9042",
+            "label": "JoCo Wiki base url",
+            "name": "joco_wiki_base_url",
+            "type": "text",
+            "instructions": "",
+            "required": 1,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "",
+                "class": "",
+                "id": ""
+            },
+            "default_value": "http:\/\/www.jonathancoulton.com\/wiki\/",
+            "placeholder": "",
+            "prepend": "",
+            "append": "",
+            "maxlength": "",
+            "readonly": 0,
+            "disabled": 0
+        },
+        {
             "key": "field_55df75c393c25",
             "label": "APIs",
             "name": "",
@@ -394,5 +415,5 @@
     "hide_on_screen": "",
     "active": 1,
     "description": "",
-    "modified": 1442960686
+    "modified": 1444161583
 }

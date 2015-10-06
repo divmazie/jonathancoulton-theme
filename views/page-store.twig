@@ -64,7 +64,7 @@
                         <span data-bind="visible: in_cart({ product_id: {{ track.id }} })">&#x2713;</span>
                     </span>
                     <span class="track_icon_right">${{ track.variants[0].price|number_format }}</span>
-                    <span class="track_icon_right">&#x24D8;</span>
+                    <span class="track_icon_right"><a href="{{ track.metafields.wiki_link }}">&#x24D8;</a></span>
                 </div>
                 {{ macros.variants_modal('Please select a file format for your download.','false',track.id,track.title,track.variants) }}
             {% endfor %}
