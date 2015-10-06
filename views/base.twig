@@ -90,7 +90,7 @@
 		<script type="text/javascript">
 			// open external links in new tab
 			jQuery('#body').find('a').filter(function() {
-				return this.hostname && this.hostname.indexOf(location.hostname)===-1
+				return this.hostname && this.hostname.indexOf(location.hostname)===-1 && this.hostname!="jonathan-coulton.myshopify.com";
 			}).attr({
 				target : "_blank"
 			});
