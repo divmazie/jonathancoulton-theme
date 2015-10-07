@@ -495,34 +495,48 @@ class Shopify {
     }
 
     public function getStoreContext() {
-        $albums = array();
-        foreach ($this->getAllCollections() as $collection) {
-            $metafields = $this->makeCall('admin/custom_collections/'.$collection->id.'/metafields');
-            foreach ($metafields->metafields as $metafield) {
-                if ($metafield->key == 'album_collection' && $metafield->value) {
-                    $products = $this->makeCall('admin/products','GET',array('collection_id'=>$collection->id));
-                    $products_context = array();
-                    foreach ($products->products as $product) {
-                        $metafields = $this->makeCall('admin/products/'.$product->id.'/metafields');
-                        $metafields_context = array();
-                        $track_number = 0;
-                        foreach ($metafields->metafields as $field) {
-                            $metafields_context[$field->key] = $field->value;
-                            if ($field->key == "track_number") {
-                                $track_number = $field->value;
+        $context = array();
+        $categories = get_field('store_categories','options');
+        if (is_array($categories)) {
+            foreach ($categories as $category) {
+                if ($category['display']) {
+                    $html_name = htmlentities(strtolower(preg_replace('/\s+/', '_',$category['display_name'])));
+                    if ($category['shopify_type'] == 'Music download') {
+                        $albums = array();
+                        foreach ($this->getAllCollections() as $collection) {
+                            $metafields = $this->makeCall('admin/custom_collections/' . $collection->id . '/metafields');
+                            foreach ($metafields->metafields as $metafield) {
+                                if ($metafield->key == 'album_collection' && $metafield->value) {
+                                    $products = $this->makeCall('admin/products', 'GET', array('collection_id' => $collection->id));
+                                    $products_context = array();
+                                    foreach ($products->products as $product) {
+                                        $metafields = $this->makeCall('admin/products/' . $product->id . '/metafields');
+                                        $metafields_context = array();
+                                        $track_number = 0;
+                                        foreach ($metafields->metafields as $field) {
+                                            $metafields_context[$field->key] = $field->value;
+                                            if ($field->key == "track_number") {
+                                                $track_number = $field->value;
+                                            }
+                                        }
+                                        $product->metafields = $metafields_context;
+                                        $products_context[$track_number] = $product;
+                                    }
+                                    ksort($products_context);
+                                    $albums[] = array('collection' => $collection, 'products' => $products_context);
+                                }
                             }
                         }
-                        $product->metafields = $metafields_context;
-                        $products_context[$track_number] = $product;
+                        $products = $albums;
+                    } else {
+                        $products = $this->makeCall("admin/products", 'GET', array('product_type' => $category['shopify_type']));
+                        $products = $products->products;
                     }
-                    ksort($products_context);
-                    $albums[] = array('collection'=>$collection,'products'=>$products_context);
+                    $context[] = array('name' => $category['display_name'], 'html_name' => $html_name, 'shopify_type' => $category['shopify_type'], 'products' => $products);
                 }
             }
         }
-        $shirts = $this->makeCall("admin/products",'GET',array('product_type' => 'Shirts'));
-        $shirts = $shirts->products;
-        return array('albums' => $albums, 'shirts' => $shirts);
+        return $context;
     }
 
 }

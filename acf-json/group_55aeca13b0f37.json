@@ -16,7 +16,7 @@
                 "id": ""
             },
             "placement": "top",
-            "endpoint": 1
+            "endpoint": 0
         },
         {
             "key": "field_55df81190c8da",
@@ -116,7 +116,7 @@
                 "id": ""
             },
             "placement": "top",
-            "endpoint": 1
+            "endpoint": 0
         },
         {
             "key": "field_55dcccc551829",
@@ -198,6 +198,100 @@
             "disabled": 0
         },
         {
+            "key": "field_56158acfcf277",
+            "label": "Store",
+            "name": "",
+            "type": "tab",
+            "instructions": "",
+            "required": 0,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "",
+                "class": "",
+                "id": ""
+            },
+            "placement": "top",
+            "endpoint": 0
+        },
+        {
+            "key": "field_561589023a077",
+            "label": "Store categories",
+            "name": "store_categories",
+            "type": "repeater",
+            "instructions": "These determine the tabs within the store part of the site and what Shopify product types they should display. \"Music download\" must be present to display the download part of the store.",
+            "required": 0,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "",
+                "class": "",
+                "id": ""
+            },
+            "min": "",
+            "max": "",
+            "layout": "table",
+            "button_label": "Add Category",
+            "sub_fields": [
+                {
+                    "key": "field_561589173a078",
+                    "label": "Shopify type",
+                    "name": "shopify_type",
+                    "type": "text",
+                    "instructions": "This is category as it appears on Shopify. This must match exactly to display anything.",
+                    "required": 1,
+                    "conditional_logic": 0,
+                    "wrapper": {
+                        "width": "",
+                        "class": "",
+                        "id": ""
+                    },
+                    "default_value": "",
+                    "placeholder": "",
+                    "prepend": "",
+                    "append": "",
+                    "maxlength": "",
+                    "readonly": 0,
+                    "disabled": 0
+                },
+                {
+                    "key": "field_561589843a079",
+                    "label": "Display name",
+                    "name": "display_name",
+                    "type": "text",
+                    "instructions": "This the text that is displayed in the user navigation. Defaults to the \"Shopify type\" if left blank.",
+                    "required": 0,
+                    "conditional_logic": 0,
+                    "wrapper": {
+                        "width": "",
+                        "class": "",
+                        "id": ""
+                    },
+                    "default_value": "",
+                    "placeholder": "",
+                    "prepend": "",
+                    "append": "",
+                    "maxlength": "",
+                    "readonly": 0,
+                    "disabled": 0
+                },
+                {
+                    "key": "field_561589df3a07a",
+                    "label": "Display",
+                    "name": "display",
+                    "type": "true_false",
+                    "instructions": "This allows you to temporarily hide parts of the store. Use if you plan on making substantial changes to the store.",
+                    "required": 0,
+                    "conditional_logic": 0,
+                    "wrapper": {
+                        "width": "",
+                        "class": "",
+                        "id": ""
+                    },
+                    "message": "",
+                    "default_value": 0
+                }
+            ]
+        },
+        {
             "key": "field_55df75c393c25",
             "label": "APIs",
             "name": "",
@@ -211,7 +305,7 @@
                 "id": ""
             },
             "placement": "top",
-            "endpoint": 1
+            "endpoint": 0
         },
         {
             "key": "field_55d24b8ab4685",
@@ -415,5 +509,5 @@
     "hide_on_screen": "",
     "active": 1,
     "description": "",
-    "modified": 1444161583
+    "modified": 1444252528
 }

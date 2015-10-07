@@ -35,56 +35,58 @@
 <div class="container">
     <nav id="nav-store">
         <ul>
-            <li class="menu-item">
-                <a onclick="store_nav('downloads')">Downloads</a>
-            </li>
-            <div class="menu_slash">/</div>
-            <li>
-                <a onclick="store_nav('shirts')">Shirts</a>
-            </li>
+            {% for category in store %}
+                {% if not loop.first %}<div class="menu_slash">/</div>{% endif %}
+                <li class="menu-item">
+                    <a onclick="store_nav('{{ category.html_name }}')">{{ category.name }}</a>
+                </li>
+            {% endfor %}
         </ul>
     </nav>
-    <div data-bind="visible: store_view() == 'downloads'">
-    {% for album in store.albums %}
-        <div class="col-xs-12 col-sm-4">
-            <div class="album_square">
-                <img src="{{ album.collection.image.src }}" class="album_image" />
-            </div>
-        </div>
-        <div class="col-xs-12 col-sm-8">
-            <h3>{{ album.collection.title }}</h3>
-            <span class="album_year">{{ album.collection.body_html }}</span>
-            {% for track in album.products %}
-                <div class="track_row">
-                    <span class="track_icon_left">{% if track.metafields.track_number > 0 %}{{ track.metafields.track_number }}{% endif %}</span>
-                    <span class="track_icon_left">{% if track.metafields.track_number > 0 %}&#9654;{% endif %}</span>
-                    <span class="track_title">{{ track.title }}</span>
+    {% for category in store %}
+        <div data-bind="visible: store_view() == '{{ category.html_name }}'">
+            {% if category.shopify_type == 'Music download' %}
+                {% for album in category.products %}
+                    <div class="col-xs-12 col-sm-4">
+                        <div class="album_square">
+                            <img src="{{ album.collection.image.src }}" class="album_image" />
+                        </div>
+                    </div>
+                    <div class="col-xs-12 col-sm-8">
+                        <h3>{{ album.collection.title }}</h3>
+                        <span class="album_year">{{ album.collection.body_html }}</span>
+                        {% for track in album.products %}
+                            <div class="track_row">
+                                <span class="track_icon_left">{% if track.metafields.track_number > 0 %}{{ track.metafields.track_number }}{% endif %}</span>
+                                <span class="track_icon_left">{% if track.metafields.track_number > 0 %}&#9654;{% endif %}</span>
+                                <span class="track_title">{{ track.title }}</span>
                     <span class="track_icon_right">
                         <a data-bind="visible: !in_cart({ product_id: {{ track.id }} })" onclick="option_modal({{ track.id }})">cart</a>
                         <span data-bind="visible: in_cart({ product_id: {{ track.id }} })">&#x2713;</span>
                     </span>
-                    <span class="track_icon_right">${{ track.variants[0].price|number_format }}</span>
-                    <span class="track_icon_right"><a href="{{ track.metafields.wiki_link }}">&#x24D8;</a></span>
-                </div>
-                {{ macros.variants_modal('Please select a file format for your download.','false',track.id,track.title,track.variants) }}
-            {% endfor %}
+                                <span class="track_icon_right">${{ track.variants[0].price|number_format }}</span>
+                                <span class="track_icon_right"><a href="{{ track.metafields.wiki_link }}">&#x24D8;</a></span>
+                            </div>
+                            {{ macros.variants_modal('Please select a file format for your download.','false',track.id,track.title,track.variants) }}
+                        {% endfor %}
+                    </div>
+                    <div class="clearfix"></div>
+                {% endfor %}
+            {% else %}
+                {% for product in category.products %}
+                    <div class="col-lg-3">
+                        <img src="{{ product.image.src }}" class="album_image" /><br />
+                        {{ product.title }}<br />
+                        {{ product.body_html }}<br />
+                        <a onclick="option_modal('{{ product.id }}')">cart</a>
+                        <span data-bind="visible: in_cart({ product_id: {{ product.id }} })">&#x2713;</span>
+                    </div>
+                    {{ macros.variants_modal('','true',product.id,product.title,product.variants) }}
+                {% endfor %}
+                <div class="clearfix"></div>
+            {% endif %}
         </div>
-        <div class="clearfix"></div>
     {% endfor %}
-    </div>
-    <div data-bind="visible: store_view() == 'shirts'">
-        {% for shirt in store.shirts %}
-            <div class="col-lg-3">
-                <img src="{{ shirt.image.src }}" class="album_image" /><br />
-                {{ shirt.title }}<br />
-                {{ shirt.body_html }}<br />
-                <a  onclick="option_modal('{{ shirt.id }}')">cart</a>
-                <span data-bind="visible: in_cart({ product_id: {{ shirt.id }} })">&#x2713;</span>
-            </div>
-            {{ macros.variants_modal('Please select your shirt size.','true',shirt.id,shirt.title,shirt.variants) }}
-        {% endfor %}
-        <div class="clearfix"></div>
-    </div>
     <button data-bind="visible: cart().length > 0" data-toggle="modal" data-target="#cart_modal">Show cart</button>
 </div>
 <div id="cart_modal" class="modal fade" role="dialog">
@@ -171,7 +173,7 @@
         }
         var ViewModel = function(start_cart) {
             var self = this;
-            self.store_view = ko.observable('shirts');
+            self.store_view = ko.observable('{{ get_vars.store_section|default('downloads') }}');
             self.cart = ko.observableArray(start_cart);
             self.remove_product = function(product) {
                 self.cart.remove(product);
