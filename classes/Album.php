@@ -122,7 +122,10 @@ class Album extends ShopifyProduct {
         return $zips;
     }
 
-    public function getChildZip($format,$flags,$label) {
+    public function getChildZip($format,$flags,$label='') {
+        if (!$label) {
+            $label = $format;
+        }
         $zip = new AlbumZip($this,$format,$flags,$label);
         return $zip;
     }

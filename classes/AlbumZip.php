@@ -15,7 +15,10 @@ class AlbumZip extends KeyedWPAttachment {
     // encode format === file extension!
     private $encodeFormat, $encodeCLIFlags, $encodeLabel;
 
-    public function __construct(Album $parentAlbum, $encodeFormat, $encodeCLIFlags, $encodeLabel) {
+    public function __construct(Album $parentAlbum, $encodeFormat, $encodeCLIFlags, $encodeLabel="") {
+        if (!$encodeLabel) {
+            $encodeLabel = $encodeFormat;
+        }
         $this->parentAlbum = $parentAlbum;
         $this->parent_post_id = $parentAlbum->getPostID();
         $this->encodeCLIFlags = $encodeCLIFlags;
@@ -86,6 +89,7 @@ class AlbumZip extends KeyedWPAttachment {
         } else {
             $upload_dir = wp_upload_dir();
             $zip = new \ZipArchive();
+            $filecount = 0;
             $filename = $upload_dir['path'] . "/" . $this->getFileAssetFileName();
             $filetype = wp_check_filetype(basename($filename), null);
             if ($zip->open($filename, \ZipArchive::CREATE) !== TRUE) {
@@ -96,6 +100,7 @@ class AlbumZip extends KeyedWPAttachment {
                 $encode_path = $encode->getPath();
                 if ($encode_path) {
                     $success = $zip->addFile($encode_path, $zip_dir_name . basename($encode_path));
+                    $filecount++;
                     if (!$success) {
                         return "Cannot find ".$encode_path."\n";
                     }
@@ -107,9 +112,15 @@ class AlbumZip extends KeyedWPAttachment {
                 $bonus_path = $bonus_asset->getPath();
                 if ($bonus_path) {
                     $success = $zip->addFile($bonus_path, $zip_dir_name . basename($bonus_path));
+                    $filecount++;
                     if (!$success) {
                         return "Cannot find " . $bonus_path . "\n";
                     }
+                }
+            }
+            if (method_exists($zip,'setCompressionIndex')) {
+                for ($i = 0; $i < $filecount; $i++) {
+                    $zip->setCompressionIndex($i, \ZipArchive::CM_STORE);
                 }
             }
             $zip->close();
