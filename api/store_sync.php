@@ -25,6 +25,7 @@ foreach ($albums as $album) {
     $context['missing_files'] = array_merge($context['missing_files'],array_values($response['missing_files']));
 }
 $shopify->deleteUnusedProducts($albums);
+$shopify->deleteUnusedCollections($albums);
 $shopify->deleteUnusedFetchProducts($albums);
 $context['unused_files'] = $shopify->getUnusedFetchFiles();
 

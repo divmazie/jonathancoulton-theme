@@ -63,8 +63,21 @@ class Shopify {
     }
 
     public function forceGetAllCollections() {
-        $response = $this->makeCall('admin/custom_collections');
-        $this->allCollections = $response->custom_collections;
+        $collections = array();
+        $response = $this->makeCall('admin/custom_collections','GET');
+        foreach ($response->custom_collections as $collection) {
+            $album_collection = false;
+            $metafields = $this->makeCall("admin/custom_collections/$collection->id/metafields");
+            foreach ($metafields->metafields as $metafield) {
+                if ($metafield->key == 'album_collection') {
+                    $album_collection = true;
+                }
+            }
+            if ($album_collection) {
+                $collections[] = $collection;
+            }
+        }
+        $this->allCollections = $collections;
         return $this->allCollections;
     }
 
@@ -358,6 +371,22 @@ class Shopify {
         foreach ($this->allProducts as $product) {
             if (!in_array($product->id,$usedIds)) {
                 $this->makeCall("admin/products/$product->id","DELETE");
+            }
+        }
+    }
+
+    public function deleteUnusedCollections($allAlbums = false) {
+        $this->forceGetAllCollections();
+        if (!$allAlbums) {
+            $allAlbums = \jct\Album::getAllAlbums();
+        }
+        $usedIds = array();
+        foreach ($allAlbums as $album) {
+            $usedIds[] = $album->getShopifyCollectionId();
+        }
+        foreach ($this->allCollections as $collection) {
+            if (!in_array($collection->id,$usedIds)) {
+                $this->makeCall("admin/custom_collections/$collection->id","DELETE");
             }
         }
     }
