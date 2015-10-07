@@ -99,6 +99,7 @@ class Track extends ShopifyProduct {
     public function getTrackTitle() {
         return $this->trackTitle;
     }
+    public function getTitle() { return $this->getTrackTitle(); }
 
     /**
      * @return mixed

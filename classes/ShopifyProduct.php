@@ -13,6 +13,7 @@ abstract class ShopifyProduct {
     public $shopify_id, $shopify_variant_ids, $shopify_variant_skus;
 
     abstract function syncToStore($shopify);
+    abstract function getTitle();
 
     public function getShopifyId() {
         return $this->shopify_id;
@@ -42,5 +43,13 @@ abstract class ShopifyProduct {
         if (update_post_meta($this->postID,'shopify_variant_skus',serialize($skus))) {
             $this->shopify_variant_skus = $skus;
         }
+    }
+
+    public function getWikiLink() {
+        $wiki_link = get_field('wiki_link',$this->postID);
+        if (!$wiki_link) {
+            $wiki_link = get_field('joco_wiki_base_url','options').urlencode(preg_replace('/\s+/', '_',$this->getTitle()));
+        }
+        return $wiki_link;
     }
 }

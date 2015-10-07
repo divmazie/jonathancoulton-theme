@@ -17,9 +17,11 @@ $context = Timber::get_context();
 
 $albums = \jct\Album::getAllAlbums();
 $context['missing_files'] = array();
+$context['album_responses'] = array();
 foreach ($albums as $album) {
     $album->cleanAttachments();
     $response = $album->syncToStore($shopify);
+    $context['album_responses'][] = $response;
     $context['missing_files'] = array_merge($context['missing_files'],array_values($response['missing_files']));
 }
 $shopify->deleteUnusedProducts($albums);

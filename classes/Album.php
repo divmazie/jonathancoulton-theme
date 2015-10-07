@@ -165,6 +165,7 @@ class Album extends ShopifyProduct {
     public function getAlbumTitle() {
         return $this->albumTitle;
     }
+    public function getTitle() { return $this->getAlbumTitle(); }
 
     /**
      * @return mixed
@@ -224,12 +225,15 @@ class Album extends ShopifyProduct {
 
     public function syncToStore($shopify) {
         $context = array();
+        $context['sync_responses'] = array();
         $response = $shopify->syncProduct($this);
+        $context['sync_responses'][] = $response['response'];
         $missing_files = $response['missing_files'];
         $track_product_ids = array(0=>$response['response']->product->id);
         $tracks = $this->getAlbumTracks();
         foreach ($tracks as $track) {
             $response = $track->syncToStore($shopify);
+            $context['sync_responses'][] = $response['response'];
             $missing_files = array_merge($missing_files,$response['missing_files']);
             $track_product_ids[intval($track->getTrackNumber())] = $response['response']->product->id;
         }

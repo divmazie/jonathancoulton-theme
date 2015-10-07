@@ -209,7 +209,7 @@
         };
 
         var start_cart = [];
-        if(typeof(Storage) !== "undefined") {
+        if(typeof(Storage) !== "undefined" && sessionStorage.getItem('cart')) {
             //sessionStorage.setItem('cart',[]);
             //var stored_cart = start_cart;
             $('#debug').html(sessionStorage.getItem('cart'));

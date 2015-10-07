@@ -37,6 +37,11 @@
                 <br />
             {% endif %}
             <br />
+            <pre>
+                {% for response in album_responses %}
+                    {{ response|print_r }}
+                {% endfor %}
+            </pre>
         </div>
     </body>
 </html>

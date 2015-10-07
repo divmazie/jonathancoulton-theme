@@ -185,6 +185,26 @@ class Shopify {
         if (strtotime($shopify_product->updated_at) < $wp_time) {
             $args = $this->getProductArgs($object, true);
             $response = $this->makeCall("admin/products/$shopify_id", "PUT", $args);
+            $metafields = $this->makeCall('admin/products/'.$shopify_id.'/metafields');
+            foreach ($metafields->metafields as $metafield) {
+                switch ($metafield->key) {
+                    case 'track_number':
+                        $track_number = get_class($object)=="jct\\Track"?$object->getTrackNumber():0;
+                        if ($metafield->value != $track_number) {
+                            $args = array('metafield' => array('id' => $metafield->id, 'value' => $track_number, 'value_type' => 'string'));
+                            $this->makeCall('admin/metafields/'.$metafield->id,'PUT',$args);
+                        }
+                        break;
+                    case 'wiki_link':
+                        $wiki_link = $object->getWikiLink();
+                        if ($metafield->value != $wiki_link) {
+                            $args = array('metafield' => array('id' => $metafield->id, 'value' => $wiki_link, 'value_type' => 'string'));
+                            $this->makeCall('admin/metafields/'.$metafield->id,'PUT',$args);
+                        }
+                        break;
+                    default: break;
+                }
+            }
             return $response;
         } else {
             $fake_response = new \stdClass();
@@ -246,11 +266,7 @@ class Shopify {
             }
             $variants[] = $v;
         }
-        $wiki_link = get_field('wiki_link',$object->getPostID());
-        if (!$wiki_link) {
-            $obj_title = get_class($object)=="jct\\Track"?$object->getTrackTitle():$object->getAlbumTitle();
-            $wiki_link = get_field('joco_wiki_base_url','options').urlencode(preg_replace('/\s+/', '_',$obj_title));
-        }
+        $wiki_link = $object->getWikiLink();
         $args = array("product" => array(
             'title' => $title,
             'body_html' => $body,
@@ -259,15 +275,21 @@ class Shopify {
             'images' => array(
                 array('attachment' => $image)
             ),
-            'metafields' => array(
-                array('key'=>'track_number','value_type'=>'string','namespace'=>'global',
-                    'value'=>get_class($object)=="jct\\Track"?$object->getTrackNumber():0),
-                array('key'=>'wiki_link','value_type'=>'string','namespace'=>'global',
-                    'value'=>$wiki_link)),
+            //'metafields' => array(
+                //array('key'=>'track_number','value_type'=>'string','namespace'=>'global',
+                    //'value'=>get_class($object)=="jct\\Track"?$object->getTrackNumber():0),
+                //array('key'=>'wiki_link','value_type'=>'string','namespace'=>'global',
+                    //'value'=>$wiki_link)),
             'variants' => $variants
         ));
         if ($update) {
             $args['product']['id'] = $object->getShopifyId();
+        } else {
+            $args['product']['metafields'] = array(
+                array('key'=>'track_number','value_type'=>'string','namespace'=>'global',
+                    'value'=>get_class($object)=="jct\\Track"?$object->getTrackNumber():0),
+                array('key'=>'wiki_link','value_type'=>'string','namespace'=>'global',
+                    'value'=>$wiki_link));
         }
         return $args;
     }
@@ -281,11 +303,11 @@ class Shopify {
         $args = array('custom_collection'=>array(
             'title' => $album->getAlbumTitle(),
             'body_html' => $album->getAlbumYear(),
-            'image' => array('attachment' => $image),
             'sort_order' => 'manual',
-            'metafields' => array(array(
-                'key'=>'album_collection','value_type'=>'string','namespace'=>'global',
-                'value'=>'true')),
+            //'image' => array('attachment' => $image),
+            //'metafields' => array(array(
+                //'key'=>'album_collection','value_type'=>'string','namespace'=>'global',
+                //'value'=>'true')),
             'collects' => $collects
         ));
         $collection_id = $album->getShopifyCollectionId();
@@ -303,11 +325,16 @@ class Shopify {
                     $collects[$key]['id'] = $collect_dict[$collect['product_id']];
                 }
             }
+            //$args['custom_collection']['image'] = array('attachment' => $image);
             $args['custom_collection']['collects'] = $collects;
-            $args['id'] = $collection_id;
+            $args['custom_collection']['id'] = $collection_id;
             $response = $this->makeCall('admin/custom_collections/'.$collection_id,'PUT',$args);
             return $response;
         } else {
+            $args['custom_collection']['image'] = array('attachment' => $image);
+            $args['custom_collection']['metafields'] = array(array(
+                'key'=>'album_collection','value_type'=>'string','namespace'=>'global',
+                'value'=>'true'));
             $response = $this->makeCall('admin/custom_collections','POST',$args);
             if ($response->custom_collection->id) {
                 $album->setShopifyCollectionId($response->custom_collection->id);
