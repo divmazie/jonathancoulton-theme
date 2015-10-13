@@ -43,6 +43,9 @@
             {% endfor %}
         </ul>
     </nav>
+    {% if store|length < 1 %}
+        <p>The store is temporarily offline.</p>
+    {% endif %}
     {% for category in store %}
         <div data-bind="visible: store_view() == '{{ category.html_name }}'">
             {% if category.shopify_type == 'Music download' %}
