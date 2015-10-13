@@ -64,6 +64,12 @@ class Track extends ShopifyProduct {
         return $encode;
     }
 
+    public function getMusicLink() {
+        $encode_label = "MP3";
+        $encode = $this->getChildEncode($this->encode_types[$encode_label][0],$this->encode_types[$encode_label][1],$encode_label);
+        return $encode->getURL();
+    }
+
     public function deleteOldEncodes() {
         $goodKeys = array();
         foreach ($this->getAllChildEncodes() as $encode) {

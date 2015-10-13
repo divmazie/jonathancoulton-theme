@@ -203,17 +203,15 @@ class Shopify {
                 switch ($metafield->key) {
                     case 'track_number':
                         $track_number = get_class($object)=="jct\\Track"?$object->getTrackNumber():0;
-                        if ($metafield->value != $track_number) {
-                            $args = array('metafield' => array('id' => $metafield->id, 'value' => $track_number, 'value_type' => 'string'));
-                            $this->makeCall('admin/metafields/'.$metafield->id,'PUT',$args);
-                        }
+                        $this->updateMetafield($metafield,$track_number);
                         break;
                     case 'wiki_link':
                         $wiki_link = $object->getWikiLink();
-                        if ($metafield->value != $wiki_link) {
-                            $args = array('metafield' => array('id' => $metafield->id, 'value' => $wiki_link, 'value_type' => 'string'));
-                            $this->makeCall('admin/metafields/'.$metafield->id,'PUT',$args);
-                        }
+                        $this->updateMetafield($metafield,$wiki_link);
+                        break;
+                    case 'music_link':
+                        $music_link = $object->getMusicLink();
+                        $this->updateMetafield($metafield,$music_link);
                         break;
                     default: break;
                 }
@@ -223,6 +221,13 @@ class Shopify {
             $fake_response = new \stdClass();
             $fake_response->product = $shopify_product;
             return $fake_response;
+        }
+    }
+
+    public function updateMetafield($old_metafield,$new_metafield_value) {
+        if ($old_metafield->value != $new_metafield_value) {
+            $args = array('metafield' => array('id' => $old_metafield->id, 'value' => $new_metafield_value, 'value_type' => 'string'));
+            $this->makeCall('admin/metafields/'.$old_metafield->id,'PUT',$args);
         }
     }
 
@@ -288,11 +293,6 @@ class Shopify {
             'images' => array(
                 array('attachment' => $image)
             ),
-            //'metafields' => array(
-                //array('key'=>'track_number','value_type'=>'string','namespace'=>'global',
-                    //'value'=>get_class($object)=="jct\\Track"?$object->getTrackNumber():0),
-                //array('key'=>'wiki_link','value_type'=>'string','namespace'=>'global',
-                    //'value'=>$wiki_link)),
             'variants' => $variants
         ));
         if ($update) {
@@ -303,6 +303,10 @@ class Shopify {
                     'value'=>get_class($object)=="jct\\Track"?$object->getTrackNumber():0),
                 array('key'=>'wiki_link','value_type'=>'string','namespace'=>'global',
                     'value'=>$wiki_link));
+            if (get_class($object)=="jct\\Track") {
+                $args['product']['metafields'][] = array('key' => 'music_link', 'value_type' => 'string', 'namespace' => 'global',
+                    'value' => $object->getMusicLink());
+            }
         }
         return $args;
     }
