@@ -61,12 +61,17 @@
                         {% for track in album.products %}
                             <div class="track_row">
                                 <span class="track_icon_left">{% if track.metafields.track_number > 0 %}{{ track.metafields.track_number }}{% endif %}</span>
-                                <span class="track_icon_left">{% if track.metafields.track_number > 0 %}&#9654;{% endif %}</span>
+                                <span class="track_icon_left">{% if track.metafields.track_number > 0 %}
+                                    <span data-bind="visible: player_ready">
+                                        <span data-bind="visible: current_song() != {{ track.id }}"><a onclick="playSound({{ track.id }})">&#9654;</a></span>
+                                        <span data-bind="visible: current_song() == {{ track.id }}"><a onclick="stopSound()">&#x25a0;</a></span>
+                                    </span>
+                                    {% endif %}</span>
                                 <span class="track_title">{{ track.title }}</span>
-                    <span class="track_icon_right">
-                        <a data-bind="visible: !in_cart({ product_id: {{ track.id }} })" onclick="option_modal({{ track.id }})">cart</a>
-                        <span data-bind="visible: in_cart({ product_id: {{ track.id }} })">&#x2713;</span>
-                    </span>
+                                <span class="track_icon_right">
+                                    <a data-bind="visible: !in_cart({ product_id: {{ track.id }} })" onclick="option_modal({{ track.id }})">cart</a>
+                                    <span data-bind="visible: in_cart({ product_id: {{ track.id }} })">&#x2713;</span>
+                                </span>
                                 <span class="track_icon_right">${{ track.variants[0].price|number_format }}</span>
                                 <span class="track_icon_right"><a href="{{ track.metafields.wiki_link }}">&#x24D8;</a></span>
                             </div>
@@ -176,6 +181,8 @@
         }
         var ViewModel = function(start_cart) {
             var self = this;
+            self.player_ready = ko.observable(false);
+            self.current_song = ko.observable();
             self.store_view = ko.observable('{{ get_vars.store_section|default('downloads') }}');
             self.cart = ko.observableArray(start_cart);
             self.remove_product = function(product) {
@@ -268,5 +275,58 @@
             $('#purchase_confirm_modal').modal('show');
         }
         {% endif %}
+
+        var playlist = [
+            {% for category in store %}
+                {% if category.shopify_type == 'Music download' %}
+                    {% for album in category.products %}
+                        {% for track in album.products %}
+                            {% if track.metafields.music_link %}
+                                { id: {{ track.id }}, url: '{{ track.metafields.music_link }}' },
+                            {% endif %}
+                        {% endfor %}
+                    {% endfor %}
+                {% endif %}
+            {% endfor %}
+        ];
+
+        soundManager.setup({
+            url: '/path/to/swf-files/',
+            flashVersion: 9, // optional: shiny features (default = 8)
+            // optional: ignore Flash where possible, use 100% HTML5 mode
+            preferFlash: false,
+            debugMode: true,
+            onready: function() {
+                myViewModel.player_ready(true);
+            }
+        });
+
+        function playSound(song_id) {
+            stopSound();
+            myViewModel.current_song(song_id);
+            for (var i=0; i<playlist.length; i++) {
+                if (playlist[i].id == song_id) {
+                    var next_id = i==playlist.length-1 ? playlist[0].id : playlist[i+1].id;
+                    soundManager.createSound({
+                        id: song_id,
+                        url: playlist[i].url,
+                        autoLoad: true,
+                        autoPlay: true,
+                        onfinish: function() {
+                            playSound(next_id);
+                        }
+                    });
+                }
+            }
+        }
+
+        function stopSound() {
+            var song = soundManager.getSoundById(myViewModel.current_song());
+            if (song) {
+                myViewModel.current_song(0);
+                song.stop();
+                song.destruct();
+            }
+        }
     </script>
 {% endblock %}

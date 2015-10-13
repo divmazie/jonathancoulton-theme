@@ -16,8 +16,10 @@
     "jquery": "2.1.4",
     "fitvids": "~1.1.0",
     "slick.js": "~1.5.5",
-    "knockout": "~3.3.0"
+    "knockout": "~3.3.0",
+    "SoundManager2": "soundmanager2#*"
   },
+
   "devDependencies": {
     "bootstrap": "~3.3.4"
   }
