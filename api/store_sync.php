@@ -27,6 +27,7 @@ foreach ($albums as $album) {
 $shopify->deleteUnusedProducts($albums);
 $shopify->deleteUnusedCollections($albums);
 $shopify->deleteUnusedFetchProducts($albums);
+delete_transient('store_context');
 $context['unused_files'] = $shopify->getUnusedFetchFiles();
 
 Timber::render("store_sync.twig",$context);

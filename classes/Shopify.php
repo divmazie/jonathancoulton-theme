@@ -528,6 +528,14 @@ class Shopify {
     }
 
     public function getStoreContext() {
+        if ($context = get_transient('store_context')) {
+            return $context;
+        } else {
+            return $this->forceGetStoreContext();
+        }
+    }
+
+    public function forceGetStoreContext() {
         $context = array();
         $categories = get_field('store_categories','options');
         if (is_array($categories)) {
@@ -569,6 +577,7 @@ class Shopify {
                 }
             }
         }
+        set_transient('store_context',$context);
         return $context;
     }
 
