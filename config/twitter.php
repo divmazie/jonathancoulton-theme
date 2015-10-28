@@ -41,7 +41,11 @@ use TwitterOAuth\Serializer\ArraySerializer;
  * For different output formats you can set one of available serializers
  * (Array, Json, Object, Text or a custom one)
  */
-$auth = new SingleUserAuth($credentials, new ArraySerializer());
+try {
+    $auth = new SingleUserAuth($credentials, new ArraySerializer());
+} catch (Exception $e) {
+    return 'Message: ' .$e->getMessage();
+}
 /**
  * Returns a collection of the most recent Tweets posted by the user
  * https://dev.twitter.com/docs/api/1.1/get/statuses/user_timeline
