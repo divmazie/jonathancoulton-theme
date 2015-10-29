@@ -9,3 +9,7 @@ wp-content
 /js/bower.min.js
 .idea/workspace.xml
 docker/docker-compose.yml
+
+# Grunt Deploy
+.ftppass
+sftpcache.json

@@ -8,6 +8,8 @@ module.exports = function(grunt) {
     grunt.loadNpmTasks('grunt-bower-task');
     //npm install grunt-composer --save-dev
     grunt.loadNpmTasks('grunt-composer');
+    //npm install grunt-sftp-deploy --saves-dev
+    grunt.loadNpmTasks('grunt-sftp-deploy');
 
     // Project configuration.
     grunt.initConfig({
@@ -64,6 +66,22 @@ module.exports = function(grunt) {
                 dest : 'js/bower.js'
                 //cssDest: 'build/_bower.css'
             }
+        },
+        'sftp-deploy': {
+            build: {
+                auth: {
+                    host: '45.79.162.208',
+                    port: 2222,
+                    authKey: 'staging'
+                },
+                cache: 'sftpcache.json',
+                src: '../jonathancoulton-theme/',
+                dest: 'wp-content/themes/jonathancoulton-theme/',
+                exclusions: ['.ftppass', '.git', '.gitignore', '.idea', 'node_modules', 'docker', 'docs', '.DS_Store', '.sftpcache.json'],
+                serverSep: '/',
+                concurrency: 4,
+                progress: true
+            }
         }
     });
 
@@ -79,4 +97,6 @@ module.exports = function(grunt) {
     grunt.registerTask('buildbower', ['bower:install', 'bower_concat', 'uglify:bower']);
 
     grunt.registerTask('builddeps', ['buildbower', 'less:compile', 'composer:install']);
+
+    grunt.registerTask( 'deploy', ['sftp-deploy']);
 };
