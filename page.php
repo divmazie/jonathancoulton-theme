@@ -35,4 +35,18 @@ if ($post->slug == "store") {
     $shopify = new jct\Shopify($apiKey,$apiPassword,$handle);
     $context['store'] = $shopify->getStoreContext();
 }
+if ($post->slug == 'news') {
+    global $paged;
+    if (!isset($paged) || !$paged){
+        $paged = 1;
+    }
+    $args = array(
+        'post_type' => 'post',
+        'posts_per_page' => 4,
+        'paged' => $paged
+    );
+    query_posts($args);
+    $context['posts'] = Timber::get_posts();
+    $context['pagination'] = Timber::get_pagination();
+}
 Timber::render( array( 'page-' . $post->post_name . '.twig', 'page.twig' ), $context );

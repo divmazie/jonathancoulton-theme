@@ -18,6 +18,12 @@ $pieces = array(// ORIGINAL PREPOP ARRAY, WILL DISCARD
         'post_title' => 'Store',
         'post_content' => "",
         'post_type' => 'page',
+    ),
+    array(
+        'post_name' => 'news',
+        'post_title' => 'News',
+        'post_content' => "",
+        'post_type' => 'page',
     )
 );
 
