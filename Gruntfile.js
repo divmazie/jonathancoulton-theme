@@ -77,7 +77,7 @@ module.exports = function(grunt) {
                 cache: 'sftpcache.json',
                 src: '../jonathancoulton-theme/',
                 dest: 'wp-content/themes/jonathancoulton-theme/',
-                exclusions: ['.ftppass', '.git', '.gitignore', '.idea', 'node_modules', 'docker', 'docs', '.DS_Store', '.sftpcache.json'],
+                exclusions: ['.ftppass', '.git', '.gitignore', '.idea', 'Gruntfile.js', 'node_modules', 'docker', 'docs', '.DS_Store', '.sftpcache.json'],
                 serverSep: '/',
                 concurrency: 4,
                 progress: true

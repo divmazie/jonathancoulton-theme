@@ -13,9 +13,9 @@
  * @since   Timber 0.1
  */
 
-if ( ! class_exists( 'Timber' ) ) {
-	echo 'Timber not activated. Make sure you activate the plugin in <a href="/wp-admin/plugins.php#timber">/wp-admin/plugins.php</a>';
-	return;
+if ( !class_exists( 'Timber' ) ) {
+    echo 'Timber not activated. Make sure you activate the plugin in <a href="/wp-admin/plugins.php#timber">/wp-admin/plugins.php</a>';
+    return;
 }
 $context = Timber::get_context();
 include_once(get_template_directory().'/include/sitewide_context.php');
@@ -28,13 +28,13 @@ $context['instagram'] = include(get_template_directory().'/config/instagram.php'
 $context['facebook_link'] = get_field('facebook_link','options');
 $bandsintown = get_transient('bandsintown');
 if (!$bandsintown) {
-	$bandsintown = json_decode(file_get_contents("http://api.bandsintown.com/artists/jonathancoulton/events.json"));
-	set_transient('bandsintown',$bandsintown,600);
+    $bandsintown = json_decode(file_get_contents("http://api.bandsintown.com/artists/jonathancoulton/events.json"));
+    set_transient('bandsintown',$bandsintown,600);
 }
 $context['bandsintown'] = $bandsintown;
 
 $templates = array( 'index.twig' );
 if ( is_home() ) {
-	array_unshift( $templates, 'home.twig' );
+    array_unshift( $templates, 'home.twig' );
 }
 Timber::render( $templates, $context );
