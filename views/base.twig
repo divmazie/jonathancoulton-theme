@@ -10,30 +10,29 @@
 		<div class="container-fluid">
 		<header class="header" >
 			{% block header %}
+			<nav id="nav-main" class="navbar-fixed-top" role="navigation">
 				<div class="container">
-					<h1 class="hdr-logo" role="banner">
-						<a class="hdr-logo-link" href="{{ site.url }}" rel="home">{{site.name}}</a>
-					</h1>
-					<nav id="nav-main" class="" role="navigation">
-						<ul class="">
-						{% for item in menu.get_items %}
-							<li class=" {{item.classes | join(' ')}}" {% if item.get_children %}onmouseover="$('#children{{ item.post_name }}').show()" onmouseout="$('#children{{ item.post_name }}').hide()" {% endif %}>
-								<a class="" href="{{item.get_link}}">{{item.title}}</a>
-								{% if item.get_children %}
-									<ul id="children{{ item.post_name }}" class="menu_children">
-									{% for child in item.get_children %}
-										<li class="">
-											<a class="" href="{{child.get_link}}">{{child.title}}</a>
-										</li>
-									{% endfor %}
-									</ul>
-								{% endif %}
-							</li>
-							{% if not loop.last %}<div class="menu_slash">/</div>{% endif %}
-						{% endfor %}
-						</ul>
-					</nav><!-- #nav -->
+					<ul class="">
+					{% for item in menu.get_items %}
+						<li class=" {{item.classes | join(' ')}}" {% if item.get_children %}onmouseover="$('#children{{ item.post_name }}').show()" onmouseout="$('#children{{ item.post_name }}').hide()" {% endif %}>
+							<a class="" href="{{item.get_link}}">{{item.title}}</a>
+							{% if item.get_children %}
+								<ul id="children{{ item.post_name }}" class="menu_children">
+								{% for child in item.get_children %}
+									<li class="">
+										<a class="" href="{{child.get_link}}">{{child.title}}</a>
+									</li>
+								{% endfor %}
+								</ul>
+							{% endif %}
+						</li>
+						{% if not loop.last %}<div class="menu_slash">/</div>{% endif %}
+					{% endfor %}
+					</ul>
 				</div>
+				{% block second_header %}
+				{% endblock %}
+			</nav><!-- #nav -->
 			{% endblock %}
 		</header>
 

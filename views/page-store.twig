@@ -31,18 +31,23 @@
 {% endmacro %}
 {% import _self as macros %}
 
+{% block second_header %}
+    <nav id="nav-store">
+        <div class="container">
+            <ul>
+                {% for category in store %}
+                    {% if not loop.first %}<div class="menu_slash">/</div>{% endif %}
+                    <li class="menu-item" data-bind="css: { 'current-menu-item': store_view() == '{{ category.html_name }}' }">
+                        <a onclick="store_nav('{{ category.html_name }}')">{{ category.name }}</a>
+                    </li>
+                {% endfor %}
+            </ul>
+        </div>
+    </nav>
+{% endblock %}
+
 {% block content %}
 <div class="container">
-    <nav id="nav-store">
-        <ul>
-            {% for category in store %}
-                {% if not loop.first %}<div class="menu_slash">/</div>{% endif %}
-                <li class="menu-item">
-                    <a onclick="store_nav('{{ category.html_name }}')">{{ category.name }}</a>
-                </li>
-            {% endfor %}
-        </ul>
-    </nav>
     {% if store|length < 1 %}
         <p>The store is temporarily offline.</p>
     {% endif %}

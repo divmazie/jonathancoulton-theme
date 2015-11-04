@@ -1,6 +1,9 @@
 .hdr-logo {
   text-align: center;
 }
+.header {
+  height: 60px;
+}
 nav {
   background-color: #FFFFFF;
   ul {
@@ -9,17 +12,32 @@ nav {
     margin: 0px 20px;
     padding: 0px;
   }
+  .current-menu-item {
+    a {
+      color: @brand-primary;
+      border-style: solid;
+      border-color: @brand-primary;
+      border-width: 5px 0 5px 0;
+    }
+  }
   li {
     float: left;
     margin: 20px 10px;
     text-transform: uppercase;
-    font-weight: 500;
+    font-weight: bold;
+    letter-spacing: 0.15em;
+    a {
+      color: black;
+    }
   }
   .menu_slash {
     float: left;
     margin: 20px 0px;
     color: #bbbbbb;
   }
+}
+#nav-store {
+  background-color: @joco_grey2;
 }
 .menu_children {
   display: none;

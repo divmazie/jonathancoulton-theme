@@ -3,6 +3,9 @@
 {% block content %}
 	<div class="container top_content">
 		<div class="col-xs-12">
+			<h1 class="hdr-logo" role="banner">
+				<a class="hdr-logo-link" href="{{ site.url }}" rel="home"><img src="{{ theme.link }}/images/JoCoLogo.svg" /></a>
+			</h1>
 			<div data-slick='{"slidesToShow": 4, "slidesToScroll": 1}' class="slick-element showcase_tiles">
 				{% for tile in showcase_tiles %}
 					<div class="showcase_tile">
@@ -30,7 +33,7 @@
 		</div>
 		<div class="hidden-xs col-sm-4">
 			<div class="side_box twitter">
-				<h4>Previously, on Twitter</h4>
+				<h5>Previously, on Twitter</h5>
 				{% if twitter.tweets %}
 					{% for tweet in twitter.tweets %}
 						<div class="tweet_text">{{ tweet.text }}</div>
@@ -40,7 +43,7 @@
 				{% endif %}
 			</div>
 			<div class="side_box instagram">
-				<h4>On Instagram</h4>
+				<h5>On Instagram</h5>
 				{% if instagram.media %}
 					{% for medium in instagram.media %}
 						<a href="{{ medium.link }}" target="_blank">
@@ -52,7 +55,7 @@
 			</div>
 			<!--<div><script type="text/javascript" src="https://cashmusic.org/public/cashmusic.js"></script><script type="text/javascript"> window.cashmusic.embed('https://cashmusic.org/public','6959');</script></div>-->
 			<div class="side_box social_media">
-				<h4>Follow Jonathan</h4>
+				<h5>Follow Jonathan</h5>
 				{% if twitter.url %}<a href="{{ twitter.url }}" target="_blank">Twitter</a>{% endif %}
 				{% if instagram.url %}<a href="{{ instagram.url }}" target="_blank">Instagram</a>{% endif %}
 				{% if facebook_link %}<a href="{{ facebook_link }}" target="_blank">Facebook</a>{% endif %}
