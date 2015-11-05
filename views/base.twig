@@ -10,7 +10,7 @@
 		<div class="container-fluid">
 		<header class="header" >
 			{% block header %}
-			<nav id="nav-main" class="navbar-fixed-top" role="navigation">
+			<nav id="nav-main" class="navbar-fixed-top" role="navigation" {% if is_logged_in %} style="top: 32px;" {% endif %}>
 				<div class="container">
 					<ul class="">
 					{% for item in menu.get_items %}
@@ -87,6 +87,7 @@
 		{% endblock %}
 		</div>
 		<script type="text/javascript">
+			$('.header').height($('#nav-main').height());
 			// open external links in new tab
 			jQuery('#body').find('a').filter(function() {
 				return this.hostname && this.hostname.indexOf(location.hostname)===-1 && this.hostname!="jonathan-coulton.myshopify.com";

@@ -1,11 +1,12 @@
 {% extends "base.twig" %}
 
 {% block content %}
-	<div class="container top_content">
+	<div class="container">
 		<div class="col-xs-12">
-			<h1 class="hdr-logo" role="banner">
-				<a class="hdr-logo-link" href="{{ site.url }}" rel="home"><img src="{{ theme.link }}/images/JoCoLogo.svg" /></a>
+			<h1 class="hdr-logo col-xs-12 col-md-10 col-md-offset-1 col-lg-8 col-lg-offset-2" role="banner">
+				<a class="hdr-logo-link" href="{{ site.url }}" rel="home"><img src="{{ theme.link }}/images/JoCoLogo.svg" style="width: 100%" /></a>
 			</h1>
+			<div class="clearfix"></div>
 			<div data-slick='{"slidesToShow": 4, "slidesToScroll": 1}' class="slick-element showcase_tiles">
 				{% for tile in showcase_tiles %}
 					<div class="showcase_tile">
@@ -27,6 +28,11 @@
 					</div>
 				{% endfor %}
 			</div>
+			<script>
+				$(window).resize(function() {
+					$(".joco-promo").height($(".joco-promo").width());
+				});
+			</script>
 		</div>
 		<div class="col-xs-12 col-sm-8">
 			{% include ['tease-'~post.post_type~'.twig', 'tease.twig'] %}
@@ -65,19 +71,21 @@
 	</div>
 	<div class="light_content">
 		<div class="container">
-			<h1>{{ blurb_header }}</h1>
-			<p>{{ blurb_content }}</p>
-			<a href="{{ site.url }}/store/?store_section=downloads"><div class="blue_arrow_right center-block">Click for more music</div></a>
+			<div class="col-lg-10 col-lg-offset-1 col-xs-12">
+				<h1 class="section_header">{{ blurb_header }}</h1>
+				<p>{{ blurb_content }}</p>
+				<a href="{{ site.url }}/store/?store_section=downloads"><div class="blue_arrow_right center-block">Click for more music</div></a>
+			</div>
 		</div>
 	</div>
 	<div>
 		<div class="container">
-			<h2>Recent releases</h2>
+			<h2 class="section_header">Recent releases</h2>
 		</div>
 	</div>
 	<div class="light_content">
 		<div class="container">
-			<h2>Upcoming shows</h2>
+			<h2 class="section_header">Upcoming shows</h2>
 			{% for show in bandsintown|slice(0,6) %}
 				<div class="show_row col-xs-12 col-sm-10 col-sm-offset-1 col-md-8 col-md-offset-2">
 					<div class="col-xs-2"><a href="{{ show.url }}">{{ show.datetime|date("M j") }}</a></div>

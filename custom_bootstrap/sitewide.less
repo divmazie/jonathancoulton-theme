@@ -6,90 +6,29 @@
 a {
   cursor: pointer;
 }
-.slick-arrow::before {
-  color: @brand-primary;
+.slick-prev:before, .slick-next:before {
+  content: '';
+}
+.slick-prev {
+  left: 15px;
+  background: url("../images/thin_black_left.svg");
+  background-size: contain;
+  &:hover {
+    background: url("../images/thin_blue_left.svg");
+    background-size: contain;
+  }
+}
+.slick-next {
+  right: 15px;
+  background: url("../images/thin_black_right.svg");
+  background-size: contain;
+  &:hover {
+    background: url("../images/thin_blue_right.svg");
+    background-size: contain;
+  }
 }
 .container-fluid {
   padding: 0;
-}
-.top_content {
-  background-color: #EBEBEB;
-}
-.light_content {
-  background-color: #ffffff;
-  padding: 60px 0;
-  margin: 0;
-  h1 {
-    text-align: center;
-    margin: auto;
-  }
-  p {
-    margin: 40px;
-  }
-}
-.article {
-  background-color: #FFFFFF;
-  padding: 20px 60px;
-  margin-bottom: 30px;
-  h2 {
-    font-weight: bold;
-    letter-spacing: 0.02em;
-    text-align: left;
-    margin-bottom: 40px;
-    a {
-      color: black;
-    }
-  }
-  iframe, img {
-    margin: auto;
-  }
-}
-.post_info {
-  font-size: 80%;
-  margin: 30px 0;
-  height: 30px;
-}
-.post_date {
-  color: #cccccc;
-}
-.post_author_name {
-  font-weight: bold;
-  text-transform: uppercase;
-}
-.post_comment_link {
-  height: 40px;
-  padding: 10px;
-  text-align: center;
-  text-transform: uppercase;
-  border-left: solid @gray-light 1px;
-  border-right: solid @gray-light 1px;
-}
-.post_share {
-  height: 40px;
-  padding: 10px 0;
-  text-transform: uppercase;
-  color: @gray-light;
-}
-
-.side_box {
-  background-color: #ffffff;
-  padding: 20px;
-  margin-bottom: 5px;
-  h5 {
-    text-transform: uppercase;
-    font-weight: 800;
-    letter-spacing: 0.15em;
-  }
-}
-.tweet_text {
-  margin: 10px 10px 0px;
-}
-.tweet_link {
-  text-align: right;
-  font-size: 12px;
-  color: #bbbbbb;
-  display: block;
-  margin: 5px 10px 20px;
 }
 .blue_arrow_right, .blue_arrow_left, .gray_arrow_right, .gray_arrow_left {
   text-align: center;
@@ -128,11 +67,4 @@ a {
   background-color: #f9f9f9;
   text-align: center;
   padding: 20px;
-}
-.show_row {
-  padding: 10px 0;
-  border-bottom: solid 1px @gray-light;
-}
-.venue_name {
-  font-weight: bold;
 }
