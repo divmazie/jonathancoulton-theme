@@ -4,26 +4,28 @@
     <div class="container">
         <div class="col-sm-12">
             {% for post in posts %}
-                <h2 class="h2 post_header"><a href="{{post.link}}">{{post.title}}</a></h2>
-                <p>{{post.content}}</p>
-                {% if post.thumbnail.src %}
-                    <img src="{{post.thumbnail.src}}" />
-                {% endif %}
-                <div class="post_info">
-                    <div class="col-xs-4">
-                        <div class="post_date">{{ post.date }}</div>
-                        <div class="post_author_name">{{ post.author.name }}</div>
-                    </div>
-                    <div class="col-xs-3">
-                        <div class="post_comment_link">
-                            <a href="{{ post.link }}#comments">{{ post.comment_count }} comments</a>
+                <div class="article">
+                    <h2 class="h2 post_header"><a href="{{post.link}}">{{post.title}}</a></h2>
+                    <p>{{post.content}}</p>
+                    {% if post.thumbnail.src %}
+                        <img src="{{post.thumbnail.src}}" />
+                    {% endif %}
+                    <div class="post_info">
+                        <div class="col-xs-4">
+                            <div class="post_date">{{ post.date }}</div>
+                            <div class="post_author_name">{{ post.author.name }}</div>
                         </div>
-                    </div>
-                    <div class="col-xs-5">
-                        <div class="post_share">
-                            Share:
-                            <a href="http://twitter.com/share?text='{{ post.title }}' from @jonathancoulton&url={{ post.link }}" target="_blank">Tweet</a>
-                            <a href="https://www.facebook.com/sharer/sharer.php?u={{ post.link }}">Facebook</a> <!--Must implement OG tags for more info-->
+                        <div class="col-xs-3">
+                            <div class="post_comment_link">
+                                <a href="{{ post.link }}#comments">{{ post.comment_count }} comments</a>
+                            </div>
+                        </div>
+                        <div class="col-xs-5">
+                            <div class="post_share">
+                                Share:
+                                <a href="http://twitter.com/share?text='{{ post.title }}' from @jonathancoulton&url={{ post.link }}" target="_blank">Tweet</a>
+                                <a href="https://www.facebook.com/sharer/sharer.php?u={{ post.link }}">Facebook</a> <!--Must implement OG tags for more info-->
+                            </div>
                         </div>
                     </div>
                 </div>

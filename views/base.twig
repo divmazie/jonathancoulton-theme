@@ -13,21 +13,22 @@
 			<nav id="nav-main" class="navbar-fixed-top" role="navigation" {% if is_logged_in %} style="top: 32px;" {% endif %}>
 				<div class="container">
 					<ul class="">
-					{% for item in menu.get_items %}
-						<li class=" {{item.classes | join(' ')}}" {% if item.get_children %}onmouseover="$('#children{{ item.post_name }}').show()" onmouseout="$('#children{{ item.post_name }}').hide()" {% endif %}>
-							<a class="" href="{{item.get_link}}">{{item.title}}</a>
-							{% if item.get_children %}
-								<ul id="children{{ item.post_name }}" class="menu_children">
-								{% for child in item.get_children %}
-									<li class="">
-										<a class="" href="{{child.get_link}}">{{child.title}}</a>
-									</li>
-								{% endfor %}
-								</ul>
-							{% endif %}
-						</li>
-						{% if not loop.last %}<div class="menu_slash">/</div>{% endif %}
-					{% endfor %}
+						<li><img src="{{ theme.link }}/images/JoCoLogo_min.svg" class="little_logo"></li>
+						{% for item in menu.get_items %}
+							<li class=" {{item.classes | join(' ')}}" {% if item.get_children %}onmouseover="$('#children{{ item.post_name }}').show()" onmouseout="$('#children{{ item.post_name }}').hide()" {% endif %}>
+								<a class="" href="{{item.get_link}}">{{item.title}}</a>
+								{% if item.get_children %}
+									<ul id="children{{ item.post_name }}" class="menu_children">
+									{% for child in item.get_children %}
+										<li class="">
+											<a class="" href="{{child.get_link}}">{{child.title}}</a>
+										</li>
+									{% endfor %}
+									</ul>
+								{% endif %}
+							</li>
+							{% if not loop.last %}<div class="menu_slash">/</div>{% endif %}
+						{% endfor %}
 					</ul>
 				</div>
 				{% block second_header %}
@@ -51,32 +52,34 @@
 		</section>
 
 		{% block footer %}
-			<div class="container">
-				<div class="col-xs-12 col-sm-4">
-					<h4>{{ theme_options.footer_left_header }}</h4>
-					<p>{{ theme_options.footer_left_text }}</p>
+			<div class="dark_content">
+				<div class="container">
+					<div class="col-xs-12 col-sm-4">
+						<h4>{{ theme_options.footer_left_header }}</h4>
+						<p>{{ theme_options.footer_left_text }}</p>
+					</div>
+					<div class="col-xs-12 col-sm-4">
+						<h4>FAQs</h4>
+						<p>
+							{% for faq in faqs if not faq.faq_is_header %}
+								{% if loop.index0 < 4 %}<a href="">{{ faq.title }}</a><br />{% endif %}
+							{% endfor %}
+						</p>
+						<a href="{{ site.url }}/faq"><div class="gray_arrow_right">All FAQs</div></a>
+					</div>
+					<div class="col-xs-12 col-sm-4">
+						<h4>Archives</h4>
+						<p>
+							{% for archive in archives %}
+								<a href="{{ archive.link }}">{{ archive.title }}</a><br />
+								{{ archive.display_date }}<br />
+								<br />
+							{% endfor %}
+						</p>
+						<a href="{{ site.url }}/"><div class="gray_arrow_right">Older posts</div></a>
+					</div>
+					<div class="clearfix"></div>
 				</div>
-				<div class="col-xs-12 col-sm-4">
-					<h4>FAQs</h4>
-					<p>
-						{% for faq in faqs if not faq.faq_is_header %}
-							{% if loop.index0 < 4 %}<a href="">{{ faq.title }}</a><br />{% endif %}
-						{% endfor %}
-					</p>
-					<a href="{{ site.url }}/faq"><div class="gray_arrow_right">All FAQs</div></a>
-				</div>
-				<div class="col-xs-12 col-sm-4">
-					<h4>Archives</h4>
-					<p>
-						{% for archive in archives %}
-							<a href="{{ archive.link }}">{{ archive.title }}</a><br />
-							{{ archive.display_date }}<br />
-							<br />
-						{% endfor %}
-					</p>
-					<a href="{{ site.url }}/"><div class="gray_arrow_right">Older posts</div></a>
-				</div>
-				<div class="clearfix"></div>
 			</div>
 			<div class="copyright">
 				<footer id="footer">
