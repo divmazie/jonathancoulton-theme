@@ -1,6 +1,41 @@
 .page-store {
   background-color: white;
 }
+.cart_link {
+  cursor: pointer;
+  font-weight: bold;
+  letter-spacing: 0.15em;
+  margin: 15px;
+  float: right;
+  width: 100px;
+  vertical-align: middle;
+  &:hover {
+    color: @brand-primary;
+  }
+}
+.cart_text {
+  display: block;
+  float: right;
+  padding: 5px 10px;
+}
+.cart_image {
+  font-size: 7px;
+  font-weight: 100;
+  letter-spacing: 0em;
+  color: white;
+  text-align: center;
+  display: block;
+  float: right;
+  padding: 6px 1px 5px 13px;
+  height: 25px;
+  width: 25px;
+  background: url("../images/cart_black.svg");
+  background-size: contain;
+}
+.cart_full {
+  background: url("../images/cart_black_blue_circle.svg");
+  background-size: contain;
+}
 .album_square {
   margin: 10px auto;
   width: 300px;
@@ -62,6 +97,22 @@
 }
 .track_icon_right {
   float: right;
+}
+.track_info_icon {
+  display: block;
+  vertical-align: bottom;
+  height: 18px;
+  width: 18px;
+  background: url("../images/info_black.svg");
+  background-size: contain;
+  &:hover {
+    background: url("../images/info_blue_filled.svg");
+    background-size: contain;
+  }
+}
+.album_info_icon {
+  background: url("../images/info_blue.svg");
+  background-size: contain;
 }
 .cart_icon_right {
   display: block;

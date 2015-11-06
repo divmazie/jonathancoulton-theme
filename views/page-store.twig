@@ -41,6 +41,10 @@
                         <a onclick="store_nav('{{ category.html_name }}')">{{ category.name }}</a>
                     </li>
                 {% endfor %}
+                <div class="cart_link" data-toggle="modal" data-target="#cart_modal">
+                    <span class="cart_image" data-bind="css: { cart_full: cart().length > 0}, text: pos_cart_number"></span>
+                    <span class="cart_text">CART</span>
+                </div>
             </ul>
         </div>
     </nav>
@@ -86,13 +90,9 @@
                                     </span>
                                 </span>
                                 <span class="track_icon_right">${{ track.variants[0].price|number_format }}</span>
-                                <span class="track_icon_right"><a href="{{ track.metafields.wiki_link }}">
-                                    {% if track.metafields.track_number == 0 %}
-                                        <img src="{{ theme.link }}/images/info_blue.svg" class="track_icon_img">
-                                    {% else %}
-                                        <img src="{{ theme.link }}/images/info_black.svg" class="track_icon_img">
-                                    {% endif %}
-                                    </a></span>
+                                <span class="track_icon_right">
+                                    <a href="{{ track.metafields.wiki_link }}" class="track_info_icon {% if track.metafields.track_number == 0 %}album_info_icon{% endif %}"></a>
+                                </span>
                             </div>
                             {{ macros.variants_modal('Please select a file format for your download.','false',track.id,track.title,track.variants) }}
                         {% endfor %}
@@ -114,7 +114,6 @@
             {% endif %}
         </div>
     {% endfor %}
-    <button data-bind="visible: cart().length > 0" data-toggle="modal" data-target="#cart_modal">Show cart</button>
 </div>
 <div id="cart_modal" class="modal fade" role="dialog">
     <div class="modal-dialog">
@@ -207,6 +206,13 @@
             self.remove_product = function(product) {
                 self.cart.remove(product);
             }
+            self.pos_cart_number = ko.computed(function() {
+                if (self.cart().length > 0) {
+                    return self.cart().length;
+                } else {
+                    return "";
+                }
+            });
             self.total_cost = ko.computed(function() {
                 var total = 0;
                 for (var i=0; i<self.cart().length; i++) {
