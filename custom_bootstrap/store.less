@@ -1,9 +1,17 @@
+.page-store {
+  background-color: white;
+}
 .album_square {
   margin: 10px auto;
   width: 300px;
   height: 300px;
   background-color: #FFF;
   text-align: center;
+}
+.album_title {
+  font-weight: bold;
+  letter-spacing: 0.02em;
+  margin: 5px 0;
 }
 .album_image {
   max-height: 100%;
@@ -13,11 +21,34 @@
 .album_year {
   font-size: 75%;
   color: @gray-light;
+  letter-spacing: 0.15em;
 }
 .track_row, .cart_row {
   height: 40px;
   padding: 10px 0;
   border-bottom: solid 1px @gray-light;
+  &:hover {
+    background-color: @joco_grey1;
+  }
+}
+.album_row {
+  color: @brand-primary;
+}
+.play_row {
+  background-color: @joco_grey1;
+  .track_title {
+    font-weight: bold;
+  }
+}
+.track_play_img {
+  height: 12px;
+}
+.track_icon_img {
+  height: 16px;
+}
+.track_title {
+  font-weight: 600;
+  letter-spacing: 0.01em;
 }
 .track_icon_left, .track_icon_right {
   display: block;

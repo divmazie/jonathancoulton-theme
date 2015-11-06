@@ -61,24 +61,38 @@
                         </div>
                     </div>
                     <div class="col-xs-12 col-sm-8">
-                        <h3>{{ album.collection.title }}</h3>
+                        <h3 class="album_title">{{ album.collection.title }}</h3>
                         <span class="album_year">{{ album.collection.body_html }}</span>
                         {% for track in album.products %}
-                            <div class="track_row">
+                            <div class="track_row {% if track.metafields.track_number == 0 %}album_row{% endif %}" data-bind="css: { play_row: current_song() == {{ track.id }} }">
                                 <span class="track_icon_left">{% if track.metafields.track_number > 0 %}{{ track.metafields.track_number }}{% endif %}</span>
                                 <span class="track_icon_left">{% if track.metafields.track_number > 0 %}
                                     <span data-bind="visible: player_ready">
-                                        <span data-bind="visible: current_song() != {{ track.id }}"><a onclick="playSound({{ track.id }})">&#9654;</a></span>
-                                        <span data-bind="visible: current_song() == {{ track.id }}"><a onclick="stopSound()">&#x25a0;</a></span>
+                                        <span data-bind="visible: current_song() != {{ track.id }}">
+                                            <a onclick="playSound({{ track.id }})"><img src="{{ theme.link }}/images/play_black.svg" class="track_play_img"></a>
+                                        </span>
+                                        <span data-bind="visible: current_song() == {{ track.id }}">
+                                            <a onclick="stopSound()"><img src="{{ theme.link }}/images/pause_black.svg" class="track_play_img"></a>
+                                        </span>
                                     </span>
                                     {% endif %}</span>
                                 <span class="track_title">{{ track.title }}</span>
                                 <span class="track_icon_right">
-                                    <a data-bind="visible: !in_cart({ product_id: {{ track.id }} })" onclick="option_modal({{ track.id }})">cart</a>
-                                    <span data-bind="visible: in_cart({ product_id: {{ track.id }} })">&#x2713;</span>
+                                    <a data-bind="visible: !in_cart({ product_id: {{ track.id }} })" onclick="option_modal({{ track.id }})">
+                                        <img src="{{ theme.link }}/images/add_to_cart_blue.svg" class="track_icon_img">
+                                    </a>
+                                    <span data-bind="visible: in_cart({ product_id: {{ track.id }} })">
+                                        <img src="{{ theme.link }}/images/checked_blue.svg" class="track_icon_img">
+                                    </span>
                                 </span>
                                 <span class="track_icon_right">${{ track.variants[0].price|number_format }}</span>
-                                <span class="track_icon_right"><a href="{{ track.metafields.wiki_link }}">&#x24D8;</a></span>
+                                <span class="track_icon_right"><a href="{{ track.metafields.wiki_link }}">
+                                    {% if track.metafields.track_number == 0 %}
+                                        <img src="{{ theme.link }}/images/info_blue.svg" class="track_icon_img">
+                                    {% else %}
+                                        <img src="{{ theme.link }}/images/info_black.svg" class="track_icon_img">
+                                    {% endif %}
+                                    </a></span>
                             </div>
                             {{ macros.variants_modal('Please select a file format for your download.','false',track.id,track.title,track.variants) }}
                         {% endfor %}

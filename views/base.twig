@@ -38,7 +38,7 @@
 
 		<section id="content" role="main" class="content-wrapper">
 			{% if title %}<h1>{{title}}</h1>{% endif %}
-			<div class="wrapper {{sidebar_class}}">
+			<div class="wrapper {{sidebar_class}} page-{{ post.slug }}">
 				{% block content %}
 					Sorry, no content
 				{% endblock %}
