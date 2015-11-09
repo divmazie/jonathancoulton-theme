@@ -5,6 +5,7 @@ wp-content
 /node_modules/
 /lib/
 /css/bootstrap.css
+style.css
 /js/bower.js
 /js/bower.min.js
 .idea/workspace.xml
