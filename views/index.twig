@@ -98,8 +98,8 @@
 						<!--Cute way of adding an "I'm feeling lucky" link for the venue: <a href="http://www.google.com/search?q={{ show.venue.name|url_encode }}+{{ show.venue.city|url_encode }}+{{ show.venue.region|url_encode }}&btnI=1">-->
 							<span class="venue_name">{{ show.venue.name }}</span><br />{{ show.venue.city }}, {{ show.venue.region }}</a></div>
 					<div class="col-xs-2">
-						<a href="{{ show.ticket_url|default(show.url) }}">
-							{% if show.ticket_status=="available" %}Tickets{% else %}Details{% endif %}
+						<a href="{{ show.ticket_url|default(show.url) }}" class="no_underline">
+							{% if show.ticket_status=="available" %}<div class="tickets">Tickets</div>{% else %}<div class="details">Details</div>{% endif %}
 						</a>
 					</div>
 					<div class="clearfix"></div>
