@@ -13,7 +13,7 @@
 			<nav id="nav-main" class="navbar-fixed-top" role="navigation" {% if is_logged_in %} style="top: 32px;" {% endif %}>
 				<div class="container">
 					<ul class="">
-						<li><img src="{{ theme.link }}/images/JoCoLogo_min.svg" class="little_logo"></li>
+						<li><a href="{{ site.url }}"><img src="{{ theme.link }}/images/JoCoLogo_min.svg" class="little_logo"></a></li>
 						{% for item in menu.get_items %}
 							<li class=" {{item.classes | join(' ')}}" {% if item.get_children %}onmouseover="$('#children{{ item.post_name }}').show()" onmouseout="$('#children{{ item.post_name }}').hide()" {% endif %}>
 								<a class="" href="{{item.get_link}}">{{item.title}}</a>

@@ -2,7 +2,7 @@
 
 {% block content %}
     <div class="container">
-        <div class="col-sm-12">
+        <div class="col-xs-12 col-sm-9">
             {% for post in posts %}
                 <div class="article">
                     <h2 class="h2 post_header"><a href="{{post.link}}">{{post.title}}</a></h2>
@@ -10,24 +10,7 @@
                     {% if post.thumbnail.src %}
                         <img src="{{post.thumbnail.src}}" />
                     {% endif %}
-                    <div class="post_info">
-                        <div class="col-xs-4">
-                            <div class="post_date">{{ post.date }}</div>
-                            <div class="post_author_name">{{ post.author.name }}</div>
-                        </div>
-                        <div class="col-xs-3">
-                            <div class="post_comment_link">
-                                <a href="{{ post.link }}#comments">{{ post.comment_count }} comments</a>
-                            </div>
-                        </div>
-                        <div class="col-xs-5">
-                            <div class="post_share">
-                                Share:
-                                <a href="http://twitter.com/share?text='{{ post.title }}' from @jonathancoulton&url={{ post.link }}" target="_blank"><img src="{{ theme.link }}/images/social_twitter_grey.svg" class="social_icon social_icon_share" /></a>
-                                <a href="https://www.facebook.com/sharer/sharer.php?u={{ post.link }}"><img src="{{ theme.link }}/images/social_facebook_grey.svg" class="social_icon social_icon_share" /></a> <!--Must implement OG tags for more info-->
-                            </div>
-                        </div>
-                    </div>
+                    {% include "post_info.twig" %}
                 </div>
             {% endfor %}
             <div class="tool-pagination">
@@ -49,6 +32,9 @@
                     <a href="{{pagination.next.link}}" class="next {{pagination.next.link|length ? '' : 'invisible'}}">Next</a>
                 {% endif %}
             </div>
+        </div>
+        <div class="hidden-xs col-sm-3">
+            {% include "sidebar.twig" %}
         </div>
     </div><!-- /container -->
 {% endblock %}

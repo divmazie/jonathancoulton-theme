@@ -1,1 +1,36 @@
-Sidebar in Timber. Add HTML to your hearts content.
+<div class="side_box twitter">
+    <h5 class="side_header">Previously, on Twitter</h5>
+    {% if twitter.tweets %}
+        <div class="side_content">
+            {% for tweet in twitter.tweets %}
+                <div class="tweet_text">{{ tweet.text }}</div>
+                <a href="{{ tweet.url }}" target="_blank" class="tweet_link">{{ tweet.ago }} ago</a>
+            {% endfor %}
+            <a href="{{ twitter.url }}" target="_blank" class="twitter_link">@{{ twitter.handle }}</a>
+        </div>
+    {% endif %}
+</div>
+<div class="side_box instagram">
+    <h5 class="side_header">On Instagram</h5>
+    {% if instagram.media %}
+        <div class="side_content">
+            {% for medium in instagram.media %}
+                <a href="{{ medium.link }}" target="_blank" class="instagram_media_link">
+                    <img src="{{ medium.thumb }}" class="instagram_thumb" />
+                </a>
+            {% endfor %}
+            <div class="clearfix"></div>
+            <a href="{{ instagram.url }}" target="_blank" class="instagram_link">@{{ instagram.handle }}</a>
+            <div class="clearfix"></div>
+        </div>
+    {% endif %}
+</div>
+<!--<div><script type="text/javascript" src="https://cashmusic.org/public/cashmusic.js"></script><script type="text/javascript"> window.cashmusic.embed('https://cashmusic.org/public','6959');</script></div>-->
+<div class="side_box social_media">
+    <h5 class="side_header">Follow Jonathan</h5>
+    <div class="side_content">
+        {% if twitter.url %}<a href="{{ twitter.url }}" target="_blank"><img src="{{ theme.link }}/images/social_twitter_color.svg" class="social_icon" /></a>{% endif %}
+        {% if instagram.url %}<a href="{{ instagram.url }}" target="_blank"><img src="{{ theme.link }}/images/social_instagram_color.svg" class="social_icon" /></a>{% endif %}
+        {% if facebook_link %}<a href="{{ facebook_link }}" target="_blank"><img src="{{ theme.link }}/images/social_facebook_color.svg" class="social_icon" /></a>{% endif %}
+    </div>
+</div>

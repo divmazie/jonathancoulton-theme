@@ -48,5 +48,8 @@ if ($post->slug == 'news') {
     query_posts($args);
     $context['posts'] = Timber::get_posts();
     $context['pagination'] = Timber::get_pagination();
+    $context['twitter'] = include(get_template_directory().'/config/twitter.php');
+    $context['instagram'] = include(get_template_directory().'/config/instagram.php');
+    $context['facebook_link'] = get_field('facebook_link','options');
 }
 Timber::render( array( 'page-' . $post->post_name . '.twig', 'page.twig' ), $context );

@@ -6,22 +6,5 @@
 	{% if post.thumbnail.src %}
 		<img src="{{post.thumbnail.src}}" />
 	{% endif %}
-	<div class="post_info">
-		<div class="col-xs-4">
-			<div class="post_date">{{ post.date }}</div>
-			<div class="post_author_name">{{ post.author.name }}</div>
-		</div>
-		<div class="col-xs-3">
-			<div class="post_comment_link">
-				<a href="{{ post.link }}#comments">{{ post.comment_count }} comments</a>
-			</div>
-		</div>
-		<div class="col-xs-5">
-			<div class="post_share">
-				Share:
-				<a href="http://twitter.com/share?text='{{ post.title }}' from @jonathancoulton&url={{ post.link }}" target="_blank"><img src="{{ theme.link }}/images/social_twitter_grey.svg" class="social_icon social_icon_share" /></a>
-				<a href="https://www.facebook.com/sharer/sharer.php?u={{ post.link }}"><img src="{{ theme.link }}/images/social_facebook_grey.svg" class="social_icon social_icon_share" /></a> <!--Must implement OG tags for more info-->
-			</div>
-		</div>
-	</div>
+	{% include "post_info.twig" %}
 {% endblock %}
