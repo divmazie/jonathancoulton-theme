@@ -48,7 +48,7 @@ new StarterSite();
 
 
 if(!is_admin()) {
-	wp_enqueue_style('bootstrap',get_template_directory_uri().'/css/bootstrap.css');
+	//wp_enqueue_style('bootstrap',get_template_directory_uri().'/css/bootstrap.css');
 	wp_enqueue_script('bower', get_template_directory_uri() . '/js/bower.min.js');
 	wp_enqueue_script('site', get_template_directory_uri() . '/js/site.js');
 	wp_dequeue_script('jquery');

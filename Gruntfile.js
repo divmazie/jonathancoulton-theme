@@ -38,7 +38,7 @@ module.exports = function(grunt) {
                     paths : ['custom_bootstrap/']
                 },
                 files : {
-                    "css/bootstrap.css" : "custom_bootstrap/custom-bootstrap.less"
+                    "style.css" : "custom_bootstrap/custom-bootstrap.less"
                 }
             }
         },
