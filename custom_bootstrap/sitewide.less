@@ -6,6 +6,9 @@
 a {
   cursor: pointer;
 }
+a.no_underline {
+  text-decoration: none;
+}
 .slick-prev:before, .slick-next:before {
   content: '';
 }
@@ -41,10 +44,16 @@ a {
 }
 .blue_arrow_right, .blue_arrow_left {
   width: 300px;
+  &:hover {
+    color: @joco_grey2;
+  }
   //background-color: #6692f1;
 }
 .gray_arrow_right, .gray_arrow_left {
   width: 200px;
+  &:hover {
+    color: @brand-primary;
+  }
   //background-color: #cccccc;
 }
 .blue_arrow_right {
