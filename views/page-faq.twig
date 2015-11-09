@@ -3,15 +3,22 @@
 {% block content %}
 	<div class="container">
 		<div class="col-sm-12">
-			<article class="post-type-{{post.post_type}}" id="post-{{post.ID}}">
+			<article class="post-type-{{post.post_type}} article" id="post-{{post.ID}}">
 				<section class="article-content">
-					<h1 class="article-h1">{{post.title}}</h1>
+					<h1 class="article-h1 post_header">{{post.title}}</h1>
 					{% for faq in faqs %}
 						{% if faq.faq_is_header %}
-							<h2>{{ faq.title }}</h2>
+							<a href="#{{ faq.slug }}" class="faq_section_link">{{ faq.title }}</a><br />
 						{% else %}
-							<h3>{{ faq.title }}</h3>
-							<p>{{ faq.content }}</p>
+							<a href="#{{ faq.slug }}" class="faq_question_link">{{ faq.title }}</a><br />
+						{% endif %}
+					{% endfor %}
+					{% for faq in faqs %}
+						{% if faq.faq_is_header %}
+							<h2 class="faq_section_title" id="{{ faq.slug }}">{{ faq.title }}</h2>
+						{% else %}
+							<h3 class="faq_question" id="{{ faq.slug }}">{{ faq.title }}</h3>
+							<div class="faq_answer">{{ faq.content }}</div>
 						{% endif %}
 					{% endfor %}
 				</section>
