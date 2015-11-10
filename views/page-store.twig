@@ -14,8 +14,11 @@
                         <h4 class="modal-title">{{ prompt|default('Please select your preferred option.') }}</h4>
                     </div>
                     <div class="modal-body">
+                        <div data-bind="visible: store_view() == 'downloads'">
+                            <label><input type="checkbox" data-bind="checked: remember_format" /> Make this format my default.</label>
+                        </div>
                         {% for variant in variants %}
-                            <button onclick='addToCart({{ id }},"{{ name }}",{{ variant.price|number_format }},{{ variants_json|json_encode() }},{{ variant.id }},{{ allow_multiple }})'>{{ variant.title }}</button>
+                            <button onclick='addToCart({{ id }},"{{ name }}",{{ variant.price|number_format }},{{ variants_json|json_encode() }},{{ variant.id }},{{ allow_multiple }})' id="product{{ id }}_{{ variant.title }}">{{ variant.title }}</button>
                         {% endfor %}
                     </div>
                 </div>
@@ -63,6 +66,20 @@
                         <div class="album_square">
                             <img src="{{ album.collection.image.src }}" class="album_image" />
                         </div>
+                        {% for track in album.products %}
+                            {% if track.metafields.track_number == 0 %}
+                                <a data-bind="visible: !in_cart({ product_id: {{ track.id }} })" onclick="option_modal({{ track.id }})">
+                                    <div class="add_to_cart_box_blue">
+                                        Add album to cart
+                                        <img src="{{ theme.link }}/images/add_to_cart_white.svg" class="track_icon_img" />
+                                    </div>
+                                </a>
+                                <div data-bind="visible: in_cart({ product_id: {{ track.id }} })" class="add_to_cart_box_blue">
+                                    Album in cart
+                                    <img src="{{ theme.link }}/images/checked_white.svg" class="track_icon_img" />
+                                </div>
+                            {% endif %}
+                        {% endfor %}
                     </div>
                     <div class="col-xs-12 col-sm-8">
                         <h3 class="album_title">{{ album.collection.title }}</h3>
@@ -102,11 +119,23 @@
             {% else %}
                 {% for product in category.products %}
                     <div class="col-lg-3">
-                        <img src="{{ product.image.src }}" class="album_image" /><br />
-                        {{ product.title }}<br />
-                        {{ product.body_html }}<br />
-                        <a onclick="option_modal('{{ product.id }}')">cart</a>
-                        <span data-bind="visible: in_cart({ product_id: {{ product.id }} })">&#x2713;</span>
+                        <div class="album_square">
+                            <img src="{{ product.image.src }}" class="album_image" /><br />
+                        </div>
+                        <a onclick="option_modal('{{ product.id }}')" class="no_underline">
+                            <div class="add_to_cart_box_blue" style="margin: 0 0 20px;">
+                                <span data-bind="visible: !in_cart({ product_id: {{ product.id }} })">
+                                    ${{ product.variants[0].price|number_format }} | Add to cart
+                                    <img src="{{ theme.link }}/images/add_to_cart_white.svg" class="track_icon_img" />
+                                </span>
+                                <span data-bind="visible: in_cart({ product_id: {{ product.id }} })">
+                                    ${{ product.variants[0].price|number_format }} | Add another
+                                    <img src="{{ theme.link }}/images/checked_white.svg" class="track_icon_img" />
+                                </span>
+                            </div>
+                        </a>
+                        <div class="product_title">{{ product.title }}</div>
+                        <div class="product_description">{{ product.body_html }}</div>
                     </div>
                     {{ macros.variants_modal('','true',product.id,product.title,product.variants) }}
                 {% endfor %}
@@ -178,6 +207,8 @@
 
     <script type="application/javascript">
         var shopify_domain = "http://jonathan-coulton.myshopify.com";
+        var default_audio_format = "";
+
         function CartItem(product_id,product_name,price,variants,variant,quantity,allow_multiple) {
             var self = this;
             self.product_id = product_id;
@@ -202,6 +233,7 @@
             self.player_ready = ko.observable(false);
             self.current_song = ko.observable();
             self.store_view = ko.observable('{{ get_vars.store_section|default('downloads') }}');
+            self.remember_format = ko.observable(true);
             self.cart = ko.observableArray(start_cart);
             self.remove_product = function(product) {
                 self.cart.remove(product);
@@ -265,7 +297,10 @@
 
         function option_modal(product_id) {
             var product_modal = $('#product_modal_'+product_id);
-            if (product_modal.size()) {
+            var default_button = product_modal.find('#product'+product_id+'_'+default_audio_format);
+            if (default_button.size()) {
+                default_button.click();
+            } else if (product_modal.size()) {
                 product_modal.modal('show');
             } else {
                 window["add_"+product_id+"_to_cart"](product_id);
@@ -274,6 +309,9 @@
 
         function addToCart(product_id,product_name,price,variants,variant_id,allow_multiple) {
             var variant = find_variant(variants,variant_id);
+            if (myViewModel.store_view() == 'downloads' && myViewModel.remember_format()) {
+                default_audio_format = variant.option;
+            }
             var product = new CartItem(product_id,product_name,price,variants,variant,1,allow_multiple);
             if (allow_multiple || !myViewModel.in_cart(product)) {
                 myViewModel.cart.push(product);
