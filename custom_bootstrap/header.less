@@ -5,7 +5,7 @@
   height: 60px;
 }
 .little_logo {
-  height: 20px;
+  height: 18px;
 }
 #nav-main {
   border-bottom: solid @joco_grey3 1px;
@@ -44,6 +44,21 @@ nav {
     float: left;
     margin: 20px 0px;
     color: #bbbbbb;
+  }
+  .listen_now {
+    float: right;
+    margin: 20px 10px;
+    font-weight: 800;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    a {
+      text-decoration: none;
+      color: black;
+      &:hover {
+        text-decoration: none;
+        color: @brand-primary;
+      }
+    }
   }
 }
 #nav-store {
