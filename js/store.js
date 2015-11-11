@@ -87,8 +87,18 @@ if(typeof(Storage) !== "undefined" && sessionStorage.getItem('cart')) {
 var myViewModel = new ViewModel(start_cart);
 ko.applyBindings(myViewModel);
 
+window.onload = function() {
+    window.history.replaceState({section: myViewModel.store_view()}, '', '/store/?store_section='+myViewModel.store_view());
+};
+window.onpopstate = function(event) {
+    if (event.state.section) {
+        myViewModel.store_view(event.state.section);
+    }
+};
 function store_nav(section) {
+    window.scrollTo(0,0);
     myViewModel.store_view(section);
+    window.history.pushState({section: section}, '', '/store/?store_section='+section);
 }
 
 function option_modal(product_id) {
