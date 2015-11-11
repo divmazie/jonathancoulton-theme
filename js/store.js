@@ -88,10 +88,10 @@ var myViewModel = new ViewModel(start_cart);
 ko.applyBindings(myViewModel);
 
 window.onload = function() {
-    window.history.replaceState({section: myViewModel.store_view()}, '', '/store/?store_section='+myViewModel.store_view());
+    window.history.replaceState({section: myViewModel.store_view()}, '', '');
 };
 window.onpopstate = function(event) {
-    if (event.state.section) {
+    if (event.state && event.state.section) {
         myViewModel.store_view(event.state.section);
     }
 };

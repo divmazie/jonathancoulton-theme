@@ -1,5 +1,28 @@
 {% extends "base.twig" %}
 
+{% macro showcase(showcase_tiles) %}
+	{% for tile in showcase_tiles %}
+		<div class="showcase_tile">
+			{% if tile.tile_link %}<a href="{{ tile.tile_link }}">{% endif %}
+				<div class="joco-promo" style="
+				{% if tile.background_color %}background-color: {{ tile.background_color }};{% endif %}
+									{% if tile.bottom_border_color %}border-bottom: solid 10px {{ tile.bottom_border_color }};{% endif %}
+						">
+					{% if tile.thumbnail %}
+						<img src="{{ tile.thumbnail.src }}" class="promo-image" />
+					{% else %}
+						<div class="promo-text">
+							<h2 class="{{ tile.header_font }}"{% if tile.header_color %} style="color: {{ tile.header_color }}"{% endif %}>{{ tile.title }}</h2>
+							<p class="{{ tile.body_font }}"{% if tile.body_color %} style="color: {{ tile.body_color }}"{% endif %}>{{ tile.post_content }}</p>
+						</div>
+					{% endif %}
+				</div>
+				{% if tile.tile_link %}</a>{% endif %}
+		</div>
+	{% endfor %}
+{% endmacro %}
+{% import _self as macros %}
+
 {% block content %}
 	<div class="container">
 		<div class="col-xs-12">
@@ -7,26 +30,11 @@
 				<a class="hdr-logo-link" href="{{ site.url }}" rel="home"><img src="{{ theme.link }}/images/JoCoLogo.svg" style="width: 100%" /></a>
 			</h1>
 			<div class="clearfix"></div>
-			<div data-slick='{"slidesToShow": 4, "slidesToScroll": 1}' class="slick-element showcase_tiles">
-				{% for tile in showcase_tiles %}
-					<div class="showcase_tile">
-						{% if tile.tile_link %}<a href="{{ tile.tile_link }}">{% endif %}
-							<div class="joco-promo" style="
-									{% if tile.background_color %}background-color: {{ tile.background_color }};{% endif %}
-									{% if tile.bottom_border_color %}border-bottom: solid 10px {{ tile.bottom_border_color }};{% endif %}
-									">
-								{% if tile.thumbnail %}
-									<img src="{{ tile.thumbnail.src }}" class="promo-image" />
-								{% else %}
-									<div class="promo-text">
-										<h2 class="{{ tile.header_font }}"{% if tile.header_color %} style="color: {{ tile.header_color }}"{% endif %}>{{ tile.title }}</h2>
-										<p class="{{ tile.body_font }}"{% if tile.body_color %} style="color: {{ tile.body_color }}"{% endif %}>{{ tile.post_content }}</p>
-									</div>
-								{% endif %}
-							</div>
-						{% if tile.tile_link %}</a>{% endif %}
-					</div>
-				{% endfor %}
+			<div data-slick='{"slidesToShow": 4, "slidesToScroll": 1}' class="slick-element showcase_tiles hidden-xs">
+				{{ macros.showcase(showcase_tiles) }}
+			</div>
+			<div data-slick='{"slidesToShow": 1, "slidesToScroll": 1}' class="slick-element showcase_tiles visible-xs">
+				{{ macros.showcase(showcase_tiles) }}
 			</div>
 		</div>
 		<div class="col-xs-12 col-sm-8">
@@ -75,10 +83,10 @@
 			{% for show in bandsintown|slice(0,6) %}
 				<div class="show_row col-xs-12 col-sm-10 col-sm-offset-1 col-md-8 col-md-offset-2">
 					<div class="col-xs-2"><a href="{{ show.url }}">{{ show.datetime|date("M j") }}</a></div>
-					<div class="col-xs-8"><a href="{{ show.venue.url }}">
+					<div class="col-xs-6 col-sm-8"><a href="{{ show.venue.url }}">
 						<!--Cute way of adding an "I'm feeling lucky" link for the venue: <a href="http://www.google.com/search?q={{ show.venue.name|url_encode }}+{{ show.venue.city|url_encode }}+{{ show.venue.region|url_encode }}&btnI=1">-->
 							<span class="venue_name">{{ show.venue.name }}</span><br />{{ show.venue.city }}, {{ show.venue.region }}</a></div>
-					<div class="col-xs-2">
+					<div class="col-xs-4 col-sm-2">
 						<a href="{{ show.ticket_url|default(show.url) }}" class="no_underline">
 							{% if show.ticket_status=="available" %}<div class="tickets">Tickets</div>{% else %}<div class="details">Details</div>{% endif %}
 						</a>

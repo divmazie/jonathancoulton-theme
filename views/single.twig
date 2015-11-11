@@ -3,7 +3,8 @@
 {% block content %}
 	<div class="container">
 		<div class="col-sm-12">
-			<article class="post-type-{{post.post_type}} article" id="post-{{post.ID}}">
+			<a class="anchor" id="post-{{post.ID}}"></a>
+			<article class="post-type-{{post.post_type}} article">
 				<section class="article-content">
 					<h1 class="article-h1 post_header">{{post.title}}</h1>
 					<p class="blog-author">
@@ -13,7 +14,8 @@
 						{{post.content}}
 					</div>
 				</section>
-				<section id="comments" class="comments">
+				<a class="anchor"  id="comments"></a>
+				<section class="comments">
 					<h3 class="h2">Comments</h3>
 					<div class="responses">
 						{% for cmt in post.get_comments() %}
