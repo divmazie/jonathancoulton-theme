@@ -6,6 +6,11 @@
     margin: auto;
   }
 }
+@media (max-width: @screen-sm) {
+  .article {
+    padding: 20px;
+  }
+}
 .post_header {
   font-weight: bold;
   letter-spacing: 0.02em;
@@ -40,6 +45,13 @@
   border-right: solid @gray-light 1px;
   a {
     color: @joco_orange;
+  }
+}
+@media (max-width: @screen-sm) {
+  .post_comment_link {
+    border: none;
+    margin: 10px 0;
+    text-align: left;
   }
 }
 .post_share {

@@ -10,6 +10,12 @@
 #nav-main {
   border-bottom: solid @joco_grey3 1px;
 }
+@media (max-width: @screen-sm) {
+  #nav-main {
+    position: absolute !important;
+    min-width: 400px;
+  }
+}
 nav {
   background-color: #FFFFFF;
   .current-menu-item {
