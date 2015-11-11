@@ -18,8 +18,9 @@
                             <label><input type="checkbox" data-bind="checked: remember_format" /> Make this format my default.</label>
                         </div>
                         {% for variant in variants %}
-                            <button onclick='addToCart({{ id }},"{{ name }}",{{ variant.price|number_format }},{{ variants_json|json_encode() }},{{ variant.id }},{{ allow_multiple }})' id="product{{ id }}_{{ variant.title }}">{{ variant.title }}</button>
+                            <button class="option" onclick='addToCart({{ id }},"{{ name }}",{{ variant.price|number_format }},{{ variants_json|json_encode() }},{{ variant.id }},{{ allow_multiple }})' id="product{{ id }}_{{ variant.title }}">{{ variant.title }}</button>
                         {% endfor %}
+                        <div class="clearfix"></div>
                     </div>
                 </div>
             </div>
@@ -118,7 +119,7 @@
                 {% endfor %}
             {% else %}
                 {% for product in category.products %}
-                    <div class="col-lg-3">
+                    <div class="col-sm-3 product">
                         <div class="album_square">
                             <img src="{{ product.image.src }}" class="album_image" /><br />
                         </div>
@@ -149,25 +150,48 @@
         <div class="modal-content">
             <div class="modal-header">
                 <button type="button" class="close" data-dismiss="modal">&times;</button>
-                <h4 class="modal-title">SHOPPING CART!</h4>
+                <h4 class="modal-title">Your cart!</h4>
             </div>
             <div class="modal-body">
+                <div class="cart_row cart_headers">
+                    <span>Item</span>
+                    <span class="cart_icon_right">Remove</span>
+                    <span class="cart_icon_right">Price</span>
+                    <span class="cart_icon_right">Option</span>
+                    <span class="cart_icon_right">Duplicate item</span>
+                </div>
                 <div data-bind="foreach: cart">
                     <div class="cart_row">
                         <span data-bind="text: product_name"></span>
                         <span class="cart_icon_right"><a data-bind="click: $root.remove_product">&#x2715;</a></span>
                         <span class="cart_icon_right">$<span data-bind="text: calculated_cost"></span></span>
                         <span class="cart_icon_right"><select data-bind="options: variants, value: variant, optionsText: 'option', visible: variants().length > 1"></select></span>
-                        <span class="cart_icon_right"><a data-bind="click: duplicate_item, visible: allow_multiple">Duplicate</a></span>
+                        <span class="cart_icon_right"><a data-bind="click: duplicate_item, visible: allow_multiple">+</a></span>
                         <!--<span class="cart_icon_right"><input type="number" data-bind="value: quantity, visible: allow_multiple" min="0" style="width: 50px;" /></span>
                         Product: <span data-bind="text: product_id"></span>
                         Variant: <span data-bind="text: variant_id"></span>
                         -->
                     </div>
                 </div>
-                Total: $<span data-bind="text: total_cost"></span><br />
-                (Shipping and tax calculated at checkout.)<br /><br />
-                <a data-bind="attr: { href: checkout_link }, visible: cart().length > 0">CHECKOUT!</a>
+                <div class="subtotal_box">
+                    <div class="subtotal_line">
+                        Subtotal <span style="float: right;">$<span data-bind="text: total_cost"></span></span>
+                    </div>
+                    <div class="subtotal_fineprint">(Shipping and tax calculated at checkout.)</div>
+                </div>
+                <div class="clearfix"></div>
+                <div style="float: left;">
+                    <a onclick="$('#cart_modal').modal('hide')" class="no_underline">
+                        <div class="gray_arrow_left">Keep shopping</div>
+                    </a>
+                </div>
+                <div style="float: right;">
+                    <a data-bind="attr: { href: checkout_link }, visible: cart().length > 0" class="no_underline">
+                        <div class="blue_arrow_right" style="width: 200px;">Checkout</div>
+                    </a>
+                    <div class="gray_arrow_right" data-bind="visible: cart().length < 1">Checkout</div>
+                </div>
+                <div class="clearfix"></div>
             </div>
         </div>
     </div>
@@ -177,10 +201,23 @@
         <div class="modal-content">
             <div class="modal-header">
                 <button type="button" class="close" data-dismiss="modal">&times;</button>
-                <h4 class="modal-title">Item added to cart!</h4>
+                <h4 class="modal-title">
+                    Item added to cart!
+                    <br />
+                    <img src="{{ theme.link }}/images/checked_white.svg">
+                </h4>
             </div>
             <div class="modal-body">
                 <span id="cart_confirm_product_name"></span> has been added to your shopping cart!
+                <div class="" style="margin: 30px auto;">
+                    <div class="col-xs-6">
+                        <button class="option centered" onclick="$('#cart_confirm_modal').modal('hide')">Keep shopping</button>
+                    </div>
+                    <div class="col-xs-6">
+                        <button class="option centered" onclick="$('#cart_confirm_modal').modal('hide'); $('#cart_modal').modal('show');">Checkout</button>
+                    </div>
+                    <div class="clearfix"></div>
+                </div>
             </div>
         </div>
     </div>
@@ -319,7 +356,7 @@
             $('#product_modal_'+product_id).modal('hide');
             $('#cart_confirm_product_name').html(product_name);
             $('#cart_confirm_modal').modal('show');
-            setTimeout("$('#cart_confirm_modal').modal('hide')",1500);
+            //setTimeout("$('#cart_confirm_modal').modal('hide')",1500);
         }
         function find_variant(variants,variant_id) {
             var variant = variants[0];
