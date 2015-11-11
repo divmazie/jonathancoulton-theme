@@ -26,6 +26,17 @@ $context['blurb_content'] = get_field('front_page_blurb_content','options');
 $context['twitter'] = include(get_template_directory().'/config/twitter.php');
 $context['instagram'] = include(get_template_directory().'/config/instagram.php');
 $context['facebook_link'] = get_field('facebook_link','options');
+$apiKey = get_field('shopify_api_key','options');
+$apiPassword = get_field('shopify_api_password','options');
+$handle = get_field('shopify_handle','options');
+$shopify = new jct\Shopify($apiKey,$apiPassword,$handle);
+$store = $shopify->getStoreContext();
+foreach ($store as $category) {
+    if ($category['shopify_type'] == "Music download") {
+        $context['albums'] = $category['products'];
+    }
+}
+$context['store'] = $store;
 $bandsintown = get_transient('bandsintown');
 if (!$bandsintown) {
     $bandsintown = json_decode(file_get_contents("http://api.bandsintown.com/artists/jonathancoulton/events.json"));

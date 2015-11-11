@@ -63,6 +63,7 @@
         <div data-bind="visible: store_view() == '{{ category.html_name }}'">
             {% if category.shopify_type == 'Music download' %}
                 {% for album in category.products %}
+                    <a class="anchor" id="album{{ album.collection.id }}"></a>
                     <div class="col-xs-12 col-sm-4">
                         <div class="album_square">
                             <img src="{{ album.collection.image.src }}" class="album_image" />

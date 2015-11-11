@@ -49,7 +49,23 @@
 	<div class="dark_content">
 		<div class="container">
 			<h2 class="section_header">Recent releases</h2>
-			<p class="featured-p"></p>
+			<p class="featured-p">
+				{% set album_count = 0 %}
+				{% for album in albums %}
+					{% if album.collection.image.src and album_count < 4 %}
+						<div class="col-sm-3 product">
+							<a href="{{ site.url }}/store/?store_section=downloads#album{{ album.collection.id }}" class="no_underline">
+								<div class="album_square">
+									<img src="{{ album.collection.image.src }}" class="album_image" /><br />
+								</div>
+								<div class="product_title">{{ album.collection.title }}</div>
+								<div class="product_description">{{ album.collection.body_html }}</div>
+							</a>
+						</div>
+						{% set album_count = album_count + 1 %}
+					{% endif %}
+				{% endfor %}
+			</p>
 		</div>
 	</div>
 	<div class="light_content">

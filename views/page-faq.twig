@@ -14,10 +14,11 @@
 						{% endif %}
 					{% endfor %}
 					{% for faq in faqs %}
+						<a class="anchor" id="{{ faq.slug }}"></a>
 						{% if faq.faq_is_header %}
-							<h2 class="faq_section_title" id="{{ faq.slug }}">{{ faq.title }}</h2>
+							<h2 class="faq_section_title">{{ faq.title }}</h2>
 						{% else %}
-							<h3 class="faq_question" id="{{ faq.slug }}">{{ faq.title }}</h3>
+							<h3 class="faq_question">{{ faq.title }}</h3>
 							<div class="faq_answer">{{ faq.content }}</div>
 						{% endif %}
 					{% endfor %}

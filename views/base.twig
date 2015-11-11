@@ -96,7 +96,9 @@
 		{% endblock %}
 		</div>
 		<script type="text/javascript">
-			$('.header').height($('#nav-main').height());
+			var nav_height = $('#nav-main').height();
+			$('.header').height(nav_height);
+			$('.anchor').css({ top: -nav_height+'px' });
 			// open external links in new tab
 			jQuery('#body').find('a').filter(function() {
 				return this.hostname && this.hostname.indexOf(location.hostname)===-1 && this.hostname!="jonathan-coulton.myshopify.com";
