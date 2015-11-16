@@ -214,6 +214,22 @@
             "endpoint": 0
         },
         {
+            "key": "field_564a43329651e",
+            "label": "Store instructions",
+            "name": "",
+            "type": "message",
+            "instructions": "",
+            "required": 0,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "",
+                "class": "",
+                "id": ""
+            },
+            "message": "Click this button after making any change to the store!\r\n\r\n<button onclick=\"window.location='\/custom_admin\/refresh_store'\">Refresh store!<\/button>",
+            "esc_html": 0
+        },
+        {
             "key": "field_561589023a077",
             "label": "Store categories",
             "name": "store_categories",
@@ -509,5 +525,5 @@
     "hide_on_screen": "",
     "active": 1,
     "description": "",
-    "modified": 1444252528
+    "modified": 1447711670
 }

@@ -22,9 +22,9 @@ Timber::add_route('api/:authcode/:script/:var', function($params){
     }
 });
 
-Timber::add_route('music_admin', function($params){
+Timber::add_route('custom_admin/:script', function($params){
     if (current_user_can('manage_options')) {
-        Timber::load_template("music_admin.php");
+        Timber::load_template('custom_admin/'.$params['script'].".php");
     } else {
         Timber::load_template("404.php");
     }
