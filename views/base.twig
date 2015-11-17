@@ -96,8 +96,15 @@
 		{% endblock %}
 		</div>
 		<script type="text/javascript">
+			var resize_tasks = function() {
+				var nav_height = $('#nav-main').height();
+				$('.header').height(nav_height);
+				$('.track_title').width($('.track_row').width() - 170);
+			};
+			$(window).resize(resize_tasks);
+
+			resize_tasks();
 			var nav_height = $('#nav-main').height();
-			$('.header').height(nav_height);
 			$('.anchor').css({ top: -nav_height+'px' });
 			// open external links in new tab
 			jQuery('#body').find('a').filter(function() {

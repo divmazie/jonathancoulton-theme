@@ -97,12 +97,15 @@
 .track_title {
   font-weight: 600;
   letter-spacing: 0.01em;
+  height: 20px;
+  overflow: hidden;
 }
 .track_icon_left, .track_icon_right {
   display: block;
   width: 20px;
   height: 20px;
   margin: 0 8px;
+  padding: 0 8px;
   text-align: center;
 }
 .track_icon_left {
@@ -139,6 +142,24 @@
   height: 40px;
   padding: 10px 0;
   border-bottom: solid 1px @gray-light;
+}
+@media (max-width: @screen-sm) {
+  .modal-dialog {
+    margin: 20px auto !important;
+  }
+  .cart_title {
+    width: 100%;
+    height: 40px;
+  }
+  .cart_row {
+    height: 80px;
+    select {
+      font-size: 10px;
+    }
+  }
+  .gray_arrow_left, .gray_arrow_right, .blue_arrow_right {
+    width: 150px !important;
+  }
 }
 .cart_icon_right {
   display: block;

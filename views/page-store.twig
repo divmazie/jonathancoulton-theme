@@ -70,7 +70,7 @@
                         </div>
                         {% for track in album.products %}
                             {% if track.metafields.track_number == 0 %}
-                                <a data-bind="visible: !in_cart({ product_id: {{ track.id }} })" onclick="option_modal({{ track.id }})">
+                                <a data-bind="visible: !in_cart({ product_id: {{ track.id }} })" onclick="option_modal({{ track.id }})" class="no_underline">
                                     <div class="add_to_cart_box_blue">
                                         Add album to cart
                                         <img src="{{ theme.link }}/images/add_to_cart_white.svg" class="track_icon_img" />
@@ -99,19 +99,21 @@
                                         </span>
                                     </span>
                                     {% endif %}</span>
-                                <span class="track_title">{{ track.title }}</span>
-                                <span class="track_icon_right">
-                                    <a data-bind="visible: !in_cart({ product_id: {{ track.id }} })" onclick="option_modal({{ track.id }})">
-                                        <img src="{{ theme.link }}/images/add_to_cart_blue.svg" class="track_icon_img">
-                                    </a>
-                                    <span data-bind="visible: in_cart({ product_id: {{ track.id }} })">
-                                        <img src="{{ theme.link }}/images/checked_blue.svg" class="track_icon_img">
+                                <div class="track_title" style="z-index: 0">{{ track.title }} blah blah</div>
+                                <div style="position: relative; top: -20px; background-color: green; z-index: 1000">
+                                    <span class="track_icon_right">
+                                        <a data-bind="visible: !in_cart({ product_id: {{ track.id }} })" onclick="option_modal({{ track.id }})">
+                                            <img src="{{ theme.link }}/images/add_to_cart_blue.svg" class="track_icon_img">
+                                        </a>
+                                        <span data-bind="visible: in_cart({ product_id: {{ track.id }} })">
+                                            <img src="{{ theme.link }}/images/checked_blue.svg" class="track_icon_img">
+                                        </span>
                                     </span>
-                                </span>
-                                <span class="track_icon_right">${{ track.variants[0].price|number_format }}</span>
-                                <span class="track_icon_right">
-                                    <a href="{{ track.metafields.wiki_link }}" class="track_info_icon {% if track.metafields.track_number == 0 %}album_info_icon{% endif %}"></a>
-                                </span>
+                                    <span class="track_icon_right">${{ track.variants[0].price|number_format }}</span>
+                                    <span class="track_icon_right">
+                                        <a href="{{ track.metafields.wiki_link }}" class="track_info_icon {% if track.metafields.track_number == 0 %}album_info_icon{% endif %}"></a>
+                                    </span>
+                                </div>
                             </div>
                             {{ macros.variants_modal('Please select a file format for your download.','false',track.id,track.title,track.variants) }}
                         {% endfor %}
@@ -166,7 +168,7 @@
                 </div>
                 <div data-bind="foreach: cart">
                     <div class="cart_row">
-                        <span data-bind="text: product_name"></span>
+                        <div data-bind="text: product_name" class="cart_title"></div>
                         <span class="cart_icon_right"><a data-bind="click: $root.remove_product">&#x2715;</a></span>
                         <span class="cart_icon_right">$<span data-bind="text: calculated_cost"></span></span>
                         <span class="cart_icon_right"><select data-bind="options: variants, value: variant, optionsText: 'option', visible: variants().length > 1"></select></span>
