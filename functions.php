@@ -69,18 +69,6 @@ include __DIR__.'/include/cpt.php';
 include __DIR__.'/include/routes.php';
 include __DIR__.'/include/prepopulate.php';
 
-function check_encodes_on_post_save($post_id) {
-	$post_type = get_post_type($post_id);
-	if ($post_type == 'Track') {
-		$album_post = get_post(get_field('track_album',$post_id));
-		$album = new Album($album_post);
-		$track = new Track(get_post($post_id),$album);
-		$track->getAllChildEncodes();
-		include_once(get_template_directory().'/api/spinupdo.php');
-	}
-}
-add_action( 'save_post', 'check_encodes_on_post_save' );
-
 function base64_url_encode($input) {
 	return strtr(base64_encode($input), '+/=', '-_~');
 }

@@ -24,9 +24,10 @@
                 <br />
             {% endfor %}
             {% if missing_files|length > 0 %}
-                Once you have uploaded those files, <button onclick="window.location.href='{{ site.url }}/api/code/store_sync/1'">sync again</button> to link them to our store.<br />
+                Once you have uploaded those files, <button onclick="window.location.href='{{ site.url }}/custom_admin/store_sync'">sync again</button> to link them to our store.<br />
             {% else %}
                 Sync performed successfully!<br />
+                <a href="{{ site.url }}/wp-admin/admin.php?page=theme-general-settings">Return to WP admin page</a>.
             {% endif %}
             <br />
             {% if unused_files|length > 0 %}
@@ -37,11 +38,13 @@
                 <br />
             {% endif %}
             <br />
+            <!--
             <pre>
                 {% for response in album_responses %}
                     {{ response|print_r }}
                 {% endfor %}
             </pre>
+            -->
         </div>
     </body>
 </html>

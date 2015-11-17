@@ -10,7 +10,7 @@ function authcode_valid($code) { // Check against transient with encoder validat
     if ($code==get_transient('do_secret'))
         return true;
     else
-        return true; // Change this to false when actually want to test!
+        return false; // Change this to false when actually want to test!
 }
 
 Timber::add_route('api/:authcode/:script/:var', function($params){

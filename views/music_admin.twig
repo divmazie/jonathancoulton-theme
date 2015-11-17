@@ -63,12 +63,12 @@
                     <a href="{{ site.url }}/wp-admin/edit.php?post_type=album">albums</a> or <a href="{{ site.url }}/wp-admin/edit.php?post_type=track">tracks</a> in Wordpress.
                 {% elseif warning_level == 'orange' %}
                     {{ macros.go_warning("Orange warnings") }} below mean you are missing encoded audio and/or zip files.<br /><br />
-                    <button onclick="window.location.href='{{ site.url }}/api/code/postencodes/1'">Create encodes and zips</button> <br />
+                    <button onclick="window.location.href='{{ site.url }}/custom_admin/postencodes'">Create encodes and zips</button> <br />
                 {% else %}
                     It appears all your music files are ready to go.
                     After you have clicked the button below once, it will create all the products in the store.
                     You may then need to upload some files to fetch and then run the sync again.<br /><br />
-                    <button onclick="window.location.href='{{ site.url }}/api/code/store_sync/1'">Sync to store</button> <br />
+                    <button onclick="window.location.href='{{ site.url }}/custom_admin/store_sync'">Sync to store</button> <br />
                 {% endif %}
             </div>
             {% for album in albums %}
