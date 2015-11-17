@@ -12,6 +12,10 @@
 	{% block head %}
     {% endblock %}
     <style>
+        .instruction {
+            margin: 40px;
+            font-size: 24px;
+        }
         .admin_album, .admin_zip, .admin_track, .admin_encode, .admin_bonus {
             margin-left: 20px;
         }
@@ -31,7 +35,42 @@
 
     <body class="{{body_class}}" data-template="base.twig">
         <div class="container">
-            This is the music admin page!
+            <h1>Manage audio file encoding and store syncing</h1>
+            {% set warning_level = 'green' %}
+            {% for album in albums %}
+                {% if (not album.art.exists) or (not album.encode_worthy) or (not album.show_album) %}
+                    {% set warning_level = 'red' %}
+                {% endif %}
+                {% for zip in album.album_zips %}
+                    {% if (not (warning_level == 'red')) and ((not zip.zip_worthy) or zip.missing_encodes) %}
+                        {% set warning_level = 'orange' %}
+                    {% endif %}
+                {% endfor %}
+                {% for track in album.tracks %}
+                    {% if (not track.art.exists) or (not track.source.exists) or (not track.encode_worthy) or track.track_num_conflict %}
+                        {% set warning_level = 'red' %}
+                    {% endif %}
+                    {% for encode in track.encodes %}
+                        {% if (not (warning_level == 'red')) and (not encode.exists) %}
+                            {% set warning_level = 'orange' %}
+                        {% endif %}
+                    {% endfor %}
+                {% endfor %}
+            {% endfor %}
+            <div class="instruction">
+                {% if warning_level == 'red' %}
+                    Please read the {{ macros.stop_warning("Red warnings") }} below and edit the relevant
+                    <a href="{{ site.url }}/wp-admin/edit.php?post_type=album">albums</a> or <a href="{{ site.url }}/wp-admin/edit.php?post_type=track">tracks</a> in Wordpress.
+                {% elseif warning_level == 'orange' %}
+                    {{ macros.go_warning("Orange warnings") }} below mean you are missing encoded audio and/or zip files.<br /><br />
+                    <button onclick="window.location.href='{{ site.url }}/api/code/postencodes/1'">Create encodes and zips</button> <br />
+                {% else %}
+                    It appears all your music files are ready to go.
+                    After you have clicked the button below once, it will create all the products in the store.
+                    You may then need to upload some files to fetch and then run the sync again.<br /><br />
+                    <button onclick="window.location.href='{{ site.url }}/api/code/store_sync/1'">Sync to store</button> <br />
+                {% endif %}
+            </div>
             {% for album in albums %}
                 <div class="admin_album">
                     Title: {{ album.title }} <br />
@@ -72,18 +111,15 @@
                     {% endif %}
                     {% for bonus in album.bonus_assets %}
                         <div class="admin_bonus">
-                            Source: {% if bonus.exists %} {{ bonus.filename }} {% else %} {{ macros.warning('SOURCE MISSING!') }} {% endif %} <br />
+                            Source: {% if bonus.exists %} {{ bonus.filename }} {% else %} {{ macros.stop_warning('SOURCE MISSING!') }} {% endif %} <br />
                         </div>
                     {% endfor %}
                 </div> <br />
             {% endfor %}
-            <div>
-                {{ macros.stop_warning("Red warnings") }} above require editing albums and tracks in Wordpress. <br />
-                {{ macros.go_warning("Orange warnings") }} can be fixed by <button onclick="window.location.href='{{ site.url }}/api/code/postencodes/1'">create encodes and zips</button> <br />
-                Only {{ macros.good_warning("green messages") }} mean you are free to <button onclick="window.location.href='{{ site.url }}/api/code/store_sync/1'">Sync to store</button> <br />
-            </div>
+            <!--
             <br /><br />
             <pre>{{ albums|print_r }}</pre>
+            -->
         </div>
     </body>
 </html>

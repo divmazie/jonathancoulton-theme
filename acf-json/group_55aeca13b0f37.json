@@ -226,7 +226,7 @@
                 "class": "",
                 "id": ""
             },
-            "message": "Click this button after making any change to the store!\r\n\r\n<button onclick=\"window.location='\/custom_admin\/refresh_store'\">Refresh store!<\/button>",
+            "message": "After creating or editing albums or tracks, visit the <a href='\/custom_admin\/music_admin'>music admin page<\/a> to create the files that will be sold to customers and sync them to the store.\r\n\r\nClick this button after making any change to the store, including changing the categories below!\r\n\r\n<button onclick=\"window.location='\/custom_admin\/refresh_store'\">Refresh store!<\/button>",
             "esc_html": 0
         },
         {
@@ -525,5 +525,5 @@
     "hide_on_screen": "",
     "active": 1,
     "description": "",
-    "modified": 1447711670
+    "modified": 1447717341
 }
