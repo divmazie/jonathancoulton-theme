@@ -154,8 +154,10 @@ class Shopify {
                 case "jct\\Track": $object_variants = $object->getAllChildEncodes(); $title = $object->getTrackTitle(); break;
             }
             foreach ($response->product->variants as $variant) {
-                if ($missing = $this->syncFetchProduct($variant->sku,$title." ".$variant->option1,$variant->price,$object_variants[$variant->option1]->getFileAssetFileName())) {
-                    $missing_files[] = array('format'=>$variant->option1,'filename'=>$missing);
+                if ($missings = $this->syncFetchProduct($variant->sku,$title." ".$variant->option1,$variant->price,array($object_variants[$variant->option1]->getFileAssetFileName()))) {
+                    foreach ($missings as $missing) {
+                        $missing_files[] = array('format' => $variant->option1, 'filename' => $missing);
+                    }
                 }
             }
         }
@@ -311,6 +313,76 @@ class Shopify {
         return $args;
     }
 
+    public function syncEverythingProduct($allAlbums = false) {
+        if (!$allAlbums) {
+            $allAlbums = \jct\Album::getAllAlbums();
+        }
+        $everything_shopify_details = get_transient('everything_shopify_details');
+        $update = false;
+        if ($everything_shopify_details && $this->productExists($everything_shopify_details['id'])) {
+            $update = true;
+        }
+        $everything_price = get_field('everything_price','options');
+        $encode_types = include(get_template_directory().'/config/encode_types.php');
+        $variants = array();
+        foreach ($encode_types as $encode_type => $encode_details) {
+            $v = array(
+                'option1' => $encode_type,
+                'price' => $everything_price,
+                'sku' => $this->sku('everything','everything',$encode_type),
+                'taxable' => false,
+                'requires_shipping' => false
+            );
+            if ($update) {
+                $v['sku'] = $everything_shopify_details['skus'][$encode_type];
+                $v['id'] = $everything_shopify_details['ids'][$encode_type];
+            }
+            $variants[] = $v;
+        }
+        $args = array("product" => array(
+            'title' => "Everything",
+            'body_html' => 'Everything listed below',
+            'vendor' => "Jonathan Coulton",
+            'product_type' => 'Music download',
+            'variants' => $variants
+        ));
+        if ($update) {
+            $args['product']['id'] = $everything_shopify_details['id'];
+        } else {
+            $args['product']['metafields'] = array(
+                array('key' => 'track_number', 'value_type' => 'string', 'namespace' => 'global', 'value' => 0),
+                array('key' => 'wiki_link', 'value_type' => 'string', 'namespace' => 'global',
+                    'value' => get_field('joco_wiki_base_url','options')));
+        }
+        if ($update) {
+            $response = $this->makeCall("admin/products/".$everything_shopify_details['id'], "PUT", $args);
+        } else {
+            $response = $this->makeCall("admin/products","POST",$args);
+            if ($response->product->id) {
+                $everything_id = $response->product->id;
+                $variant_ids = array();
+                $variant_skus = array();
+                foreach ($response->product->variants as $variant) {
+                    $variant_ids[$variant->option1] = $variant->id;
+                    $variant_skus[$variant->option1] = $variant->sku;
+                }
+                $everything_ids = $variant_ids;
+                $everything_skus = $variant_skus;
+                $everything_shopify_details = array('id'=>$everything_id,'ids'=>$everything_ids,'skus'=>$everything_skus);
+                set_transient('everything_shopify_details',$everything_shopify_details);
+            }
+            $this->forceGetAllProducts();
+        }
+        foreach ($encode_types as $encode_type => $encode_details) {
+            $filenames = array();
+            foreach ($allAlbums as $album) {
+                $filenames[] = $album->getChildZip($encode_details[0],$encode_details[1],$encode_type)->getFilename();
+            }
+            $sku = $this->sku('everything','everthying',$encode_type);
+            $this->syncFetchProduct($sku,'Everything '.$encode_type,$everything_price,$filenames);
+        }
+    }
+
     public function syncAlbumCollection($album,$ids) {
         $image = base64_encode(file_get_contents($album->getAlbumArtObject()->getPath()));
         $collects = array();
@@ -366,6 +438,9 @@ class Shopify {
             $allAlbums = \jct\Album::getAllAlbums();
         }
         $usedIds = array();
+        if ($everything_shopify_details = get_transient('everything_shopify_details')) {
+            $usedIds = array($everything_shopify_details['id']);
+        }
         foreach ($allAlbums as $album) {
             $usedIds[] = $album->getShopifyId();
             foreach ($album->getAlbumTracks() as $track) {
@@ -435,48 +510,52 @@ class Shopify {
         }
     }
 
-    public function syncFetchProduct($sku,$name,$price,$filename) {
+    public function syncFetchProduct($sku,$name,$price,$filenames) {
         $fetch_product = false;
         foreach ($this->getFetchProducts() as $product) {
             if ((string) $product->getSKU() == $sku) {
                 $fetch_product = $product;
             }
         }
+        $missing_files = array();
         $files = array();
+        foreach ($filenames as $filename) {
+            if ($file = $this->getFetchFile($filename)) {
+                $files[] = $file;
+            } else {
+                $missing_files[] = $filename;
+            }
+        }
         if (!$fetch_product) {
             $fetch_product = new Product();
             $fetch_product->setSKU($sku);
             $fetch_product->setName($name);
             $fetch_product->setPrice($price);
             $fetch_product->setCurrency(Currency::USD);
-            if ($file = $this->getFetchFile($filename)) {
-                $files[] = $file;
-            }
             try {
                 $fetch_product->create($files, false);
             } catch (Exception $e) {
                 return $e->getMessage();
             }
         } else {
+            /*
+            // These are good checks to do, but a pain with multiple file products
             $file_object = $this->getFetchFile($filename);
             if ($file_object // Only update Fetch product if file asset is ready to deliver
                     && ($name != (string) $fetch_product->getName()
                         || strval($price) != (string) $fetch_product->getPrice()
                         || $file_object != $fetch_product->getFiles()[0]) ) {
-                $fetch_product->setName($name);
-                $fetch_product->setPrice($price);
-                if ($file = $file_object) {
-                    $files[] = $file;
-                }
-                try {
-                    $fetch_product->update($files);
-                } catch (Exception $e) {
-                    return $e->getMessage();
-                }
+            */
+            $fetch_product->setName($name);
+            $fetch_product->setPrice($price);
+            try {
+                $fetch_product->update($files);
+            } catch (Exception $e) {
+                return $e->getMessage();
             }
         }
-        if (count($files)<1) {
-            return $filename;
+        if (count($missing_files)) {
+            return $missing_files;
         } else {
             return false;
         }
@@ -494,6 +573,9 @@ class Shopify {
     public function deleteUnusedFetchProducts($allAlbums = false) {
         $this->forceGetFetchProducts();
         $used_skus = array();
+        if ($everything_shopify_details = get_transient('everything_shopify_details')) {
+            $used_skus = $everything_shopify_details['skus'];
+        }
         foreach ($allAlbums as $album) {
             $used_skus = array_merge($used_skus,array_values($album->getShopifyVariantSkus()));
             foreach ($album->getAlbumTracks() as $track) {
@@ -544,6 +626,14 @@ class Shopify {
                     $html_name = htmlentities(strtolower(preg_replace('/\s+/', '_',$category['display_name'])));
                     if ($category['shopify_type'] == 'Music download') {
                         $albums = array();
+                        if ($everything_shopify_details = get_transient('everything_shopify_details')) {
+                            $shopify_request = 'admin/products/'.$everything_shopify_details['id'];
+                            $products = $this->makeCall($shopify_request,'GET');
+                            $product = $products->product;
+                            $collection_context = array('title'=>$product->title,'body_html'=>$product->body_html);
+                            $product->metafields = array('wiki_link' => get_field('joco_wiki_base_url','options').'Discography');
+                            $albums[] = array('collection' => $collection_context, 'products' => array($product));
+                        }
                         foreach ($this->getAllCollections() as $collection) {
                             $metafields = $this->makeCall('admin/custom_collections/' . $collection->id . '/metafields');
                             foreach ($metafields->metafields as $metafield) {

@@ -230,6 +230,29 @@
             "esc_html": 0
         },
         {
+            "key": "field_564cf548fe4c2",
+            "label": "Everything price",
+            "name": "everything_price",
+            "type": "number",
+            "instructions": "The price for getting everything in the download store as one product.",
+            "required": 1,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "",
+                "class": "",
+                "id": ""
+            },
+            "default_value": "",
+            "placeholder": "",
+            "prepend": "",
+            "append": "",
+            "min": 0,
+            "max": "",
+            "step": "",
+            "readonly": 0,
+            "disabled": 0
+        },
+        {
             "key": "field_561589023a077",
             "label": "Store categories",
             "name": "store_categories",
@@ -525,5 +548,5 @@
     "hide_on_screen": "",
     "active": 1,
     "description": "",
-    "modified": 1447717341
+    "modified": 1447884176
 }
