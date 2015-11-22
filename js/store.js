@@ -98,6 +98,7 @@ window.onpopstate = function(event) {
 function store_nav(section) {
     window.scrollTo(0,0);
     myViewModel.store_view(section);
+    resize_tasks();
     window.history.pushState({section: section}, '', '/store/?store_section='+section);
 }
 

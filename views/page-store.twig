@@ -102,7 +102,7 @@
                                     </span>
                                     {% endif %}</span>
                                 <div class="track_title" style="z-index: 0">{{ track.title }}</div>
-                                <div style="position: relative; top: -20px; background-color: green; z-index: 1000">
+                                <div class="track_icon_right_group">
                                     <span class="track_icon_right">
                                         <a data-bind="visible: !in_cart({ product_id: {{ track.id }} })" onclick="option_modal({{ track.id }})">
                                             <img src="{{ theme.link }}/images/add_to_cart_blue.svg" class="track_icon_img">
@@ -119,6 +119,7 @@
                             </div>
                             {{ macros.variants_modal('Please select a file format for your download.','false',track.id,track.title,track.variants) }}
                         {% endfor %}
+                        <div style="height: 50px;"></div>
                     </div>
                     <div class="clearfix"></div>
                 {% endfor %}
