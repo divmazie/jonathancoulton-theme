@@ -66,9 +66,7 @@
                     <a class="anchor" id="album{{ album.collection.id }}"></a>
                     <div class="col-xs-12 col-sm-4">
                         {% if album.collection.image.src %}
-                            <div class="album_square">
-                                <img src="{{ album.collection.image.src }}" class="album_image" />
-                            </div>
+                            <div class="album_square" style="background-image: url('{{ album.collection.image.src }}')"></div>
                         {% endif %}
                         {% for track in album.products %}
                             {% if track.metafields.track_number == 0 %}
@@ -126,9 +124,7 @@
             {% else %}
                 {% for product in category.products %}
                     <div class="col-sm-3 product">
-                        <div class="album_square">
-                            <img src="{{ product.image.src }}" class="album_image" /><br />
-                        </div>
+                        <div class="album_square" style="background-image: url('{{ product.image.src }}')"></div>
                         <a onclick="option_modal('{{ product.id }}')" class="no_underline">
                             <div class="add_to_cart_box_blue" style="margin: 0 0 20px;">
                                 <span data-bind="visible: !in_cart({ product_id: {{ product.id }} })">
