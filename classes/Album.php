@@ -42,7 +42,7 @@ class Album extends ShopifyProduct {
         $this->shopify_variant_ids = unserialize(get_post_meta($post_id,'shopify_variant_ids',false)[0]);
         $this->shopify_variant_skus = unserialize(get_post_meta($post_id,'shopify_variant_skus',false)[0]);
         $this->shopify_collection_id = get_post_meta($post_id,'shopify_collection_id',false)[0];
-        $tracks = get_posts(array('post_type' => 'track', 'posts_per_page'   => 100, 'meta_key' => 'track_album', 'meta_value' => $post_id)); // Constructor probs shouldn't do this lookup
+        $tracks = get_posts(array('post_type' => 'track', 'posts_per_page' => -1, 'meta_key' => 'track_album', 'meta_value' => $post_id)); // Constructor probs shouldn't do this lookup
         foreach ($tracks as $track) {
             $track_num = intval(get_field('track_number', $track->ID));
             while (isset($this->albumTracks[$track_num])) {
@@ -237,7 +237,8 @@ class Album extends ShopifyProduct {
             $missing_files = array_merge($missing_files,$response['missing_files']);
             $track_product_ids[intval($track->getTrackNumber())] = $response['response']->product->id;
         }
-        $context['collection_sync_response'] = $shopify->syncAlbumCollection($this,$track_product_ids);
+        set_transient('track_product_ids',$track_product_ids);
+        //$context['collection_sync_response'] = $shopify->syncAlbumCollection($this,$track_product_ids);
         $missing_files_context = array();
         foreach ($missing_files as $missing_file) {
             $format = $missing_file['format'];
@@ -249,6 +250,13 @@ class Album extends ShopifyProduct {
         }
         $context['missing_files'] = $missing_files_context;
         return $context;
+    }
+
+    public function syncCollection($shopify) {
+        $track_product_ids = get_transient('track_product_ids');
+        $response = $shopify->syncAlbumCollection($this,$track_product_ids);
+        delete_transient('track_product_ids');
+        return $response;
     }
 
 }

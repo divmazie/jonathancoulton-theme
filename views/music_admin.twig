@@ -68,7 +68,8 @@
                     It appears all your music files are ready to go.
                     After you have clicked the button below once, it will create all the products in the store.
                     You may then need to upload some files to fetch and then run the sync again.<br /><br />
-                    <button onclick="window.location.href='{{ site.url }}/custom_admin/store_sync'">Sync to store</button> <br />
+                    <button onclick="window.location.href='{{ site.url }}/custom_admin/store_sync?album=0&step=0'">Sync to store</button> <br />
+                    (This may take a while...)
                 {% endif %}
             </div>
             {% for album in albums %}

@@ -178,7 +178,7 @@ class Shopify {
             $object->setShopifyVariantIds($variant_ids);
             $object->setShopifyVariantSkus($variant_skus);
         }
-        $this->forceGetAllProducts();
+        //$this->forceGetAllProducts();
         return $response;
     }
 
@@ -371,7 +371,7 @@ class Shopify {
                 $everything_shopify_details = array('id'=>$everything_id,'ids'=>$everything_ids,'skus'=>$everything_skus);
                 set_transient('everything_shopify_details',$everything_shopify_details);
             }
-            $this->forceGetAllProducts();
+            //$this->forceGetAllProducts();
         }
         foreach ($encode_types as $encode_type => $encode_details) {
             $filenames = array();
@@ -475,7 +475,7 @@ class Shopify {
             return $this->allFetchFiles;
         }
         try{
-            $fetch_files = $this->fetch->getFiles(); // Grabs all files
+            $fetch_files = $this->fetch->getFiles(10000,1); // Grabs all files
             return $fetch_files;
             /*
             $fetch_files_array = array();
@@ -501,7 +501,7 @@ class Shopify {
 
     public function forceGetFetchProducts() {
         try{
-            $this->allFetchProducts = $this->fetch->getProducts(); // Grabs all products (potentially HUGE!)
+            $this->allFetchProducts = $this->fetch->getProducts(10000,1); // Grabs all products (potentially HUGE!)
             return $this->allFetchProducts;
         }
         catch (Exception $e){
@@ -592,15 +592,17 @@ class Shopify {
     public function getUnusedFetchFiles() { // Must be called after all products are synced
         $this->forceGetFetchProducts();
         $unused = array();
+        $used = array();
+        foreach ($this->getFetchProducts() as $product) {
+            foreach ($product->getFiles() as $product_file) {
+                $used[] = (string) $product_file->getFileName();
+            }
+        }
         foreach ($this->getFetchFiles() as $file) {
-            $filename = (string) $file->getFileName();
             $matching_product = false;
-            foreach ($this->getFetchProducts() as $product) {
-                foreach ($product->getFiles() as $product_file) {
-                    if ($filename == (string) $product_file->getFileName()) {
-                        $matching_product = true;
-                    }
-                }
+            $filename = (string) $file->getFileName();
+            if (in_array($filename,$used)) {
+                $matching_product = true;
             }
             if (!$matching_product) {
                 $unused[] = $filename;
