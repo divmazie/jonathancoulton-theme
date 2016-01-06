@@ -34,6 +34,7 @@ if ($post->slug == "store") {
     $handle = get_field('shopify_handle','options');
     $shopify = new jct\Shopify($apiKey,$apiPassword,$handle);
     $context['store'] = $shopify->getStoreContext();
+    $context['thisisthestore'] = true;
 }
 if ($post->slug == 'news') {
     global $paged;

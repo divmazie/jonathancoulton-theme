@@ -27,7 +27,8 @@ function CartItem(product_id,product_name,price,variants,variant,quantity,allow_
 var ViewModel = function(start_cart) {
     var self = this;
     self.player_ready = ko.observable(false);
-    self.current_song = ko.observable();
+    self.current_song = ko.observable(0);
+    self.playing = ko.observable(false);
     self.store_view = ko.observable(store_section);
     self.remember_format = ko.observable(true);
     self.cart = ko.observableArray(start_cart);

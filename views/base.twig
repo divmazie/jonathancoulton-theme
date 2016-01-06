@@ -30,10 +30,21 @@
 							{% if not loop.last %}<div class="menu_slash">/</div>{% endif %}
 						{% endfor %}
 						<div class="listen_now hidden-xs">
-							<a href="{{ site.url }}/store/?store_section=downloads">
-								Listen now
-								<img src="{{ theme.link }}/images/play_circle_black.svg" style="height: 20px;" />
-							</a>
+							{% if thisisthestore %}
+								<a onclick="backControl()">back</a>
+								<span data-bind="visible: !playing()">
+									<a onclick="playControl()"><img src="{{ theme.link }}/images/play_black.svg"></a>
+								</span>
+								<span data-bind="visible: playing()">
+									<a onclick="pauseSound()"><img src="{{ theme.link }}/images/pause_black.svg"></a>
+								</span>
+								<a onclick="nextControl()">next</a>
+							{% else %}
+								<a href="{{ site.url }}/store/?store_section=downloads">
+									Listen now
+									<img src="{{ theme.link }}/images/play_circle_black.svg" style="height: 20px;" />
+								</a>
+							{% endif %}
 						</div>
 					</ul>
 				</div>

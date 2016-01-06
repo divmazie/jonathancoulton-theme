@@ -91,11 +91,11 @@
                                 <span class="track_icon_left">{% if track.metafields.track_number > 0 %}{{ track.metafields.track_number }}{% endif %}</span>
                                 <span class="track_icon_left">{% if track.metafields.track_number > 0 %}
                                     <span data-bind="visible: player_ready">
-                                        <span data-bind="visible: current_song() != {{ track.id }}">
+                                        <span data-bind="visible: current_song() != {{ track.id }} || !playing()">
                                             <a onclick="playSound({{ track.id }})"><img src="{{ theme.link }}/images/play_black.svg" class="track_play_img"></a>
                                         </span>
-                                        <span data-bind="visible: current_song() == {{ track.id }}">
-                                            <a onclick="stopSound()"><img src="{{ theme.link }}/images/pause_black.svg" class="track_play_img"></a>
+                                        <span data-bind="visible: current_song() == {{ track.id }} && playing">
+                                            <a onclick="pauseSound()"><img src="{{ theme.link }}/images/pause_black.svg" class="track_play_img"></a>
                                         </span>
                                     </span>
                                     {% endif %}</span>
@@ -277,23 +277,65 @@
             }
         });
 
-        function playSound(song_id) {
-            stopSound();
-            myViewModel.current_song(song_id);
-            for (var i=0; i<playlist.length; i++) {
-                if (playlist[i].id == song_id) {
-                    var next_id = i==playlist.length-1 ? playlist[0].id : playlist[i+1].id;
-                    soundManager.createSound({
-                        id: song_id,
-                        url: playlist[i].url,
-                        autoLoad: true,
-                        autoPlay: true,
-                        onfinish: function() {
-                            playSound(next_id);
-                        }
-                    });
+        function playControl() {
+            if (myViewModel.current_song() == 0) {
+                playSound(playlist[0].id);
+            } else {
+                playSound(myViewModel.current_song())
+            }
+        }
+
+        function nextControl() {
+            var current_song = myViewModel.current_song();
+            if (current_song != 0) {
+                for (var i = 0; i < playlist.length; i++) {
+                    if (playlist[i].id == current_song) {
+                        var next_id = i == playlist.length-1 ? playlist[0].id : playlist[i+1].id;
+                        playSound(next_id);
+                    }
                 }
             }
+        }
+
+        function backControl() {
+            var current_song = myViewModel.current_song();
+            if (current_song != 0) {
+                for (var i = 0; i < playlist.length; i++) {
+                    if (playlist[i].id == current_song) {
+                        var next_id = i == 0 ? playlist[playlist.length-1].id : playlist[i-1].id;
+                        playSound(next_id);
+                    }
+                }
+            }
+        }
+
+        function playSound(song_id) {
+            myViewModel.playing(true);
+            if (myViewModel.current_song() == song_id) {
+                soundManager.resume(song_id);
+            } else {
+                stopSound();
+                myViewModel.current_song(song_id);
+                for (var i = 0; i < playlist.length; i++) {
+                    if (playlist[i].id == song_id) {
+                        var next_id = i == playlist.length - 1 ? playlist[0].id : playlist[i + 1].id;
+                        soundManager.createSound({
+                            id: song_id,
+                            url: playlist[i].url,
+                            autoLoad: true,
+                            autoPlay: true,
+                            onfinish: function () {
+                                playSound(next_id);
+                            }
+                        });
+                    }
+                }
+            }
+        }
+
+        function pauseSound() {
+            myViewModel.playing(false);
+            soundManager.pause(myViewModel.current_song());
         }
 
         function stopSound() {
