@@ -258,7 +258,7 @@
                     {% for album in category.products %}
                         {% for track in album.products %}
                             {% if track.metafields.music_link %}
-                                { id: {{ track.id }}, url: '{{ track.metafields.music_link }}' },
+                                { id: {{ track.id }}, url: '{{ track.metafields.music_link }}', title: '{{ track.title|e }}' },
                             {% endif %}
                         {% endfor %}
                     {% endfor %}
@@ -318,6 +318,7 @@
                 myViewModel.current_song(song_id);
                 for (var i = 0; i < playlist.length; i++) {
                     if (playlist[i].id == song_id) {
+                        myViewModel.current_song_title($('<textarea />').html(playlist[i].title).text()); // the jquery removes html entities
                         var next_id = i == playlist.length - 1 ? playlist[0].id : playlist[i + 1].id;
                         soundManager.createSound({
                             id: song_id,

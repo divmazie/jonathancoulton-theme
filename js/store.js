@@ -28,6 +28,7 @@ var ViewModel = function(start_cart) {
     var self = this;
     self.player_ready = ko.observable(false);
     self.current_song = ko.observable(0);
+    self.current_song_title = ko.observable("Listen now");
     self.playing = ko.observable(false);
     self.store_view = ko.observable(store_section);
     self.remember_format = ko.observable(true);

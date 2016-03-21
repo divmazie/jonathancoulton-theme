@@ -3,11 +3,10 @@
 <!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
 <svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
 	 width="29.461px" height="34.02px" viewBox="0 0 29.461 34.02" enable-background="new 0 0 29.461 34.02" xml:space="preserve">
-<g id="Layer_1_1_" display="none">
-	<polygon display="inline" fill="#202020" points="0,0 29.461,17.01 0,34.02 	"/>
-</g>
+<polygon points="0,3.51 22.096,16.268 0,29.025 "/>
 <g id="Layer_2">
-	<line fill="none" stroke="#000000" stroke-width="9" stroke-miterlimit="10" x1="5.752" y1="0" x2="5.794" y2="34.02"/>
-	<line fill="none" stroke="#000000" stroke-width="9" stroke-miterlimit="10" x1="23.667" y1="0.003" x2="23.708" y2="34.02"/>
+	<path fill="none" stroke="#010101" stroke-width="9" stroke-miterlimit="10" d="M6.541,39.729"/>
+	<path fill="none" stroke="#010101" stroke-width="9" stroke-miterlimit="10" d="M8.557,8.714"/>
+	<line fill="none" stroke="#010101" stroke-width="9" stroke-miterlimit="10" x1="24.887" y1="3.691" x2="24.917" y2="29.205"/>
 </g>
 </svg>
