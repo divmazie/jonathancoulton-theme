@@ -131,5 +131,117 @@
 				target : "_blank"
 			});
 		</script>
+
+
+		<div id="mailingListPrompt" class="modal fade" role="dialog">
+			<div class="modal-dialog">
+				<div class="modal-content">
+					<div class="modal-header">
+						<button type="button" class="close" data-dismiss="modal">x</button>
+						<h4 class="modal-title">Sign Up for the Jonathan Coulton Mailing List!</h4>
+					</div>
+					<div class="modal-body">
+						<p>
+							We'll send you four free tracks to start,
+							we'll never give your address to others,
+							and we'll make sure you know about the latest
+							news and upcoming concerts.
+						</p>
+						<form action="http://jonathancoulton.us1.list-manage.com/subscribe/post?u=87b55ca91b624feed8dbc516d&amp;id=05220760c5" method="post" id="mc-embedded-subscribe-form" name="mc-embedded-subscribe-form" class="validate" target="_blank" novalidate>
+							<input type="text" name="EMAIL" tabIndex="1" style="margin: 20px auto; width: 100%;">
+							<div>
+								<button class="option dismiss">
+									Dismiss
+								</button>
+								<button class="option signup">
+									Sign Up!
+								</button>
+							</div>
+							<div style="color: #f00;" id="signuperror"></div>
+						</form>
+					</div>
+				</div>
+			</div>
+		</div>
+		<script type="text/javascript">
+			var emlre = /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i;
+			//$j = jQuery.noConflict();
+			function showSignUp() {
+				$('#mailingListPrompt').modal('show');
+				$('#mailingListPrompt input[name=EMAIL]').focus();
+			}
+
+			function hideSignUp() {
+				$('#mailingListPrompt').modal('hide');
+				//$('#mailingListPrompt input[name=EMAIL]').focus();
+			}
+
+			function hideForever() {
+				$.cookie('shouldShowMailingListPrompt', 'false', {
+					expires : 365, // hope no one minds seeing this every year
+					path : '/',
+				});
+
+			}
+
+			function hideTemporarily() {
+				$.cookie('shouldShowMailingListPrompt', 'delay', {
+					expires : 30,
+					path : '/',
+				});
+			}
+
+			function seemsToSupportCookies() {
+				$.cookie('jsCookieTest', 'jsCookieTest', {
+					expires : 1,
+					path : '/',
+				});
+
+				// returns true if present...
+				return $.removeCookie('jsCookieTest');
+				;
+			}
+
+
+			$(document).ready(function() {
+
+				if((seemsToSupportCookies() || (Math.floor(Math.random() * 101) == 100)) && $.cookie('shouldShowMailingListPrompt') === undefined) {
+					// bind signup button handlers
+
+					showSignUp();
+
+				}
+
+				$('#mailingListPrompt button.signup').click(function(e) {
+					e.preventDefault();
+					var eml = $('#mailingListPrompt input[name=EMAIL]').val();
+					if(!eml.match(emlre)) {
+						//alert("Sorry that doesn't appear to be a valid email address. Please check it and try signing up again!");
+						$('#signuperror').text("Sorry that doesn't appear to be a valid email address. Please check it and try signing up again!");
+						$('#mailingListPrompt input[name=EMAIL]').focus();
+						return;
+					}
+					$(this).parents('form')[0].submit();
+					hideSignUp();
+					hideForever();
+				});
+				$('#mailingListPrompt button.dismiss').click(function(e) {
+					e.preventDefault();
+					hideSignUp();
+					hideTemporarily();
+				});
+
+				$('#mailingListPrompt input[name=EMAIL]').keypress(function(e) {
+					if(e.which == 13) {
+						e.preventDefault();
+						$('#mailingListPrompt button.signup').click();
+						return false;
+					}
+				});
+
+			});
+
+		</script>
+
 	</body>
 </html>
