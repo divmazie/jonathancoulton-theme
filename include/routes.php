@@ -29,3 +29,9 @@ Timber::add_route('custom_admin/:script', function($params){
         Timber::load_template("404.php");
     }
 });
+
+Timber::add_route('wiki/:wikipage', function($params) {
+    $redirect_location = get_field('joco_wiki_base_url','options').$params['wikipage'];
+    header('Location: '.$redirect_location);
+    die();
+});
