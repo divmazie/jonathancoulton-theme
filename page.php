@@ -26,7 +26,7 @@ include_once(get_template_directory().'/include/sitewide_context.php');
 $post = new TimberPost();
 $context['post'] = $post;
 if ($post->slug == "faq") {
-    $context['faqs'] = Timber::get_posts('post_type=faq');
+    $context['faqs'] = Timber::get_posts('post_type=faq&numberposts=-1');
 }
 if ($post->slug == "store") {
     $apiKey = get_field('shopify_api_key','options');
