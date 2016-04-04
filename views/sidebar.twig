@@ -29,8 +29,9 @@
 <div class="side_box social_media">
     <h5 class="side_header">Follow Jonathan</h5>
     <div class="side_content">
-        {% if twitter.url %}<a href="{{ twitter.url }}" target="_blank"><img src="{{ theme.link }}/images/social_twitter_color.svg" class="social_icon" /></a>{% endif %}
-        {% if instagram.url %}<a href="{{ instagram.url }}" target="_blank"><img src="{{ theme.link }}/images/social_instagram_color.svg" class="social_icon" /></a>{% endif %}
-        {% if facebook_link %}<a href="{{ facebook_link }}" target="_blank"><img src="{{ theme.link }}/images/social_facebook_color.svg" class="social_icon" /></a>{% endif %}
+        {% if twitter.url %}<a href="{{ twitter.url }}" target="_blank" class="social_icon_link"><img src="{{ theme.link }}/images/social_twitter_color.svg" class="social_icon" /></a>{% endif %}
+        {% if instagram.url %}<a href="{{ instagram.url }}" target="_blank" class="social_icon_link"><img src="{{ theme.link }}/images/social_instagram_color.svg" class="social_icon" /></a>{% endif %}
+        {% if facebook_link %}<a href="{{ facebook_link }}" target="_blank" class="social_icon_link"><img src="{{ theme.link }}/images/social_facebook_color.svg" class="social_icon" /></a>{% endif %}
     </div>
+    <div class="clearfix"></div>
 </div>
