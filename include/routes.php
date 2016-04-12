@@ -32,6 +32,6 @@ Timber::add_route('custom_admin/:script', function($params){
 
 Timber::add_route('wiki/:wikipage', function($params) {
     $redirect_location = get_field('joco_wiki_base_url','options').$params['wikipage'];
-    header('Location: '.$redirect_location);
+    header('Location: '.$redirect_location,TRUE,301);
     die();
 });
