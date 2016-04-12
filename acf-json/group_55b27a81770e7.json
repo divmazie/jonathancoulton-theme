@@ -152,6 +152,29 @@
             "default_value": 0
         },
         {
+            "key": "field_570d4d2b24c33",
+            "label": "Album sort order",
+            "name": "album_sort_order",
+            "type": "number",
+            "instructions": "Use the convention of year of release plus two digits to sort within that year.\r\nIf two albums are released in 2016, enter 201610 for the first one and 201620 for the second one.\r\nIf you want the album to display in an order other than when it was released, you can use this convention to slot an album between other albums.\r\nThe largest numbers will appear at the top of the store. Numbers must be unique.",
+            "required": 1,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "",
+                "class": "",
+                "id": ""
+            },
+            "default_value": "",
+            "placeholder": "",
+            "prepend": "",
+            "append": "",
+            "min": "",
+            "max": "",
+            "step": "",
+            "readonly": 0,
+            "disabled": 0
+        },
+        {
             "key": "field_55c0db03e8bb9",
             "label": "Bonus assets",
             "name": "bonus_assets",
@@ -240,5 +263,5 @@
     ],
     "active": 1,
     "description": "",
-    "modified": 1444162665
+    "modified": 1460490003
 }

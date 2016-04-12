@@ -5,7 +5,7 @@ namespace jct;
 class Album extends ShopifyProduct {
 
 
-    private $albumTitle, $albumArtist, $albumPrice, $albumYear, $albumGenre, $albumComment, $albumArtObject, $albumBonusAssetObjects, $albumShow;
+    private $albumTitle, $albumArtist, $albumPrice, $albumYear, $albumGenre, $albumComment, $albumArtObject, $albumBonusAssetObjects, $albumShow, $albumSortOrder;
     // the parent post object
     private $encode_types,$wpPost;
     //
@@ -37,6 +37,7 @@ class Album extends ShopifyProduct {
             }
         }
         $this->albumShow = get_field('show_album_in_store',$post_id);
+        $this->albumSortOrder = get_field('album_sort_order',$post_id);
         $this->encode_types = include(get_template_directory().'/config/encode_types.php');
         $this->shopify_id = get_post_meta($post_id,'shopify_id',false)[0];
         $this->shopify_variant_ids = unserialize(get_post_meta($post_id,'shopify_variant_ids',false)[0]);
@@ -211,6 +212,10 @@ class Album extends ShopifyProduct {
      */
     public function getAlbumComment() {
         return $this->albumComment;
+    }
+
+    public function getAlbumSortOrder() {
+        return $this->albumSortOrder;
     }
 
     public function getShopifyCollectionId() {

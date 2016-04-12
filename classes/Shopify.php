@@ -418,12 +418,18 @@ class Shopify {
             $args['custom_collection']['collects'] = $collects;
             $args['custom_collection']['id'] = $collection_id;
             $response = $this->makeCall('admin/custom_collections/'.$collection_id,'PUT',$args);
+            $metafields = $this->makeCall('admin/custom_collections/'.$collection_id.'/metafields');
+            foreach ($metafields->metafields as $metafield) {
+                if ($metafield->key == 'album_sort_order') {
+                    $this->updateMetafield($metafield,$album->getAlbumSortOrder());
+                }
+            }
             return $response;
         } else {
             $args['custom_collection']['image'] = array('attachment' => $image);
-            $args['custom_collection']['metafields'] = array(array(
-                'key'=>'album_collection','value_type'=>'string','namespace'=>'global',
-                'value'=>'true'));
+            $args['custom_collection']['metafields'] = array(
+                array('key'=>'album_collection','value_type'=>'string','namespace'=>'global','value'=>'true'),
+                array('key'=>'album_sort_order','value_type'=>'integer','namespace'=>'global','value'=>$album->getAlbumSortOrder()));
             $response = $this->makeCall('admin/custom_collections','POST',$args);
             if ($response->custom_collection->id) {
                 $album->setShopifyCollectionId($response->custom_collection->id);
@@ -638,6 +644,8 @@ class Shopify {
                         }
                         foreach ($this->getAllCollections() as $collection) {
                             $metafields = $this->makeCall('admin/custom_collections/' . $collection->id . '/metafields');
+                            $album_to_add = false;
+                            $album_sort_order = false;
                             foreach ($metafields->metafields as $metafield) {
                                 if ($metafield->key == 'album_collection' && $metafield->value) {
                                     $products = $this->makeCall('admin/products', 'GET', array('collection_id' => $collection->id));
@@ -656,10 +664,17 @@ class Shopify {
                                         $products_context[$track_number] = $product;
                                     }
                                     ksort($products_context);
-                                    $albums[] = array('collection' => $collection, 'products' => $products_context);
+                                    $album_to_add = array('collection' => $collection, 'products' => $products_context);
+                                }
+                                if ($metafield->key == 'album_sort_order') {
+                                    $album_sort_order = $metafield->value;
                                 }
                             }
+                            if ($album_sort_order && $album_to_add) {
+                                $albums[$album_sort_order] = $album_to_add;
+                            }
                         }
+                        ksort($albums);
                         $products = $albums;
                     } else {
                         $products = $this->makeCall("admin/products", 'GET', array('product_type' => $category['shopify_type']));
