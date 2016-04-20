@@ -674,7 +674,7 @@ class Shopify {
                                 $albums[$album_sort_order] = $album_to_add;
                             }
                         }
-                        ksort($albums);
+                        krsort($albums);
                         $products = $albums;
                     } else {
                         $products = $this->makeCall("admin/products", 'GET', array('product_type' => $category['shopify_type']));

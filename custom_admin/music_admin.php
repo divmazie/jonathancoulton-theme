@@ -16,5 +16,6 @@ foreach ($albums as $album) {
         $album_context[$album->getAlbumSortOrder()]['sort_order_conflict_album'] = $album->getTitle();
     }
 }
+krsort($album_context);
 $context['albums'] = $album_context;
 Timber::render("music_admin.twig",$context);
