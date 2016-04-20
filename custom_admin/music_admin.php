@@ -9,7 +9,12 @@ $context = Timber::get_context();
 $album_context = array();
 $albums = \jct\Album::getAllAlbums();
 foreach ($albums as $album) {
-    $album_context[$album->getAlbumTitle()] = $album->getAlbumContext();
+    if (!isset($album_context[$album->getAlbumSortOrder()])) {
+        $album_context[$album->getAlbumSortOrder()] = $album->getAlbumContext();
+    } else {
+        $album_context[$album->getAlbumSortOrder()]['sort_order_conflict'] = true;
+        $album_context[$album->getAlbumSortOrder()]['sort_order_conflict_album'] = $album->getTitle();
+    }
 }
 $context['albums'] = $album_context;
 Timber::render("music_admin.twig",$context);

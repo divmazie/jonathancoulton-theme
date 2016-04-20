@@ -163,7 +163,9 @@ class Track extends ShopifyProduct {
         $context['number'] = $this->getTrackNumber();
         $context['price'] = $this->getTrackPrice();
         $context['encode_worthy'] = $this->isEncodeWorthy();
-        $context['art'] = array('filename'=>basename($this->getTrackArtObject()->getPath()),'exists'=>file_exists($this->getTrackArtObject()->getPath()));
+        $context['art'] = $this->getTrackArtObject() ?
+            array('filename'=>basename($this->getTrackArtObject()->getPath()),'exists'=>file_exists($this->getTrackArtObject()->getPath()))
+            : array('filename'=>'MISSING!!!','exists'=>false);
         $context['source'] = array('filename'=>basename($this->getTrackSourceFileObject()->getPath()),'exists'=>file_exists($this->getTrackSourceFileObject()->getPath()));
         $context['encodes'] = array();
         $context['track_num_conflict'] = false;

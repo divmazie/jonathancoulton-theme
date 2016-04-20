@@ -56,7 +56,7 @@ class Album extends ShopifyProduct {
 
     static function getAllAlbums() {
         $albums = array();
-        $album_posts = get_posts(array('post_type' => 'album'));
+        $album_posts = get_posts(array('post_type' => 'album','numberposts' => -1));
         foreach ($album_posts as $album_post) {
             $albums[] = new Album($album_post);
         }
@@ -69,9 +69,13 @@ class Album extends ShopifyProduct {
         $context['encode_worthy'] = $this->isEncodeWorthy() ? true : false;
         $context['year'] = $this->getAlbumYear();
         $context['price'] = $this->getAlbumPrice();
-        $context['art'] = array('filename'=>basename($this->getAlbumArtObject()->getPath()),
-            'url'=>$this->getAlbumArtObject()->getURL(),
-            'exists'=>file_exists($this->getAlbumArtObject()->getPath()));
+        $context['sort_order'] = $this->getAlbumSortOrder();
+        $context['sort_order_conflict'] = false;
+        $context['art'] = $this->getAlbumArtObject() ?
+            array('filename'=> basename($this->getAlbumArtObject()->getPath()),
+                'url'=>$this->getAlbumArtObject()->getURL(),
+                'exists'=>file_exists($this->getAlbumArtObject()->getPath()))
+            : array('filename'=>'MISSING!!!', 'url'=>'MISSING!!!', 'exists'=>false);
         $context['album_zips'] = array();
         foreach ($this->getAllChildZips() as $zip) {
             $context['album_zips'][] = $zip->getZipContext();

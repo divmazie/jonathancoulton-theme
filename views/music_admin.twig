@@ -38,7 +38,7 @@
             <h1>Manage audio file encoding and store syncing</h1>
             {% set warning_level = 'green' %}
             {% for album in albums %}
-                {% if (not album.art.exists) or (not album.encode_worthy) or (not album.show_album) %}
+                {% if (not album.art.exists) or (not album.encode_worthy) or (not album.show_album) or album.sort_order_conflict %}
                     {% set warning_level = 'red' %}
                 {% endif %}
                 {% for zip in album.album_zips %}
@@ -77,8 +77,10 @@
                     Title: {{ album.title }} <br />
                     Artist: {{ album.artist }} <br />
                     Art: {% if album.art.exists %} {{ album.art.filename }} {% else %} {{ macros.stop_warning('ART MISSING!') }} {% endif %} <br />
+                    Sort Order: {{ album.sort_order }} <br />
                     {% if not album.encode_worthy %} {{ macros.stop_warning('NOT ENCODE WORTHY!') }} <br /> {% endif %}
                     {% if not album.show_album %} {{ macros.stop_warning('NOT MARKED AS READY!') }} <br /> {% endif %}
+                    {% if album.sort_order_conflict %} {{ macros.stop_warning('SAME SORT ORDER VALUE AS ',album.sort_order_conflict_album) }} <br /> {% endif %}
                     Zips:
                     {% for zip in album.album_zips %}
                         <div class="admin_zip">
