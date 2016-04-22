@@ -36,6 +36,7 @@
     <body class="{{body_class}}" data-template="base.twig">
         <div class="container">
             <h1>Manage audio file encoding and store syncing</h1>
+            <div><a href="{{ site.url }}/custom_admin/music_admin/">Return to album list</a></div>
             {% set warning_level = 'green' %}
             {% for album in albums %}
                 {% if (not album.art.exists) or (not album.encode_worthy) or (not album.show_album) or album.sort_order_conflict %}
@@ -63,13 +64,11 @@
                     <a href="{{ site.url }}/wp-admin/edit.php?post_type=album">albums</a> or <a href="{{ site.url }}/wp-admin/edit.php?post_type=track">tracks</a> in Wordpress.
                 {% elseif warning_level == 'orange' %}
                     {{ macros.go_warning("Orange warnings") }} below mean you are missing encoded audio and/or zip files.<br /><br />
-                    <button onclick="window.location.href='{{ site.url }}/custom_admin/postencodes'">Create encodes and zips</button> <br />
+                    <button onclick="window.location.href='{{ site.url }}/custom_admin/postencodes{{ post_id_get_string }}'">Create encodes and zips</button> <br />
+                    If there are many tracks in this album, it may give you a 502 timeout error. You can reload the page as many times as you need to for it to get through all the tracks.
                 {% else %}
                     It appears all your music files are ready to go.
-                    After you have clicked the button below once, it will create all the products in the store.
-                    You may then need to upload some files to fetch and then run the sync again.<br /><br />
-                    <button onclick="window.location.href='{{ site.url }}/custom_admin/store_sync?album=0&step=0'">Sync to store</button> <br />
-                    (This may take a while...)
+                    <a href="{{ site.url }}/custom_admin/music_admin/">Return to album list</a> to encode another album or sync download offerings to Shopify.
                 {% endif %}
             </div>
             {% for album in albums %}

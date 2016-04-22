@@ -640,7 +640,7 @@ class Shopify {
                             $product = $products->product;
                             $collection_context = array('title'=>$product->title,'body_html'=>$product->body_html);
                             $product->metafields = array('wiki_link' => get_field('joco_wiki_base_url','options').'Discography');
-                            $albums[] = array('collection' => $collection_context, 'products' => array($product));
+                            $albums[300099] = array('collection' => $collection_context, 'products' => array($product));
                         }
                         foreach ($this->getAllCollections() as $collection) {
                             $metafields = $this->makeCall('admin/custom_collections/' . $collection->id . '/metafields');

@@ -35,7 +35,7 @@ var ViewModel = function(start_cart) {
     self.cart = ko.observableArray(start_cart);
     self.remove_product = function(product) {
         self.cart.remove(product);
-    }
+    };
     self.pos_cart_number = ko.computed(function() {
         if (self.cart().length > 0) {
             return self.cart().length;
@@ -67,7 +67,7 @@ var ViewModel = function(start_cart) {
             }
         }
         return false;
-    }
+    };
     self.store_local = ko.computed(function() {
         if(typeof(Storage) !== "undefined") {
             sessionStorage.setItem('cart',ko.toJSON(self.cart()));

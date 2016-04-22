@@ -12,7 +12,14 @@ set_transient('do_secret',randstr(40),60*60*24);
 
 $content = ["v" => $params['var']];
 $encodes = [];
-$albums = Album::getAllAlbums();
+$post_id = $_REQUEST['album_post_id'];
+if ($post_id) {
+    $post = get_post($post_id);
+    $album = new \jct\Album($post);
+    $albums = array($album);
+} else {
+    $albums = Album::getAllAlbums();
+}
 foreach($albums as $album) {
     $album_encodes = $album->getNeededEncodes();
     if($album_encodes) {
@@ -51,6 +58,7 @@ if ($_GET['verbose']) {
     echo "<pre>" . htmlentities(curl_exec($ch));
 } else {
     curl_exec($ch);
-    \header("Location: ".site_url()."/custom_admin/music_admin");
+    $get_string = $post_id ? "?album_post_id=$post_id" : '';
+    \header("Location: ".site_url()."/custom_admin/music_admin/$get_string");
 }
 ?>

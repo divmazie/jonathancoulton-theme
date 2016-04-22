@@ -42,7 +42,7 @@ class WPAttachment {
     }
 
     public function fileAssetExists() {
-        if ($this->getAttachmentID() ) {// && file_exists($this->getPath()) && filesize($this->getPath())) { // Checking filesize for hundreds of files slows things down?
+        if ($this->getAttachmentID() && file_exists($this->getPath()) && filesize($this->getPath())) { // Checking filesize for hundreds of files slows things down?
             return true;
         } else {
             return false;
