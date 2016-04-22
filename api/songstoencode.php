@@ -10,10 +10,9 @@ namespace jct;
  */
 header('Content-type: application/json');
 $content = array("v" => $params['var']);
-$album_posts = get_posts(array('post_type' => 'album'));
+$albums = Album::getAllAlbums();
 $encodes = array();
-foreach ($album_posts as $album_post) {
-    $album = new Album($album_post);
+foreach ($albums as $album) {
     $album_encodes = $album->getNeededEncodes();
     if ($album_encodes) {
         $encodes = array_merge($encodes,$album_encodes);

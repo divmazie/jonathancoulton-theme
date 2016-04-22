@@ -23,25 +23,25 @@ class Track extends ShopifyProduct {
         $this->wpPost = $post;
         $this->parentAlbum = $parentAlbum;
         $this->trackTitle = $post->post_title;
-        $this->trackNumber = get_field('track_number',$post_id);
-        $this->trackPrice = get_field('track_price',$post_id);
-        $this->trackArtist = get_field('track_artist',$post_id);
-        $this->trackGenre = get_field('track_genre',$post_id);
-        $this->trackYear = get_field('track_year',$post_id);
-        $this->trackComment = get_field('track_comment',$post_id);
-        $this->trackArtObject = get_field('track_art',$post_id) ? new WPAttachment(get_field('track_art',$post_id)) : false;
-        $this->trackSourceFileObject = get_field('track_source',$post_id) ? new WPAttachment(get_field('track_source',$post_id)) : false;
+        //$this->trackNumber = get_field('track_number',$post_id);
+        //$this->trackPrice = get_field('track_price',$post_id);
+        //$this->trackArtist = get_field('track_artist',$post_id);
+        //$this->trackGenre = get_field('track_genre',$post_id);
+        //$this->trackYear = get_field('track_year',$post_id);
+        //$this->trackComment = get_field('track_comment',$post_id);
+        //$this->trackArtObject = get_field('track_art',$post_id) ? new WPAttachment(get_field('track_art',$post_id)) : false;
+        //$this->trackSourceFileObject = get_field('track_source',$post_id) ? new WPAttachment(get_field('track_source',$post_id)) : false;
         $this->encode_types = include(get_template_directory().'/config/encode_types.php');
-        $this->shopify_id = get_post_meta($post_id,'shopify_id',false)[0];
-        $this->shopify_variant_ids = unserialize(get_post_meta($post_id,'shopify_variant_ids',false)[0]);
-        $this->shopify_variant_skus = unserialize(get_post_meta($post_id,'shopify_variant_skus',false)[0]);
+        //$this->shopify_id = get_post_meta($post_id,'shopify_id',false)[0];
+        //$this->shopify_variant_ids = unserialize(get_post_meta($post_id,'shopify_variant_ids',false)[0]);
+        //$this->shopify_variant_skus = unserialize(get_post_meta($post_id,'shopify_variant_skus',false)[0]);
     }
 
     public function isEncodeWorthy() {
         $worthy = false;
         if ($this->parentAlbum->isEncodeWorthy()) {
             //$worthy = true;
-            if ($this->trackTitle && $this->getTrackArtist() && $this->trackSourceFileObject && $this->getTrackArtObject()) {
+            if ($this->getTrackTitle() && $this->getTrackArtist() && $this->getTrackSourceFileObject() && $this->getTrackArtObject()) {
                 $worthy = true;
             }
         }
@@ -111,10 +111,12 @@ class Track extends ShopifyProduct {
      * @return mixed
      */
     public function getTrackNumber() {
+        if (!isset($this->trackNumber)) $this->trackNumber = get_field('track_number',$this->postID);
         return abs(intval($this->trackNumber));
     }
 
     public function getTrackPrice() {
+        if (!isset($this->trackPrice)) $this->trackPrice = get_field('track_price',$this->postID);
         return abs(intval($this->trackPrice));
     }
 
@@ -123,6 +125,7 @@ class Track extends ShopifyProduct {
      * @return mixed
      */
     public function getTrackArtist() {
+        if (!isset($this->trackArtist)) $this->trackArtist = get_field('track_artist',$this->postID);
         return $this->trackArtist ? $this->trackArtist : $this->parentAlbum->getAlbumArtist();
     }
 
@@ -130,6 +133,7 @@ class Track extends ShopifyProduct {
      * @return mixed
      */
     public function getTrackGenre() {
+        if (!isset($this->trackGenre)) $this->trackGenre = get_field('track_genre',$this->postID);
         return $this->trackGenre ? $this->trackGenre : $this->parentAlbum->getAlbumGenre();
     }
 
@@ -137,6 +141,7 @@ class Track extends ShopifyProduct {
      * @return mixed
      */
     public function getTrackYear() {
+        if (!isset($this->trackYear)) $this->trackYear = get_field('track_year',$this->postID);
         return $this->trackYear ? $this->trackYear : $this->parentAlbum->getAlbumYear();
     }
 
@@ -144,6 +149,7 @@ class Track extends ShopifyProduct {
      * @return mixed
      */
     public function getTrackComment() {
+        if (!isset($this->trackComment)) $this->trackComment = get_field('track_comment',$this->postID);
         return $this->trackComment ? $this->trackComment : $this->parentAlbum->getAlbumComment();
     }
 
@@ -151,17 +157,19 @@ class Track extends ShopifyProduct {
      * @return mixed
      */
     public function getTrackArtObject() {
+        if (!isset($this->trackArtObject)) $this->trackArtObject = get_field('track_art',$this->postID) ? new WPAttachment(get_field('track_art',$this->postID)) : false;
         return $this->trackArtObject ? $this->trackArtObject : $this->parentAlbum->getAlbumArtObject();
     }
 
     public function getTrackSourceFileObject() {
+        if (!isset($this->trackSourceFileObject)) $this->trackSourceFileObject = get_field('track_source',$this->postID) ? new WPAttachment(get_field('track_source',$this->postID)) : false;
         return $this->trackSourceFileObject;
     }
 
     public function getTrackContext() {
         $context = array('title' => $this->getTrackTitle(), 'artist' => $this->getTrackArtist());
         $context['number'] = $this->getTrackNumber();
-        $context['price'] = $this->getTrackPrice();
+        //$context['price'] = $this->getTrackPrice();
         $context['encode_worthy'] = $this->isEncodeWorthy();
         $context['art'] = $this->getTrackArtObject() ?
             array('filename'=>basename($this->getTrackArtObject()->getPath()),'exists'=>file_exists($this->getTrackArtObject()->getPath()))

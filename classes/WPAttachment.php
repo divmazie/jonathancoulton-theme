@@ -13,6 +13,7 @@ class WPAttachment {
 
     public $attachment_id;
     public $parent_post_id;
+    private $path;
 
     public function __construct($attachment) {
         if (is_array($attachment)) {
@@ -32,7 +33,8 @@ class WPAttachment {
     }
 
     public function getPath() {
-        return get_attached_file($this->getAttachmentID());
+        if (!isset($this->path)) $this->path = get_attached_file($this->getAttachmentID());
+        return $this->path;
     }
 
     public function getURL() {
@@ -40,7 +42,7 @@ class WPAttachment {
     }
 
     public function fileAssetExists() {
-        if ($this->getAttachmentID() && file_exists($this->getPath()) && filesize($this->getPath())) {
+        if ($this->getAttachmentID() ) {// && file_exists($this->getPath()) && filesize($this->getPath())) { // Checking filesize for hundreds of files slows things down?
             return true;
         } else {
             return false;

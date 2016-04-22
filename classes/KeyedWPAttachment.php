@@ -29,7 +29,7 @@ abstract class KeyedWPAttachment extends WPAttachment {
     }
 
     public function getAttachmentID() { // Redefined from parent class, because property is not set in constructor for child objects
-        if ($this->attachment_id) { return $this->attachment_id; }
+        if (isset($this->attachment_id)) { return $this->attachment_id; }
         $attachment_id = get_post_meta($this->parent_post_id,'attachment_id_'.$this->getUniqueKey(),false)[0];
         $this->attachment_id = $attachment_id;
         return $attachment_id ? $attachment_id : false;

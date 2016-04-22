@@ -23,12 +23,13 @@ class Album extends ShopifyProduct {
         // fill in private fields from post object/acf/postmeta
         $this->wpPost = $post;
         $this->albumTitle = $post->post_title;
-        $this->albumArtist = get_field('album_artist',$post_id);
-        $this->albumPrice = get_field('album_price',$post_id);
-        $this->albumYear = get_field('album_year',$post_id);
-        $this->albumGenre = get_field('album_genre',$post_id);
-        $this->albumComment = get_field('album_comment',$post_id);
-        $this->albumArtObject = get_field('album_art',$post_id) ? new WPAttachment(get_field('album_art',$post_id)) : false;
+        //$this->albumArtist = get_field('album_artist',$post_id);
+        //$this->albumPrice = get_field('album_price',$post_id);
+        //$this->albumYear = get_field('album_year',$post_id);
+        //$this->albumGenre = get_field('album_genre',$post_id);
+        //$this->albumComment = get_field('album_comment',$post_id);
+        //$this->albumArtObject = get_field('album_art',$post_id) ? new WPAttachment(get_field('album_art',$post_id)) : false;
+        /*
         $this->albumBonusAssetObjects = array();
         $bonus_asset_rows = get_field('bonus_assets',$post_id);
         if (is_array($bonus_asset_rows)) {
@@ -36,22 +37,15 @@ class Album extends ShopifyProduct {
                 $this->albumBonusAssetObjects[] = new WPAttachment($row['bonus_asset']);
             }
         }
-        $this->albumShow = get_field('show_album_in_store',$post_id);
-        $this->albumSortOrder = get_field('album_sort_order',$post_id);
+        */
+        //$this->albumShow = get_field('show_album_in_store',$post_id);
+        //$this->albumSortOrder = get_field('album_sort_order',$post_id);
         $this->encode_types = include(get_template_directory().'/config/encode_types.php');
-        $this->shopify_id = get_post_meta($post_id,'shopify_id',false)[0];
-        $this->shopify_variant_ids = unserialize(get_post_meta($post_id,'shopify_variant_ids',false)[0]);
-        $this->shopify_variant_skus = unserialize(get_post_meta($post_id,'shopify_variant_skus',false)[0]);
-        $this->shopify_collection_id = get_post_meta($post_id,'shopify_collection_id',false)[0];
-        $tracks = get_posts(array('post_type' => 'track', 'posts_per_page' => -1, 'meta_key' => 'track_album', 'meta_value' => $post_id)); // Constructor probs shouldn't do this lookup
-        foreach ($tracks as $track) {
-            $track_num = intval(get_field('track_number', $track->ID));
-            while (isset($this->albumTracks[$track_num])) {
-                $track_num = 1000 + $track_num;
-            }
-            $this->albumTracks[$track_num] = new Track($track, $this);
-        }
-        ksort($this->albumTracks);
+        //$this->shopify_id = get_post_meta($post_id,'shopify_id',false)[0];
+        //$this->shopify_variant_ids = unserialize(get_post_meta($post_id,'shopify_variant_ids',false)[0]);
+        //$this->shopify_variant_skus = unserialize(get_post_meta($post_id,'shopify_variant_skus',false)[0]);
+        //$this->shopify_collection_id = get_post_meta($post_id,'shopify_collection_id',false)[0];
+        // Tracks now gotten in getAlbumTracks() to reduce database hits
     }
 
     static function getAllAlbums() {
@@ -65,10 +59,10 @@ class Album extends ShopifyProduct {
 
     public function getAlbumContext() {
         $context = array('title' => $this->getAlbumTitle(), 'artist' => $this->getAlbumArtist());
-        $context['show_album'] = $this->albumShow ? true : false;
+        $context['show_album'] = $this->getAlbumShow() ? true : false;
         $context['encode_worthy'] = $this->isEncodeWorthy() ? true : false;
-        $context['year'] = $this->getAlbumYear();
-        $context['price'] = $this->getAlbumPrice();
+        //$context['year'] = $this->getAlbumYear();
+        //$context['price'] = $this->getAlbumPrice();
         $context['sort_order'] = $this->getAlbumSortOrder();
         $context['sort_order_conflict'] = false;
         $context['art'] = $this->getAlbumArtObject() ?
@@ -96,7 +90,7 @@ class Album extends ShopifyProduct {
 
     public function isEncodeWorthy() {
         $worthy = false;
-        if ($this->albumShow && $this->albumTitle && $this->albumArtist && $this->albumArtObject) {
+        if ($this->getAlbumShow() && $this->getAlbumTitle() && $this->getAlbumArtist() && $this->getAlbumArtObject()) {
             $worthy = true;
         }
         return $worthy;
@@ -106,8 +100,14 @@ class Album extends ShopifyProduct {
         if (!$this->isEncodeWorthy()) {
             return false;
         }
+        $zips = $this->getAllChildZips();
+        $all_zips_exist = true;
+        foreach ($zips as $zip) {
+            if (!$zip->fileAssetExists()) $all_zips_exist = false;
+        }
+        if ($all_zips_exist) return false;
         $encodes = array();
-        foreach ($this->albumTracks as $track) {
+        foreach ($this->getAlbumTracks() as $track) {
             $track_encodes = $track->getNeededEncodes();
             if ($track_encodes) {
                 $encodes = array_merge($encodes, $track_encodes);
@@ -152,11 +152,22 @@ class Album extends ShopifyProduct {
     }
 
     public function getNumberOfAlbumTracks() {
-        return count($this->albumTracks);
+        return count($this->getAlbumTracks());
     }
 
     // @return array the album tracks IN ORDER
     public function getAlbumTracks() {
+        if (!count($this->albumTracks)) {
+            $tracks = get_posts(array('post_type' => 'track', 'posts_per_page' => -1, 'meta_key' => 'track_album', 'meta_value' => $this->postID));
+            foreach ($tracks as $track) {
+                $track_num = intval(get_field('track_number', $track->ID));
+                while (isset($this->albumTracks[$track_num])) {
+                    $track_num = 1000 + $track_num;
+                }
+                $this->albumTracks[$track_num] = new Track($track, $this);
+            }
+            ksort($this->albumTracks);
+        }
         return $this->albumTracks;
     }
 
@@ -176,10 +187,12 @@ class Album extends ShopifyProduct {
      * @return mixed
      */
     public function getAlbumArtist() {
+        if (!isset($this->albumArtist)) $this->albumArtist = get_field('album_artist',$this->postID);
         return $this->albumArtist;
     }
 
     public function getAlbumPrice() {
+        if (!isset($this->albumPrice)) $this->albumPrice = get_field('album_price',$this->postID);
         return abs(intval($this->albumPrice));
     }
 
@@ -187,6 +200,7 @@ class Album extends ShopifyProduct {
      * @return mixed
      */
     public function getAlbumYear() {
+        if (!isset($this->albumYear)) $this->albumYear = get_field('album_year',$this->postID);
         return $this->albumYear;
     }
 
@@ -194,6 +208,7 @@ class Album extends ShopifyProduct {
      * @return mixed
      */
     public function getAlbumGenre() {
+        if (!isset($this->albumGenre)) $this->albumGenre = get_field('album_genre',$this->postID);
         return $this->albumGenre;
     }
 
@@ -201,6 +216,7 @@ class Album extends ShopifyProduct {
      * @return mixed
      */
     public function getAlbumArtObject() {
+        if (!isset($this->albumArtObject)) $this->albumArtObject = get_field('album_art',$this->postID) ? new WPAttachment(get_field('album_art',$this->postID)) : false;
         return $this->albumArtObject;
     }
 
@@ -208,21 +224,38 @@ class Album extends ShopifyProduct {
      * @return mixed
      */
     public function getAlbumBonusAssetObjects() {
+        if (!isset($this->albumBonusAssetObjects)) {
+            $this->albumBonusAssetObjects = array();
+            $bonus_asset_rows = get_field('bonus_assets',$this->postID);
+            if (is_array($bonus_asset_rows)) {
+                foreach ($bonus_asset_rows as $row) {
+                    $this->albumBonusAssetObjects[] = new WPAttachment($row['bonus_asset']);
+                }
+            }
+        }
         return $this->albumBonusAssetObjects;
+    }
+
+    public function getAlbumShow() {
+        if (!isset($this->albumShow)) $this->albumShow = get_field('show_album_in_store',$this->postID);
+        return $this->albumShow;
     }
 
     /**
      * @return mixed
      */
     public function getAlbumComment() {
+        if (!isset($this->albumComment)) $this->albumComment = get_field('album_comment',$this->postID);
         return $this->albumComment;
     }
 
     public function getAlbumSortOrder() {
+        if (!isset($this->albumSortOrder)) $this->albumSortOrder = get_field('album_sort_order',$this->postID);
         return $this->albumSortOrder;
     }
 
     public function getShopifyCollectionId() {
+        if (!isset($this->shopify_collection_id)) $this->shopify_collection_id = get_post_meta($this->postID,'shopify_collection_id',false)[0];
         return $this->shopify_collection_id;
     }
 

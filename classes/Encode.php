@@ -39,7 +39,7 @@ class Encode extends KeyedWPAttachment {
         // track number underscore track title underscore short hash dot extension
         return sprintf('%d_%s_%s.%s', $this->parentTrack->getTrackNumber(),
                         $title,$this->getShortUniqueKey(),
-                        $this->encodeFormat);
+                        $this->encodeFormat=='aac'||$this->encodeFormat=='alac'?'m4a':$this->encodeFormat);
     }
 
     public function getEncodeLabel() {
@@ -86,7 +86,7 @@ class Encode extends KeyedWPAttachment {
         return $config;
     }
 
-    public function encodeIsNeeded(){
+    public function encodeIsNeeded() {
         return !$this->fileAssetExists();
     }
 

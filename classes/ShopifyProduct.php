@@ -16,6 +16,7 @@ abstract class ShopifyProduct {
     abstract function getTitle();
 
     public function getShopifyId() {
+        if (!isset($this->shopify_id)) $this->shopify_id = get_post_meta($this->postID,'shopify_id',false)[0];
         return $this->shopify_id;
     }
 
@@ -26,6 +27,7 @@ abstract class ShopifyProduct {
     }
 
     public function getShopifyVariantIds() {
+        if (!isset($this->shopify_variant_ids)) $this->shopify_variant_ids = unserialize(get_post_meta($this->postID,'shopify_variant_ids',false)[0]);
         return $this->shopify_variant_ids;
     }
 
@@ -36,6 +38,7 @@ abstract class ShopifyProduct {
     }
 
     public function getShopifyVariantSkus() {
+        if (!isset($this->shopify_variant_skus)) $this->shopify_variant_skus = unserialize(get_post_meta($this->postID,'shopify_variant_skus',false)[0]);
         return $this->shopify_variant_skus;
     }
 
