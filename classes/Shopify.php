@@ -16,6 +16,7 @@ class Shopify {
     private $apiKey, $apiPassword, $handle;
     private $allProducts, $allCollections;
     private $fetch, $allFetchProducts, $allFetchFiles;
+    private $last_api_call_time;
 
     public function __construct($apiKey, $apiPassword, $handle) {
         $this->apiKey = $apiKey;
@@ -125,6 +126,8 @@ class Shopify {
         $ch = curl_init($url);
         curl_setopt($ch, CURLOPT_CUSTOMREQUEST, $requestType);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 0);
+        curl_setopt($ch, CURLOPT_TIMEOUT, 600);
         if ($requestType != "GET") {
             curl_setopt($ch, CURLOPT_POSTFIELDS, $data_string);
             curl_setopt($ch, CURLOPT_HTTPHEADER, [
@@ -134,6 +137,10 @@ class Shopify {
                 ]
             );
         }
+        if ($this->last_api_call_time == time()) {
+            usleep(500000);
+        }
+        $this->last_api_call_time = time();
         $response = curl_exec($ch);
         return json_decode($response);
     }
@@ -621,11 +628,67 @@ class Shopify {
         if ($context = get_transient('store_context')) {
             return $context;
         } else {
-            return $this->forceGetStoreContext();
+            return false;
         }
     }
 
-    public function forceGetStoreContext() {
+    // Gets one album at a time and saves working arrays in transients
+    // Call this function once per page load and then reload until it returns zero
+    // Then hit getAllShopifyContext()
+    public function getAlbumsFromShopify() {
+        $collections_to_go = get_transient('collections_to_go');
+        $albums = get_transient('temporary_albums_context');
+        if (!is_array($collections_to_go) || !is_array($albums)) {
+            $collections_to_go = $this->getAllCollections();
+            $albums = array();
+            if ($everything_shopify_details = get_transient('everything_shopify_details')) {
+                $shopify_request = 'admin/products/'.$everything_shopify_details['id'];
+                $products = $this->makeCall($shopify_request,'GET');
+                $product = $products->product;
+                $collection_context = array('title'=>$product->title,'body_html'=>$product->body_html);
+                $product->metafields = array('wiki_link' => get_field('joco_wiki_base_url','options').'Discography');
+                $albums[300099] = array('collection' => $collection_context, 'products' => array($product));
+            }
+        } else {
+            $collection = array_pop($collections_to_go);
+            $metafields = $this->makeCall('admin/custom_collections/' . $collection->id . '/metafields');
+            $album_to_add = false;
+            $album_sort_order = false;
+            foreach ($metafields->metafields as $metafield) {
+                if ($metafield->key == 'album_collection' && $metafield->value) {
+                    $products = $this->makeCall('admin/products', 'GET', array('collection_id' => $collection->id));
+                    $products_context = array();
+                    foreach ($products->products as $product) {
+                        $metafields = $this->makeCall('admin/products/' . $product->id . '/metafields');
+                        $metafields_context = array();
+                        $track_number = 0;
+                        foreach ($metafields->metafields as $field) {
+                            $metafields_context[$field->key] = $field->value;
+                            if ($field->key == "track_number") {
+                                $track_number = $field->value;
+                            }
+                        }
+                        $product->metafields = $metafields_context;
+                        if (!isset($products_context[$track_number]))
+                            $products_context[$track_number] = $product;
+                    }
+                    ksort($products_context);
+                    $album_to_add = array('collection' => $collection, 'products' => $products_context);
+                }
+                if ($metafield->key == 'album_sort_order') {
+                    $album_sort_order = $metafield->value;
+                }
+            }
+            if ($album_sort_order && $album_to_add) {
+                $albums[$album_sort_order] = $album_to_add;
+            }
+        }
+        set_transient('collections_to_go',$collections_to_go);
+        set_transient('temporary_albums_context',$albums);
+        return count($collections_to_go);
+    }
+
+    public function getAllShopifyContext() {
         $context = array();
         $categories = get_field('store_categories','options');
         if (is_array($categories)) {
@@ -633,47 +696,7 @@ class Shopify {
                 if ($category['display']) {
                     $html_name = htmlentities(strtolower(preg_replace('/\s+/', '_',$category['display_name'])));
                     if ($category['shopify_type'] == 'Music download') {
-                        $albums = array();
-                        if ($everything_shopify_details = get_transient('everything_shopify_details')) {
-                            $shopify_request = 'admin/products/'.$everything_shopify_details['id'];
-                            $products = $this->makeCall($shopify_request,'GET');
-                            $product = $products->product;
-                            $collection_context = array('title'=>$product->title,'body_html'=>$product->body_html);
-                            $product->metafields = array('wiki_link' => get_field('joco_wiki_base_url','options').'Discography');
-                            $albums[300099] = array('collection' => $collection_context, 'products' => array($product));
-                        }
-                        foreach ($this->getAllCollections() as $collection) {
-                            $metafields = $this->makeCall('admin/custom_collections/' . $collection->id . '/metafields');
-                            $album_to_add = false;
-                            $album_sort_order = false;
-                            foreach ($metafields->metafields as $metafield) {
-                                if ($metafield->key == 'album_collection' && $metafield->value) {
-                                    $products = $this->makeCall('admin/products', 'GET', array('collection_id' => $collection->id));
-                                    $products_context = array();
-                                    foreach ($products->products as $product) {
-                                        $metafields = $this->makeCall('admin/products/' . $product->id . '/metafields');
-                                        $metafields_context = array();
-                                        $track_number = 0;
-                                        foreach ($metafields->metafields as $field) {
-                                            $metafields_context[$field->key] = $field->value;
-                                            if ($field->key == "track_number") {
-                                                $track_number = $field->value;
-                                            }
-                                        }
-                                        $product->metafields = $metafields_context;
-                                        $products_context[$track_number] = $product;
-                                    }
-                                    ksort($products_context);
-                                    $album_to_add = array('collection' => $collection, 'products' => $products_context);
-                                }
-                                if ($metafield->key == 'album_sort_order') {
-                                    $album_sort_order = $metafield->value;
-                                }
-                            }
-                            if ($album_sort_order && $album_to_add) {
-                                $albums[$album_sort_order] = $album_to_add;
-                            }
-                        }
+                        $albums = get_transient('temporary_albums_context');
                         krsort($albums);
                         $products = $albums;
                     } else {
