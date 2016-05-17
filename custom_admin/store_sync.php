@@ -11,11 +11,6 @@ $apiPassword = get_field('shopify_api_password','options');
 $handle = get_field('shopify_handle','options');
 $shopify = new jct\Shopify($apiKey,$apiPassword,$handle);
 
-$albums = \jct\Album::getAllAlbums();
-$missing_files = get_transient('missing_files');
-if ($missing_files === false) {
-    $missing_files = array();
-}
 $album_num = $_GET['album'];
 $step_num = $_GET['step'];
 if (!$album_num) {
@@ -24,14 +19,25 @@ if (!$album_num) {
 if (!$step_num) {
     $step_num = 0;
 }
+if ($album_num==0 && $step_num==0) {
+    delete_transient('missing_files');
+}
+$albums = \jct\Album::getAllAlbums();
+$missing_files = get_transient('missing_files');
+if ($missing_files === false) {
+    $missing_files = array();
+}
 if ($album_num<count($albums)) {
     $album = $albums[$album_num];
     if ($step_num==0) {
         $album->cleanAttachments();
-        $response = $album->syncToStore($shopify);
+        $response = $album->syncToStore($shopify,$step_num);
+        reload($album_num,1);
+    } elseif ($step_num==1) {
+        $response = $album->syncToStore($shopify,$step_num);
         $missing_files = array_merge($missing_files, array_values($response['missing_files']));
         set_transient('missing_files',$missing_files);
-        reload($album_num,1);
+        reload($album_num,2);
     } else {
         $album->syncCollection($shopify);
         reload($album_num+1,0);
@@ -46,14 +52,20 @@ if ($album_num<count($albums)) {
         reload($album_num,2);
     } else if ($step_num==2) {
         $shopify->deleteUnusedFetchProducts($albums);
-        reload($album_num,3);
+        reload($album_num, 3);
     } else {
-        $context = Timber::get_context();
-        delete_transient('store_context');
-        $context['missing_files'] = $missing_files;
-        delete_transient('missing_files');
-        $context['unused_files'] = $shopify->getUnusedFetchFiles();
-        Timber::render("store_sync.twig",$context);
+        $unused_fetch_files = ($step_num==3 ? false : get_transient('unused_fetch_files'));
+        if (!is_array($unused_fetch_files)) {
+            $unused_fetch_files = $shopify->getUnusedFetchFiles();
+            set_transient('unused_fetch_files',$unused_fetch_files);
+            reload($album_num,4);
+        } else {
+            $context = Timber::get_context();
+            $context['missing_files'] = $missing_files;
+            $context['unused_files'] = $unused_fetch_files;
+            delete_transient('unused_fetch_files');
+            Timber::render("store_sync.twig", $context);
+        }
     }
 }
 function reload($album,$step) {

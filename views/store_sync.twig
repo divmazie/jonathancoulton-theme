@@ -24,10 +24,12 @@
                 <br />
             {% endfor %}
             {% if missing_files|length > 0 %}
-                Once you have uploaded those files, <button onclick="window.location.href='{{ site.url }}/custom_admin/store_sync?album=0&step=0'">sync again</button> to link them to our store.<br />
+                Once you have uploaded those files,
+                <button onclick="window.location.href='{{ site.url }}/custom_admin/store_sync?album=0&step=0'">sync again</button> to link them to our store.<br />
             {% else %}
-                Sync performed successfully!<br />
-                <a href="{{ site.url }}/wp-admin/admin.php?page=theme-general-settings">Return to WP admin page</a>.
+                Sync to shopify performed successfully. To make these changes appear on our website, you must
+                <button onclick="window.location.href='{{ site.url }}/custom_admin/refresh_store'">refresh the store</button><br /><br />
+                Or you can do this later and <a href="{{ site.url }}/wp-admin/admin.php?page=theme-general-settings">Return to WP admin page</a>.
             {% endif %}
             <br />
             {% if unused_files|length > 0 %}
