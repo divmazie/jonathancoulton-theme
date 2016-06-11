@@ -35,7 +35,8 @@
 	  "fetchapp/fetchapp": "dev-master",
 	  "ricardoper/twitteroauth": "2.*",
         "cosenary/instagram": "^2.4@dev",
-	  "fetchapp/fetchapp": "dev-master"
+	  "fetchapp/fetchapp": "dev-master",
+        "aws/aws-sdk-php": "^3.18"
 	},
   "autoload": {
 	"psr-4": {"jct\\": "classes/"}
