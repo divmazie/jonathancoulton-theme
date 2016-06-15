@@ -83,9 +83,9 @@ class AlbumZip extends KeyedWPAttachment {
 
     public function createZip() {
         if (!$this->isZipWorthy()) {
-            return "Album is not zip-worthy!\n";
+            return array(false,"Album is not zip-worthy!\n");
         } elseif ($this->fileAssetExists()) {
-            return "Album is already zipped!\n";
+            return array(false,"Album is already zipped!\n");
         } else {
             $upload_dir = wp_upload_dir();
             $zip = new \ZipArchive();
@@ -93,7 +93,7 @@ class AlbumZip extends KeyedWPAttachment {
             $filename = $upload_dir['path'] . "/" . $this->getFileAssetFileName();
             $filetype = wp_check_filetype(basename($filename), null);
             if ($zip->open($filename, \ZipArchive::CREATE) !== TRUE) {
-                return "Cannot open zip file: <$filename>\n";
+                return array(false,"Cannot open zip file: <$filename>\n");
             }
             $zip_dir_name = $this->parentAlbum->getAlbumTitle() . "/";
             foreach ($this->getEncodesToZip() as $encode) {
@@ -102,10 +102,10 @@ class AlbumZip extends KeyedWPAttachment {
                     $success = $zip->addFile($encode_path, $zip_dir_name . basename($encode_path));
                     $filecount++;
                     if (!$success) {
-                        return "Cannot find ".$encode_path."\n";
+                        return array(false,"Cannot find ".$encode_path."\n");
                     }
                 } else {
-                    return "Cannot find path for ".$encode->getFileAssetFileName()."\n";
+                    return array(false,"Cannot find path for ".$encode->getFileAssetFileName()."\n");
                 }
             }
             foreach ($this->parentAlbum->getAlbumBonusAssetObjects() as $bonus_asset) {
@@ -114,7 +114,7 @@ class AlbumZip extends KeyedWPAttachment {
                     $success = $zip->addFile($bonus_path, $zip_dir_name . basename($bonus_path));
                     $filecount++;
                     if (!$success) {
-                        return "Cannot find " . $bonus_path . "\n";
+                        return array(false,"Cannot find " . $bonus_path . "\n");
                     }
                 }
             }
@@ -134,7 +134,7 @@ class AlbumZip extends KeyedWPAttachment {
             // Insert the attachment.
             $attach_id = wp_insert_attachment($attachment, $filename, $this->parentAlbum->getPostID());
             if (!$attach_id) {
-                return "Zip created, but couldn't add it as attachment to WP!\n";
+                return array(false,"Zip created, but couldn't add it as attachment to WP!\n");
             }
             // Make sure that this file is included, as wp_generate_attachment_metadata() depends on it.
             require_once(ABSPATH . 'wp-admin/includes/image.php');
@@ -143,7 +143,7 @@ class AlbumZip extends KeyedWPAttachment {
             $attach_data = array_merge($attach_data, array('unique_key' => $this->getUniqueKey()));
             wp_update_attachment_metadata($attach_id, $attach_data);
             $this->completeAttaching($attach_id);
-            return "Zip created successfully!\n";
+            return array(true,"Zip created successfully!\n");
         }
     }
 
@@ -169,5 +169,17 @@ class AlbumZip extends KeyedWPAttachment {
         $context['missing_encodes'] = $this->isMissingEncodes() ? true : false;
         $context['exists'] = $this->fileAssetExists() ? true : false;
         return $context;
+    }
+
+    public function getAwsKey() { // Same as getFileAssetFileName() without the short hash
+        $title = $this->parentAlbum->getAlbumTitle();
+        $title = iconv('UTF-8','ASCII//TRANSLIT',$title);
+        // replace spaces with underscore
+        $title = preg_replace('/\s/u', '_', $title);
+        // remove non ascii alnum_ with
+        $title = preg_replace('/[^\da-z_]/i', '', $title);
+
+        // album title underscore format underscore short hash dot extension
+        return sprintf('%s_%s.%s',$title,$this->encodeFormat,"zip");
     }
 }

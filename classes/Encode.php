@@ -110,23 +110,23 @@ class Encode extends KeyedWPAttachment {
 
         $file_array_key = "file";
         if (!isset($_FILES[$file_array_key])) {
-            return "No file!";
+            return array(false,"No file!");
         }
         if (md5_file($_FILES[$file_array_key]['tmp_name']) != $_POST['md5']) {
-            return "Uploaded file md5 does not match posted md5!";
+            return array(false,"Uploaded file md5 does not match posted md5!");
         }
         $_FILES[$file_array_key]['name'] = $this->getFileAssetFileName();
         $attachment_id = media_handle_upload($file_array_key, $this->parentTrack->getPostID(), array(), array('test_form' => false));
 
         if ( is_wp_error($attachment_id) ) {
-            return $attachment_id->get_error_message();
+            return array(false,$attachment_id->get_error_message());
         } else {
             $return = "File is valid, and was successfully uploaded.\n";
             $old_meta = wp_get_attachment_metadata($attachment_id);
             $new_meta = array_merge($old_meta, array('unique_key' => $this->getUniqueKey()));
             wp_update_attachment_metadata($attachment_id,$new_meta);
             $this->completeAttaching($attachment_id);
-            return $return;
+            return array(true,$return);
         }
     }
 
@@ -134,6 +134,19 @@ class Encode extends KeyedWPAttachment {
         $context = array('format' => $this->getEncodeFormat(), 'flags' => $this->getEncodeCLIFlags());
         $context['exists'] = $this->fileAssetExists();
         return $context;
+    }
+
+    public function getAwsKey() { // Same as getFileAssetFileName() without the short hash
+        $title = $this->parentTrack->getTrackTitle();
+        $title = iconv('UTF-8','ASCII//TRANSLIT',$title);
+        // replace spaces with underscore
+        $title = preg_replace('/\s/u', '_', $title);
+        // remove non ascii alnum_ with
+        $title = preg_replace('/[^\da-z_]/i', '', $title);
+
+        // track number underscore track title dot extension
+        return sprintf('%d_%s.%s', $this->parentTrack->getTrackNumber(),
+            $this->encodeFormat=='aac'||$this->encodeFormat=='alac'?'m4a':$this->encodeFormat);
     }
 
 }
