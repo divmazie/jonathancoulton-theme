@@ -37,7 +37,7 @@ class Encode extends KeyedWPAttachment {
         $title = preg_replace('/[^\da-z_]/i', '', $title);
 
         // track number underscore track title underscore short hash dot extension
-        return sprintf('%d_%s_%s.%s', $this->parentTrack->getTrackNumber(),
+        return sprintf("%'.02d_%s_%s.%s", $this->parentTrack->getTrackNumber(),
                         $title,$this->getShortUniqueKey(),
                         $this->encodeFormat=='aac'||$this->encodeFormat=='alac'?'m4a':$this->encodeFormat);
     }
@@ -125,7 +125,7 @@ class Encode extends KeyedWPAttachment {
             $old_meta = wp_get_attachment_metadata($attachment_id);
             $new_meta = array_merge($old_meta, array('unique_key' => $this->getUniqueKey()));
             wp_update_attachment_metadata($attachment_id,$new_meta);
-            $this->completeAttaching($attachment_id);
+            $this->completeAttaching($attachment_id,false);
             return array(true,$return);
         }
     }
@@ -143,9 +143,15 @@ class Encode extends KeyedWPAttachment {
         $title = preg_replace('/\s/u', '_', $title);
         // remove non ascii alnum_ with
         $title = preg_replace('/[^\da-z_]/i', '', $title);
+        $album_title = $this->parentTrack->getAlbum()->getAlbumTitle();
+        $album_title = iconv('UTF-8','ASCII//TRANSLIT',$album_title);
+        // replace spaces with underscore
+        $album_title = preg_replace('/\s/u', '_', $album_title);
+        // remove non ascii alnum_ with
+        $album_title = preg_replace('/[^\da-z_]/i', '', $album_title);
 
         // track number underscore track title dot extension
-        return sprintf('%d_%s.%s', $this->parentTrack->getTrackNumber(),
+        return sprintf("%s_%'.02d_%s_%s.%s", $album_title, $this->parentTrack->getTrackNumber(),$title,$this->encodeFormat,
             $this->encodeFormat=='aac'||$this->encodeFormat=='alac'?'m4a':$this->encodeFormat);
     }
 

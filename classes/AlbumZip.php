@@ -142,7 +142,7 @@ class AlbumZip extends KeyedWPAttachment {
             $attach_data = wp_generate_attachment_metadata($attach_id, $filename);
             $attach_data = array_merge($attach_data, array('unique_key' => $this->getUniqueKey()));
             wp_update_attachment_metadata($attach_id, $attach_data);
-            $this->completeAttaching($attach_id);
+            $this->completeAttaching($attach_id,true);
             return array(true,"Zip created successfully!\n");
         }
     }
@@ -168,6 +168,7 @@ class AlbumZip extends KeyedWPAttachment {
         $context['zip_worthy'] = $this->isZipWorthy() ? true : false;
         $context['missing_encodes'] = $this->isMissingEncodes() ? true : false;
         $context['exists'] = $this->fileAssetExists() ? true : false;
+        $context['path'] = $this->getPath();
         return $context;
     }
 

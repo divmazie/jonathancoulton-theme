@@ -86,6 +86,7 @@
                             {% if zip.exists %} {{ macros.good_warning(zip.format," zip good to go.") }} {% endif %}
                             {% if not zip.zip_worthy %} {{ macros.go_warning(zip.format," zip not zip-worthy!") }} {% endif %}
                             {% if zip.missing_encodes %} {{ macros.go_warning(zip.format," encodes missing!") }} {% endif %}
+                            {{ zip.path }}
                         </div>
                     {% endfor  %}
                     Tracks:

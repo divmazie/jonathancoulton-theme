@@ -39,9 +39,9 @@ abstract class KeyedWPAttachment extends WPAttachment {
         return $attachment_id ? $attachment_id : false;
     }
 
-    public function completeAttaching($attachment_id) {
+    public function completeAttaching($attachment_id,$skip_renaming) {
         $this->setKeyedAttachmentID($attachment_id);
-        $this->fixAttachmentFileName();
+        if (!$skip_renaming) $this->fixAttachmentFileName();
     }
 
     public function fixAttachmentFileName() {
@@ -66,7 +66,7 @@ abstract class KeyedWPAttachment extends WPAttachment {
     }
     
     public function uploadToAws($s3) {
-        $bucket = 'joco-songs-new'; // Should this be a theme option? I think this is the only place it's needed
+        $bucket = get_field('aws_bucket_name','options');
         $result = $s3->putObject([
             'Bucket' => $bucket,
             'Key' => $this->getAwsKey(),
