@@ -50,8 +50,14 @@ class Shopify {
     }
 
     public function forceGetAllProducts() {
-        $response = $this->makeCall("admin/products",'GET',array('product_type' => 'Music download'));
-        $this->allProducts = $response->products;
+        $response = $this->makeCall('admin/products/count','GET',array('product_type' => 'Music download'));
+        $num_products = $response->count;
+        $products = array();
+        for ($i=0; $i<$num_products/250; $i++) {
+            $response = $this->makeCall("admin/products", 'GET', array('product_type' => 'Music download', 'limit' => 250, 'page' => $i+1));
+            $products = array_merge($products,$response->products);
+        }
+        $this->allProducts = $products;
         return $this->allProducts;
     }
 
@@ -65,7 +71,7 @@ class Shopify {
 
     public function forceGetAllCollections() {
         $collections = array();
-        $response = $this->makeCall('admin/custom_collections','GET');
+        $response = $this->makeCall('admin/custom_collections','GET',array('limit'=>250)); // This will cause problems if we have >250 albums
         foreach ($response->custom_collections as $collection) {
             $album_collection = false;
             $metafields = $this->makeCall("admin/custom_collections/$collection->id/metafields");
