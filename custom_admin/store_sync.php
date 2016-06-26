@@ -54,18 +54,9 @@ if ($album_num<count($albums)) {
         $shopify->deleteUnusedFetchProducts($albums);
         reload($album_num, 3);
     } else {
-        $unused_fetch_files = ($step_num==3 ? false : get_transient('unused_fetch_files'));
-        if (!is_array($unused_fetch_files)) {
-            $unused_fetch_files = $shopify->getUnusedFetchFiles();
-            set_transient('unused_fetch_files',$unused_fetch_files);
-            reload($album_num,4);
-        } else {
-            $context = Timber::get_context();
-            $context['missing_files'] = $missing_files;
-            $context['unused_files'] = $unused_fetch_files;
-            delete_transient('unused_fetch_files');
-            Timber::render("store_sync.twig", $context);
-        }
+        $context = Timber::get_context();
+        $context['missing_files'] = $missing_files;
+        Timber::render("store_sync.twig", $context);
     }
 }
 function reload($album,$step) {

@@ -5,6 +5,8 @@ namespace jct;
 abstract class KeyedWPAttachment extends WPAttachment {
 
     private $awsUrl;
+    // encode format === file extension!
+    public $encodeLabel, $encodeFormat, $encodeCLIFlags;
 
     abstract public function getUniqueKey();
 
@@ -80,12 +82,13 @@ abstract class KeyedWPAttachment extends WPAttachment {
 
     public function setAwsUrl($url) {
         $this->awsUrl = $url;
-        return update_post_meta($this->parent_post_id, 'aws_url', $url);
+        return update_post_meta($this->parent_post_id, strtolower('aws_url_'.$this->encodeLabel), $url);
     }
 
     public function getAwsUrl() {
-        if (isset($this->awsUrl)) { return $this->awsUrl; }
-        $url = get_post_meta($this->parent_post_id,'aws_url',false)[0];
+        if ($this->awsUrl) { return $this->awsUrl; }
+        $key = strtolower('aws_url_'.$this->encodeLabel);
+        $url = get_post_meta($this->parent_post_id,$key,false)[0];
         $this->awsUrl = $url;
         return $url ? $url : false;
     }

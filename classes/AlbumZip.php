@@ -12,8 +12,6 @@ namespace jct;
 class AlbumZip extends KeyedWPAttachment {
 
     private $parentAlbum;
-    // encode format === file extension!
-    private $encodeFormat, $encodeCLIFlags, $encodeLabel;
 
     public function __construct(Album $parentAlbum, $encodeFormat, $encodeCLIFlags, $encodeLabel="") {
         if (!$encodeLabel) {

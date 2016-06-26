@@ -5,8 +5,6 @@ namespace jct;
 class Encode extends KeyedWPAttachment {
 
     private $parentTrack;
-    // encode format === file extension!
-    private $encodeLabel,$encodeFormat, $encodeCLIFlags;
 
     static function recoverFromTransient($transient_key) {
         $encode_details = get_transient($transient_key);

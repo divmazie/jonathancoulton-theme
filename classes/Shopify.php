@@ -161,9 +161,11 @@ class Shopify {
                 case "jct\\Track": $object_variants = $object->getAllChildEncodes(); $title = $object->getTrackTitle(); break;
             }
             foreach ($response->product->variants as $variant) {
-                if ($missings = $this->syncFetchProduct($variant->sku,$title." ".$variant->option1,$variant->price,array($object_variants[$variant->option1]->getFileAssetFileName()))) {
+                $fetch_name = $title." ".$variant->option1;
+                $aws_links = array($object_variants[$variant->option1]->getAwsUrl());
+                if ($missings = $this->syncFetchProduct($variant->sku,$fetch_name,$variant->price,$aws_links)) {
                     foreach ($missings as $missing) {
-                        $missing_files[] = array('format' => $variant->option1, 'filename' => $missing);
+                        $missing_files[] = array('fetch_name' => $fetch_name, 'url' => $missing);
                     }
                 }
             }
@@ -381,12 +383,12 @@ class Shopify {
             //$this->forceGetAllProducts();
         }
         foreach ($encode_types as $encode_type => $encode_details) {
-            $filenames = array();
+            $aws_links = array();
             foreach ($allAlbums as $album) {
-                $filenames[] = $album->getChildZip($encode_details[0],$encode_details[1],$encode_type)->getFilename();
+                $aws_links[] = $album->getChildZip($encode_details[0],$encode_details[1],$encode_type)->getAwsUrl();
             }
             $sku = $this->sku('everything','everthying',$encode_type);
-            $this->syncFetchProduct($sku,'Everything '.$encode_type,$everything_price,$filenames);
+            $this->syncFetchProduct($sku,'Everything '.$encode_type,$everything_price,$aws_links);
         }
     }
 
@@ -483,28 +485,6 @@ class Shopify {
         }
     }
 
-    public function getFetchFiles() {
-        if (isset($this->allFetchFiles)) {
-            return $this->allFetchFiles;
-        }
-        try{
-            $fetch_files = $this->fetch->getFiles(10000,1); // Grabs all files
-            return $fetch_files;
-            /*
-            $fetch_files_array = array();
-            foreach ($fetch_files as $file) {
-                $fetch_files_array[(int) $file->getFileID()] = (string) $file->getFileName();
-            }
-            $this->allFetchFiles = $fetch_files_array;
-            return $this->allFetchFiles;
-            */
-        }
-        catch (Exception $e){
-            // This will occur on any call if the AuthenticationKey and AuthenticationToken are not set.
-            return $e->getMessage();
-        }
-    }
-
     public function getFetchProducts() {
         if (isset($this->allFetchProducts)) {
             return $this->allFetchProducts;
@@ -523,44 +503,39 @@ class Shopify {
         }
     }
 
-    public function syncFetchProduct($sku,$name,$price,$filenames) {
+    public function syncFetchProduct($sku,$name,$price,$aws_links) {
         $fetch_product = false;
         foreach ($this->getFetchProducts() as $product) {
             if ((string) $product->getSKU() == $sku) {
                 $fetch_product = $product;
             }
         }
-        $missing_files = array();
         $files = array();
-        foreach ($filenames as $filename) {
-            if ($file = $this->getFetchFile($filename)) {
-                $files[] = $file;
-            } else {
-                $missing_files[] = $filename;
-            }
-        }
         if (!$fetch_product) {
             $fetch_product = new Product();
             $fetch_product->setSKU($sku);
             $fetch_product->setName($name);
             $fetch_product->setPrice($price);
             $fetch_product->setCurrency(Currency::USD);
+            $missing_files = $aws_links;
             try {
                 $fetch_product->create($files, false);
             } catch (Exception $e) {
                 return $e->getMessage();
             }
         } else {
-            /*
-            // These are good checks to do, but a pain with multiple file products
-            $file_object = $this->getFetchFile($filename);
-            if ($file_object // Only update Fetch product if file asset is ready to deliver
-                    && ($name != (string) $fetch_product->getName()
-                        || strval($price) != (string) $fetch_product->getPrice()
-                        || $file_object != $fetch_product->getFiles()[0]) ) {
-            */
             $fetch_product->setName($name);
             $fetch_product->setPrice($price);
+            $existing_files = $fetch_product->getFiles();
+            $used_links = array();
+            foreach ($existing_files as $file) {
+                $link = $file->getURL();
+                if (in_array($link,$aws_links)) {
+                    $files[] = $file;
+                    $used_links[] = $link;
+                }
+            }
+            $missing_files = array_diff($aws_links,$used_links);
             try {
                 $fetch_product->update($files);
             } catch (Exception $e) {
@@ -572,15 +547,6 @@ class Shopify {
         } else {
             return false;
         }
-    }
-
-    public function getFetchFile($filename) {
-        foreach ($this->getFetchFiles() as $file) {
-            if ((string) $file->getFileName() == $filename) {
-                return $file;
-            }
-        }
-        return false;
     }
 
     public function deleteUnusedFetchProducts($allAlbums = false) {
@@ -600,28 +566,6 @@ class Shopify {
                 $product->delete();
             }
         }
-    }
-
-    public function getUnusedFetchFiles() { // Must be called after all products are synced
-        $this->forceGetFetchProducts();
-        $unused = array();
-        $used = array();
-        foreach ($this->getFetchProducts() as $product) {
-            foreach ($product->getFiles() as $product_file) {
-                $used[] = (string) $product_file->getFileName();
-            }
-        }
-        foreach ($this->getFetchFiles() as $file) {
-            $matching_product = false;
-            $filename = (string) $file->getFileName();
-            if (in_array($filename,$used)) {
-                $matching_product = true;
-            }
-            if (!$matching_product) {
-                $unused[] = $filename;
-            }
-        }
-        return $unused;
     }
 
     public function getStoreContext() {

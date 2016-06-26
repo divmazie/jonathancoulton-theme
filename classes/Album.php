@@ -52,7 +52,9 @@ class Album extends ShopifyProduct {
         $albums = array();
         $album_posts = get_posts(array('post_type' => 'album','numberposts' => -1));
         foreach ($album_posts as $album_post) {
-            $albums[] = new Album($album_post);
+            $album = new Album($album_post);
+            if ($album->getAlbumShow())
+                $albums[] = $album;
         }
         return $albums;
     }
@@ -297,15 +299,7 @@ class Album extends ShopifyProduct {
             delete_transient('temp_context');
             delete_transient('temp_missing_files');
             //$context['collection_sync_response'] = $shopify->syncAlbumCollection($this,$track_product_ids);
-            $missing_files_context = array();
-            foreach ($missing_files as $missing_file) {
-                $format = $missing_file['format'];
-                if (!isset($missing_files_context[$format])) {
-                    $zip = $this->getAllChildZips()[$format];
-                    $missing_files_context[$format] = array('zip' => array('filename' => $zip->getFileAssetFileName(), 'url' => $zip->getURL()), 'files' => array());
-                }
-                $missing_files_context[$format]['files'][] = $missing_file['filename'];
-            }
+            $missing_files_context = $missing_files;
             $context['missing_files'] = $missing_files_context;
         }
         return $context;
