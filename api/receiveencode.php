@@ -22,13 +22,13 @@ if ($encode->getUniqueKey() == $transient_key) {
         ]);
         $s3_result = $encode->uploadToAws($s3);
         //fastcgi_finish_request();
-        $zip = $encode->getParentTrack()->getAlbum()->getChildZip($encode->getEncodeFormat(), $encode->getEncodeCLIFlags());
+        $zip = $encode->getParentTrack()->getAlbum()->getChildZip($encode->getEncodeFormat(), $encode->getEncodeCLIFlags(), $encode->getEncodeLabel());
         $zip_path = $zip->getPath();
         $zip_result = $zip->createZip();
         echo $zip_result[1];
         if ($zip_result[0]) {
             // Must reconstruct zip object for getPath() method to work correctly
-            $zip = $encode->getParentTrack()->getAlbum()->getChildZip($encode->getEncodeFormat(), $encode->getEncodeCLIFlags());
+            $zip = $encode->getParentTrack()->getAlbum()->getChildZip($encode->getEncodeFormat(), $encode->getEncodeCLIFlags(), $encode->getEncodeLabel());
             $s3_result = $zip->uploadToAws($s3);
         }
     }
