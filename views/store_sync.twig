@@ -2,6 +2,15 @@
 	{% block head %}
     {% endblock %}
     <style>
+        .unselectable {
+            -webkit-user-select: none;
+            -khtml-user-select: none;
+            -moz-user-select: none;
+            user-select: none;
+        }
+        input {
+            width: 80%;
+        }
     </style>
     </head>
 
@@ -10,12 +19,14 @@
             <h2>Store Sync Info!</h2>
             <br />
             {% if missing_files|length > 0 %}
-                Edit the following Fetch Products to add the URLs as external files
+                Edit the following Fetch Products to add the URLs as external files.
                 <br />
+                Note that white space must be deleted from URLs.
+                <br /><br />
                 {% for fetch_product in missing_files %}
-                    <div>{{ fetch_product.fetch_name }}</div>
-                    <div>{{ fetch_product.url }}</div>
-                    <br /><br />
+                    <div><span class="unselectable">Fetch name to search: </span><input type="text" value="{{ fetch_product.fetch_name }}" readonly /></div>
+                    <div><span class="unselectable">External file URL: </span><input type="text" value="{{ fetch_product.url }}" readonly /></div>
+                    <br />
                 {% endfor %}
                 Once you have modified the above fetch products,
                 <button onclick="window.location.href='{{ site.url }}/custom_admin/store_sync?album=0&step=0'">sync again</button> to link them to our store.<br />
