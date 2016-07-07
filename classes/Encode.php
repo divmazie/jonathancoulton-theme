@@ -63,8 +63,8 @@ class Encode extends KeyedWPAttachment {
     public function getEncodeConfig($skipUniqueKeys=false) {
         $authcode = get_transient('do_secret');
         $parent = $this->parentTrack;
-        $config = array('source_url' => $parent->getTrackSourceFileObject()->getURL(),
-            'source_md5' => md5_file($parent->getTrackSourceFileObject()->getPath()),
+        $config = array('source_url' => $parent->getTrackSourceFileObject() ? $parent->getTrackSourceFileObject()->getURL() : 'shit...',
+            'source_md5' => $parent->getTrackSourceFileObject() ? md5_file($parent->getTrackSourceFileObject()->getPath()) : 'shit...',
             'encode_format' => $this->getEncodeFormat(),
             'dest_url' => get_site_url()."/api/".($skipUniqueKeys?'':$authcode)."/receiveencode/".($skipUniqueKeys?'':$this->getUniqueKey()),
             'art_url' => $parent->getTrackArtObject() ? $parent->getTrackArtObject()->getURL() : 'MISSING!!!',
