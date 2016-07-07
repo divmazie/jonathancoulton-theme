@@ -44,7 +44,9 @@ if ($album_num<count($albums)) {
     }
 } else {
     if ($step_num == 0) {
-        $shopify->syncEverythingProduct($albums);
+        $response = $shopify->syncEverythingProduct($albums);
+        $missing_files = array_merge($missing_files, array_values($response['missing_files']));
+        set_transient('missing_files',$missing_files);
         reload($album_num,1);
     } else if ($step_num==1) {
         $shopify->deleteUnusedProducts($albums);

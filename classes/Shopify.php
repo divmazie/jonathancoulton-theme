@@ -388,14 +388,20 @@ class Shopify {
             $everything_shopify_details = array('id'=>$everything_id,'ids'=>$everything_ids,'skus'=>$everything_skus);
             set_transient('everything_shopify_details',$everything_shopify_details);
         }
+        $missing_files = array();
         foreach ($encode_types as $encode_type => $encode_details) {
             $aws_links = array();
             foreach ($allAlbums as $album) {
                 $aws_links[] = $album->getChildZip($encode_details[0],$encode_details[1],$encode_type)->getAwsUrl();
             }
             $sku = $this->sku('everything','everything',$encode_type);
-            $this->syncFetchProduct($sku,'Everything '.$encode_type,$everything_price,$aws_links);
+            $fetch_name = 'Everything '.$encode_type;
+            $missings = $this->syncFetchProduct($sku,$fetch_name,$everything_price,$aws_links);
+            foreach ($missings as $missing) {
+                $missing_files[] = array('fetch_name' => $fetch_name, 'url' => $missing);
+            }
         }
+        return array('missing_files'=>$missing_files);
     }
 
     public function syncAlbumCollection($album,$ids) {
