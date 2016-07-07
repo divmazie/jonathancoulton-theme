@@ -373,27 +373,27 @@ class Shopify {
             $response = $this->makeCall("admin/products/".$everything_shopify_details['id'], "PUT", $args);
         } else {
             $response = $this->makeCall("admin/products","POST",$args);
-            if ($response->product->id) {
-                $everything_id = $response->product->id;
-                $variant_ids = array();
-                $variant_skus = array();
-                foreach ($response->product->variants as $variant) {
-                    $variant_ids[$variant->option1] = $variant->id;
-                    $variant_skus[$variant->option1] = $variant->sku;
-                }
-                $everything_ids = $variant_ids;
-                $everything_skus = $variant_skus;
-                $everything_shopify_details = array('id'=>$everything_id,'ids'=>$everything_ids,'skus'=>$everything_skus);
-                set_transient('everything_shopify_details',$everything_shopify_details);
-            }
             //$this->forceGetAllProducts();
+        }
+        if ($response->product->id) {
+            $everything_id = $response->product->id;
+            $variant_ids = array();
+            $variant_skus = array();
+            foreach ($response->product->variants as $variant) {
+                $variant_ids[$variant->option1] = $variant->id;
+                $variant_skus[$variant->option1] = $variant->sku;
+            }
+            $everything_ids = $variant_ids;
+            $everything_skus = $variant_skus;
+            $everything_shopify_details = array('id'=>$everything_id,'ids'=>$everything_ids,'skus'=>$everything_skus);
+            set_transient('everything_shopify_details',$everything_shopify_details);
         }
         foreach ($encode_types as $encode_type => $encode_details) {
             $aws_links = array();
             foreach ($allAlbums as $album) {
                 $aws_links[] = $album->getChildZip($encode_details[0],$encode_details[1],$encode_type)->getAwsUrl();
             }
-            $sku = $this->sku('everything','everthying',$encode_type);
+            $sku = $this->sku('everything','everything',$encode_type);
             $this->syncFetchProduct($sku,'Everything '.$encode_type,$everything_price,$aws_links);
         }
     }
