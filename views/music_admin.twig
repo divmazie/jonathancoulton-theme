@@ -43,7 +43,7 @@
                     {% set warning_level = 'red' %}
                 {% endif %}
                 {% for zip in album.album_zips %}
-                    {% if (not (warning_level == 'red')) and ((not zip.zip_worthy) or zip.missing_encodes) %}
+                    {% if (not (warning_level == 'red')) and ((not zip.zip_worthy) or zip.missing_encodes or (not zip.exists)) %}
                         {% set warning_level = 'orange' %}
                     {% endif %}
                 {% endfor %}
@@ -84,6 +84,7 @@
                     {% for zip in album.album_zips %}
                         <div class="admin_zip">
                             {{ dump(zip) }}
+                            {% if not zip.exists %} {{ macros.go_warning(zip.format,' zip non-existant!') }} {% endif %}
                             {% if zip.exists %} {{ macros.good_warning(zip.format," zip good to go.") }} {% endif %}
                             {% if not zip.zip_worthy %} {{ macros.go_warning(zip.format," zip not zip-worthy!") }} {% endif %}
                             {% if zip.missing_encodes %} {{ macros.go_warning(zip.format," encodes missing!") }} {% endif %}

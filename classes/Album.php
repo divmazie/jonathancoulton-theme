@@ -74,7 +74,9 @@ class Album extends ShopifyProduct {
             : array('filename'=>'MISSING!!!', 'url'=>'MISSING!!!', 'exists'=>false);
         $context['album_zips'] = array();
         foreach ($this->getAllChildZips() as $zip) {
-            $context['album_zips'][] = $zip->getZipContext();
+            $zip_context = $zip->getZipContext();
+            if (!is_array($zip_context)) $zip_context = array('exists'=>false);
+            $context['album_zips'][] = $zip_context;
         }
         $context['tracks'] = array();
         foreach ($this->getAlbumTracks() as $key => $track) {
