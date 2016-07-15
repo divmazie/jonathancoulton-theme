@@ -5,6 +5,7 @@ namespace jct;
 abstract class KeyedWPAttachment extends WPAttachment {
 
     private $awsUrl;
+    private $createdTime, $uploadedTime;
     // encode format === file extension!
     public $encodeLabel, $encodeFormat, $encodeCLIFlags;
 
@@ -77,6 +78,7 @@ abstract class KeyedWPAttachment extends WPAttachment {
         ]);
         $url = $result->toArray()['ObjectURL'];
         $this->setAwsUrl($url);
+        $this->setUploadedTime();
         return $result;
     }
 
@@ -91,6 +93,40 @@ abstract class KeyedWPAttachment extends WPAttachment {
         $url = get_post_meta($this->parent_post_id,$key,false)[0];
         $this->awsUrl = $url;
         return $url ? $url : false;
+    }
+
+    public function setCreatedTime() {
+        $time = $this->createdTime = time();
+        return update_post_meta($this->parent_post_id, strtolower('encode_created_time_'.$this->encodeLabel), $time);
+    }
+
+    public function getCreatedTime() {
+        if ($this->createdTime) {
+            return $this->createdTime;
+        }
+        $time = get_post_meta($this->parent_post_id,strtolower('encode_created_time_'.$this->encodeLabel),false)[0];
+        if (!$time) $time = 1;
+        $this->createdTime = $time;
+        return $this->createdTime;
+    }
+
+    public function setUploadedTime() {
+        $time = $this->uploadedTime = time();
+        return update_post_meta($this->parent_post_id, strtolower('encode_uploaded_time_'.$this->encodeLabel), $time);
+    }
+
+    public function getUploadedTime() {
+        if ($this->uploadedTime) {
+            return $this->uploadedTime;
+        }
+        $time = get_post_meta($this->parent_post_id,strtolower('encode_uploaded_time_'.$this->encodeLabel),false)[0];
+        if (!$time) $time = 0;
+        $this->uploadedTime = $time;
+        return $this->uploadedTime;
+    }
+
+    public function needToUpload() {
+        return $this->getUploadedTime() < $this->getCreatedTime();
     }
 
 }

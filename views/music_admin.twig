@@ -43,7 +43,7 @@
                     {% set warning_level = 'red' %}
                 {% endif %}
                 {% for zip in album.album_zips %}
-                    {% if (not (warning_level == 'red')) and ((not zip.zip_worthy) or zip.missing_encodes or (not zip.exists)) %}
+                    {% if (not (warning_level == 'red')) and ((not zip.zip_worthy) or zip.missing_encodes or (not zip.exists) or zip.need_to_upload) %}
                         {% set warning_level = 'orange' %}
                     {% endif %}
                 {% endfor %}
@@ -52,7 +52,7 @@
                         {% set warning_level = 'red' %}
                     {% endif %}
                     {% for encode in track.encodes %}
-                        {% if (not (warning_level == 'red')) and (not encode.exists) %}
+                        {% if (not (warning_level == 'red')) and ((not encode.exists) or encode.need_to_upload) %}
                             {% set warning_level = 'orange' %}
                         {% endif %}
                     {% endfor %}
@@ -65,7 +65,7 @@
                 {% elseif warning_level == 'orange' %}
                     {{ macros.go_warning("Orange warnings") }} below mean you are missing encoded audio and/or zip files.<br /><br />
                     <button onclick="window.location.href='{{ site.url }}/custom_admin/postencodes{{ post_id_get_string }}'">Create encodes and zips</button> <br />
-                    If there are many tracks in this album, it may give you a 502 timeout error. You can reload the page as many times as you need to for it to get through all the tracks.
+                    You will probably got a 502 timeout error, but you can reload the page as many times as you need to for it to get through all the tracks.
                 {% else %}
                     It appears all your music files are ready to go.
                     <a href="{{ site.url }}/custom_admin/music_admin/">Return to album list</a> to encode another album or sync download offerings to Shopify.
@@ -88,6 +88,7 @@
                             {% if zip.exists %} {{ macros.good_warning(zip.format," zip good to go.") }} {% endif %}
                             {% if not zip.zip_worthy %} {{ macros.go_warning(zip.format," zip not zip-worthy!") }} {% endif %}
                             {% if zip.missing_encodes %} {{ macros.go_warning(zip.format," encodes missing!") }} {% endif %}
+                            {% if zip.need_to_upload %} {{ macros.go_warning(zip.format," zip not uploaded to AWS!") }} {% endif %}
                             {{ zip.path }}
                         </div>
                     {% endfor  %}
@@ -104,8 +105,9 @@
                             Encodes:
                             {% for encode in track.encodes %}
                                 <div class="admin_encode">
-                                    {% if encode.exists %} {{ macros.good_warning(encode.format," encode good to go.") }} {% endif %}
+                                    {% if encode.exists %} {{ macros.good_warning(encode.format," encode created.") }} {% endif %}
                                     {% if not encode.exists %} {{ macros.go_warning(encode.format," encode missing!") }} {% endif %}
+                                    {% if encode.need_to_upload %} {{ macros.go_warning(encode.format," encode not uploaded to AWS!") }} {% endif %}
                                 </div>
                             {% endfor  %}
                         </div>

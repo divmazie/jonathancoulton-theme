@@ -124,6 +124,7 @@ class Encode extends KeyedWPAttachment {
             $new_meta = array_merge($old_meta, array('unique_key' => $this->getUniqueKey()));
             wp_update_attachment_metadata($attachment_id,$new_meta);
             $this->completeAttaching($attachment_id,false);
+            $this->setCreatedTime();
             return array(true,$return);
         }
     }
@@ -131,6 +132,7 @@ class Encode extends KeyedWPAttachment {
     public function getEncodeContext() {
         $context = array('format' => $this->getEncodeFormat(), 'flags' => $this->getEncodeCLIFlags());
         $context['exists'] = $this->fileAssetExists();
+        $context['need_to_upload'] = $this->needToUpload();
         return $context;
     }
 
