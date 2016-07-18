@@ -21,7 +21,7 @@
             {% if missing_files|length > 0 %}
                 Edit the following Fetch Products to add the URLs as external files.
                 <br />
-                Note that white space must be deleted from URLs.
+                Note that white space must be deleted from URLs and Fetch search does not work with quotes or apostrophes.
                 <br /><br />
                 {% for fetch_product in missing_files %}
                     <div><span class="unselectable">Fetch name to search: </span><input type="text" value="{{ fetch_product.fetch_name }}" readonly /></div>

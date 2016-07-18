@@ -35,7 +35,7 @@ if (count($encodes)==0) {
     foreach ($albums as $album) {
         $zips = $album->getAllChildZips();
         foreach ($zips as $zip) {
-            if (!$zip->getAwsUrl() or !wp_get_attachment_metadata($zip->getAttachmentID())) {
+            if (!wp_get_attachment_metadata($zip->getAttachmentID())) {
                 $format = $zip->getEncodeFormat();
                 $flags = $zip->getEncodeCLIFlags();
                 $label = $zip->getEncodeLabel();
