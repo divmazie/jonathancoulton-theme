@@ -18,7 +18,7 @@
                             <label><input type="checkbox" data-bind="checked: remember_format" /> Make this format my default.</label>
                         </div>
                         {% for variant in variants %}
-                            <button class="option" onclick='addToCart({{ id }},"{{ name }}",{{ variant.price|number_format }},{{ variants_json|json_encode() }},{{ variant.id }},{{ allow_multiple }})' id="product{{ id }}_{{ variant.title }}">{{ variant.title }}</button>
+                            <button class="option" onclick='addToCart({{ id }},"{{ name|escape('js') }}",{{ variant.price|number_format }},{{ variants_json|json_encode() }},{{ variant.id }},{{ allow_multiple }})' id="product{{ id }}_{{ variant.title }}">{{ variant.title }}</button>
                         {% endfor %}
                         <div class="clearfix"></div>
                     </div>
