@@ -73,7 +73,8 @@ abstract class KeyedWPAttachment extends WPAttachment {
         $result = $s3->putObject([
             'Bucket' => $bucket,
             'Key' => $this->getAwsKey(),
-            'SourceFile' => $this->getPath()
+            'SourceFile' => $this->getPath(),
+            'Content-Disposition' => 'attachment'
             //'ACL'   =>  'public-read' // Set permissions through bucket policy for referrals from joco.fetchapp.com
         ]);
         $url = $result->toArray()['ObjectURL'];
