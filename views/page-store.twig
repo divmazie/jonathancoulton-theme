@@ -60,6 +60,10 @@
         <p>The store is temporarily offline.</p>
     {% endif %}
     {% for category in store %}
+        {% set allow_multiple = 'true' %}
+        {% if category.shopify_type == 'Music download' or category.shopify_type == 'Karaoke' %}
+            {% set allow_multiple = 'false' %}
+        {% endif %}
         <div data-bind="visible: store_view() == '{{ category.html_name }}'">
             {% if category.shopify_type == 'Music download' %}
                 {% for album in category.products %}
@@ -115,7 +119,7 @@
                                     </span>
                                 </div>
                             </div>
-                            {{ macros.variants_modal('Please select a file format for your download.','false',track.id,track.title,track.variants) }}
+                            {{ macros.variants_modal('Please select a file format for your download.',allow_multiple,track.id,track.title,track.variants) }}
                         {% endfor %}
                         <div style="height: 50px;"></div>
                     </div>
@@ -140,7 +144,7 @@
                         <div class="product_title">{{ product.title }}</div>
                         <div class="product_description">{{ product.body_html }}</div>
                     </div>
-                    {{ macros.variants_modal('','true',product.id,product.title,product.variants) }}
+                    {{ macros.variants_modal('',allow_multiple,product.id,product.title,product.variants) }}
                 {% endfor %}
                 <div class="clearfix"></div>
             {% endif %}
