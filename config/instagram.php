@@ -14,17 +14,16 @@ if ($from_transient) {
     return array_merge($from_transient,array('from'=>'transient'));
 }
 
-use MetzWeb\Instagram\Instagram;
-
 $handle = get_field('instagram_handle','options');
-$user_id = 1593277106; // This is a realjonathancoulton's user-id hardcoded, see http://jelled.com/instagram/lookup-user-id#
-$client_id = get_field('instagram_client_id','option'); // API key was set up by David (Instagram: divmazie), get from him or register new one
-$instagram = new Instagram($client_id);
-$response = $instagram->getUserMedia($user_id,$number_images);
-//return $response->data;
+
+$json = file_get_contents("https://www.instagram.com/$handle/media/");
+$insta = json_decode($json);
 $media = array();
-foreach ($response->data as $datum) {
-    $media[] = array('link' => $datum->link, 'thumb' => $datum->images->thumbnail->url);
+$i = 1;
+foreach ($insta->items as $item) {
+    $media[] = array('link' => $item->link, 'thumb' => $item->images->thumbnail->url);
+    $i++;
+    if ($i > $number_images) break;
 }
 $instagram_context = array('handle' => $handle, 'url' => "https://instagram.com/$handle", 'media' => $media);
 set_transient('instagram_context',$instagram_context,60);
