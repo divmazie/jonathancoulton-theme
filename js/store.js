@@ -106,7 +106,9 @@ ko.applyBindings(myViewModel);
 function make_store_visible() {
     myViewModel.knockout_loaded(true);
     $('#content').resize();
-    window.scrollTo(0,$('#'+scrollto).offset().top);
+    if (scrollto) {
+        window.scrollTo(0, $('#' + scrollto).offset().top);
+    }
 }
 setTimeout('make_store_visible()',50);
 
@@ -147,9 +149,11 @@ function addToCart(product_id,product_name,price,variants,variant_id,allow_multi
         myViewModel.cart.push(product);
     }
     $('#product_modal_'+product_id).modal('hide');
-    $('#cart_confirm_product_name').html(product_name);
-    $('#cart_confirm_modal').modal('show');
-    setTimeout("$('#cart_confirm_modal').modal('hide')",3000);
+    if (!$('#cart_modal').hasClass('in')) {
+        $('#cart_confirm_product_name').html(product_name);
+        $('#cart_confirm_modal').modal('show');
+    }
+    setTimeout("$('#cart_confirm_modal').modal('hide')", 3000);
 }
 
 function find_variant(variants,variant_id) {

@@ -219,7 +219,8 @@
                         <button class="option centered" onclick="$('#cart_confirm_modal').modal('hide')">Keep shopping</button>
                     </div>
                     <div class="col-xs-6">
-                        <button class="option centered" onclick="$('#cart_confirm_modal').modal('hide'); $('#cart_modal').modal('show');">Checkout</button>
+                        <!-- The setTimeout function prevents weird scrolling behavior from Bootstrap -->
+                        <button class="option centered" onclick="$('#cart_confirm_modal').modal('hide'); setTimeout('$(\'#cart_modal\').modal(\'show\')',400);">Checkout</button>
                     </div>
                     <div class="clearfix"></div>
                 </div>
