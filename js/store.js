@@ -70,18 +70,18 @@ var ViewModel = function(start_cart) {
     };
     self.store_local = ko.computed(function() {
         if(typeof(Storage) !== "undefined") {
-            sessionStorage.setItem('cart',ko.toJSON(self.cart()));
+            localStorage.setItem('cart',ko.toJSON(self.cart()));
         }
     });
     self.knockout_loaded = ko.observable(false);
 };
 
 var start_cart = [];
-if(typeof(Storage) !== "undefined" && sessionStorage.getItem('cart')) {
-    //sessionStorage.setItem('cart',[]);
+if(typeof(Storage) !== "undefined" && localStorage.getItem('cart')) {
+    //localStorage.setItem('cart',[]);
     //var stored_cart = start_cart;
-    $('#debug').html(sessionStorage.getItem('cart'));
-    var stored_cart = JSON.parse(sessionStorage.getItem('cart'));
+    $('#debug').html(localStorage.getItem('cart'));
+    var stored_cart = JSON.parse(localStorage.getItem('cart'));
     for (var i = 0; i < stored_cart.length; i++) {
         var variant = find_variant(stored_cart[i].variants,stored_cart[i].variant_id);
         start_cart.push(new CartItem(stored_cart[i].product_id,stored_cart[i].product_name,stored_cart[i].price,stored_cart[i].variants,variant,stored_cart[i].quantity,stored_cart[i].allow_multiple));
