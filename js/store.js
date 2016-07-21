@@ -73,6 +73,7 @@ var ViewModel = function(start_cart) {
             sessionStorage.setItem('cart',ko.toJSON(self.cart()));
         }
     });
+    self.knockout_loaded = ko.observable(false);
 };
 
 var start_cart = [];
@@ -86,8 +87,27 @@ if(typeof(Storage) !== "undefined" && sessionStorage.getItem('cart')) {
         start_cart.push(new CartItem(stored_cart[i].product_id,stored_cart[i].product_name,stored_cart[i].price,stored_cart[i].variants,variant,stored_cart[i].quantity,stored_cart[i].allow_multiple));
     }
 }
+// Here's a custom Knockout binding that makes elements shown/hidden via jQuery's fadeIn()/fadeOut() methods
+// Could be stored in a separate utility library
+ko.bindingHandlers.fadeVisible = {
+    init: function(element, valueAccessor) {
+        // Initially set the element to be instantly visible/hidden depending on the value
+        var value = valueAccessor();
+        $(element).toggle(ko.unwrap(value)); // Use "unwrapObservable" so we can handle values that may or may not be observable
+    },
+    update: function(element, valueAccessor) {
+        // Whenever the value subsequently changes, slowly fade the element in or out
+        var value = valueAccessor();
+        ko.unwrap(value) ? $(element).fadeIn() : $(element).fadeOut();
+    }
+};
 var myViewModel = new ViewModel(start_cart);
 ko.applyBindings(myViewModel);
+function make_store_visible() {
+    myViewModel.knockout_loaded(true);
+    $('#content').resize();
+}
+setTimeout('make_store_visible()',50);
 
 window.onload = function() {
     window.history.replaceState({section: myViewModel.store_view()}, '', '');
@@ -128,7 +148,7 @@ function addToCart(product_id,product_name,price,variants,variant_id,allow_multi
     $('#product_modal_'+product_id).modal('hide');
     $('#cart_confirm_product_name').html(product_name);
     $('#cart_confirm_modal').modal('show');
-    setTimeout("$('#cart_confirm_modal').modal('hide')",1500);
+    setTimeout("$('#cart_confirm_modal').modal('hide')",3000);
 }
 
 function find_variant(variants,variant_id) {

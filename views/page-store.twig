@@ -55,7 +55,7 @@
 {% endblock %}
 
 {% block content %}
-<div class="container">
+<div class="container" style="display: none; padding-bottom: 60px;" data-bind="fadeVisible: knockout_loaded">
     {% if store|length < 1 %}
         <p>The store is temporarily offline.</p>
     {% endif %}
@@ -271,7 +271,7 @@
             flashVersion: 9, // optional: shiny features (default = 8)
             // optional: ignore Flash where possible, use 100% HTML5 mode
             preferFlash: false,
-            debugMode: true,
+            debugMode: false,
             onready: function() {
                 myViewModel.player_ready(true);
             }
