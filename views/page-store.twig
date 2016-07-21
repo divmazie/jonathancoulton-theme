@@ -242,7 +242,15 @@
     </div>
 
     <script type="application/javascript">
-        var store_section = '{{ get_vars.store_section|default('downloads') }}';
+        //var store_section = '{{ get_vars.store_section|default('downloads') }}';
+        var store_section = 'downloads';
+        var scrollto = '';
+        var hash = window.location.hash.split('#')[1];
+        if (hash) {
+            var parts = hash.split('-'); // This means anchor IDs can't have dashes in them
+            store_section = parts[0];
+            scrollto = parts[1];
+        }
 
         {% if get_vars.return_from_shopify %}
         window.onload = function() {

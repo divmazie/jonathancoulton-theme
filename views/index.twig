@@ -50,7 +50,7 @@
 			<div class="col-lg-10 col-lg-offset-1 col-xs-12">
 				<h1 class="section_header">{{ blurb_header }}</h1>
 				<p class="featured-p">{{ blurb_content|striptags }}</p>
-				<a href="{{ site.url }}/store/?store_section=downloads" class="no_underline"><div class="blue_arrow_right center-block">Click for more music</div></a>
+				<a href="{{ site.url }}/store/#downloads" class="no_underline"><div class="blue_arrow_right center-block">Click for more music</div></a>
 			</div>
 		</div>
 	</div>
@@ -62,7 +62,7 @@
 				{% for album in albums %}
 					{% if album.collection.image.src and album_count < 4 %}
 						<div class="col-sm-3 product">
-							<a href="{{ site.url }}/store/?store_section=downloads#album{{ album.collection.id }}" class="no_underline">
+							<a href="{{ site.url }}/store/#downloads-album{{ album.collection.id }}" class="no_underline">
 								<div class="album_square" style="background-image: url('{{ album.collection.image.src }}')"></div>
 								<div class="product_title">{{ album.collection.title }}</div>
 								<div class="product_description">{{ album.collection.body_html }}</div>

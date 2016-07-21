@@ -106,6 +106,7 @@ ko.applyBindings(myViewModel);
 function make_store_visible() {
     myViewModel.knockout_loaded(true);
     $('#content').resize();
+    window.scrollTo(0,$('#'+scrollto).offset().top);
 }
 setTimeout('make_store_visible()',50);
 
@@ -121,7 +122,7 @@ function store_nav(section) {
     window.scrollTo(0,0);
     myViewModel.store_view(section);
     resize_tasks();
-    window.history.pushState({section: section}, '', '/store/?store_section='+section);
+    window.history.pushState({section: section}, '', '/store/#'+section);
 }
 
 function option_modal(product_id) {
