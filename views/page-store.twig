@@ -141,8 +141,10 @@
                                 </span>
                             </div>
                         </a>
-                        <div class="product_title">{{ product.title }}</div>
-                        <div class="product_description">{{ product.body_html }}</div>
+                        <div class="product_text">
+                            <div class="product_title">{{ product.title }}</div>
+                            <div class="product_description">{{ product.body_html }}</div>
+                        </div>
                     </div>
                     {{ macros.variants_modal('',allow_multiple,product.id,product.title,product.variants) }}
                 {% endfor %}

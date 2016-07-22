@@ -656,8 +656,12 @@ class Shopify {
                         krsort($albums);
                         $products = $albums;
                     } else {
-                        $products = $this->makeCall("admin/products", 'GET', array('product_type' => $category['shopify_type']));
-                        $products = $products->products;
+                        $response = $this->makeCall("admin/products", 'GET', array('product_type' => $category['shopify_type'], 'limit' => 250));
+                        $products = array();
+                        foreach ($response->products as $product) {
+                            $products[strtotime($product->created_at)] = $product;
+                        }
+                        krsort($products);
                     }
                     $context[] = array('name' => $category['display_name'], 'html_name' => $html_name, 'shopify_type' => $category['shopify_type'], 'products' => $products);
                 }
