@@ -567,6 +567,7 @@ class Shopify {
         if ($everything_shopify_details = get_transient('everything_shopify_details')) {
             $used_skus = $everything_shopify_details['skus'];
         }
+        $used_skus = array_merge($used_skus,$this->getKaraokeSkus());
         foreach ($allAlbums as $album) {
             $used_skus = array_merge($used_skus,array_values($album->getShopifyVariantSkus()));
             foreach ($album->getAlbumTracks() as $track) {
@@ -578,6 +579,15 @@ class Shopify {
                 $product->delete();
             }
         }
+    }
+
+    public function getKaraokeSkus() {
+        $response = $this->makeCall("admin/products", 'GET', array('product_type' => 'Karaoke', 'limit' => 250));
+        $skus = array();
+        foreach ($response->products as $product) {
+            $skus[] = $product->variants[0]->sku;
+        }
+        return $skus;
     }
 
     public function getStoreContext() {
