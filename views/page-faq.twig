@@ -8,9 +8,13 @@
 					<h1 class="article-h1 post_header">{{post.title}}</h1>
 					{% for faq in faqs %}
 						{% if faq.faq_is_header %}
-							<a href="#{{ faq.slug }}" class="faq_section_link">{{ faq.title }}</a><br />
+							<div class="faq_section_link">
+								<a href="#{{ faq.slug }}">{{ faq.title }}</a>
+							</div>
 						{% else %}
-							<a href="#{{ faq.slug }}" class="faq_question_link">{{ faq.title }}</a><br />
+							<div class="faq_question_link">
+								<a href="#{{ faq.slug }}">{{ faq.title }}</a>
+							</div>
 						{% endif %}
 					{% endfor %}
 					{% for faq in faqs %}
