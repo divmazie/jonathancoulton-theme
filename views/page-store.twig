@@ -137,7 +137,9 @@
                                     <img src="{{ theme.link }}/images/add_to_cart_white.svg" class="track_icon_img" />
                                 </span>
                                 <span data-bind="visible: in_cart({ product_id: {{ product.id }} })">
-                                    ${{ product.variants[0].price|number_format }} | Add another
+                                    ${{ product.variants[0].price|number_format }} |
+                                    {% if category.shopify_type == 'Karaoke' %}Added to cart
+                                    {% else %}Add another{% endif %}
                                     <img src="{{ theme.link }}/images/checked_white.svg" class="track_icon_img" />
                                 </span>
                             </div>
