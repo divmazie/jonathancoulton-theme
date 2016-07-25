@@ -61,11 +61,13 @@
 				{% set album_count = 0 %}
 				{% for album in albums %}
 					{% if album.collection.image.src and album_count < 4 %}
-						<div class="col-sm-3 product">
+						<div class="col-sm-3 col-xs-6 product">
 							<a href="{{ site.url }}/store/#downloads-album{{ album.collection.id }}" class="no_underline">
 								<div class="album_square" style="background-image: url('{{ album.collection.image.src }}')"></div>
-								<div class="product_title">{{ album.collection.title }}</div>
-								<div class="product_description">{{ album.collection.body_html }}</div>
+								<div class="product_text">
+									<div class="product_title">{{ album.collection.title }}</div>
+									<div class="product_description">{{ album.collection.body_html }}</div>
+								</div>
 							</a>
 						</div>
 						{% set album_count = album_count + 1 %}

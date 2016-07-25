@@ -127,7 +127,7 @@
                 {% endfor %}
             {% else %}
                 {% for product in category.products %}
-                    <div class="col-sm-3 product">
+                    <div class="col-xs-6 col-sm-4 col-md-3 product">
                         <div class="album_square" style="background-image: url('{{ product.image.src }}')"></div>
                         <a onclick="option_modal('{{ product.id }}')" class="no_underline">
                             <div class="add_to_cart_box_blue" style="margin: 0 0 20px;">

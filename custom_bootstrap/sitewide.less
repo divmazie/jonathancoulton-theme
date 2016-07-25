@@ -4,7 +4,7 @@
 @import url(https://fonts.googleapis.com/css?family=Open+Sans:400,400italic,600,600italic,700,700italic,800);
 
 body {
-  min-width: 400px;
+  min-width: 375px;
 }
 a {
   cursor: pointer;
@@ -17,6 +17,11 @@ a.anchor {
   position: relative;
   top: -62px;
   visibility: hidden;
+}
+@media (max-width: @screen-sm) {
+  a.anchor {
+    position: static !important;
+  }
 }
 .slick-prev:before, .slick-next:before {
   content: '';
@@ -53,7 +58,7 @@ a.anchor {
   border-style: solid;
 }
 .blue_arrow_right, .blue_arrow_left {
-  width: 300px;
+  width: 275px;
   &:hover {
     color: @joco_grey2;
   }
