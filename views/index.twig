@@ -60,7 +60,7 @@
 			<p class="featured-p">
 				{% set album_count = 0 %}
 				{% for album in albums %}
-					{% if album.collection.image.src and album_count < 4 %}
+					{% if (album.collection.image.src and album_count < 4) and (album.collection.title != 'Everything') %}
 						<div class="col-sm-3 col-xs-6 product">
 							<a href="{{ site.url }}/store/#downloads-album{{ album.collection.id }}" class="no_underline">
 								<div class="album_square" style="background-image: url('{{ album.collection.image.src }}')"></div>

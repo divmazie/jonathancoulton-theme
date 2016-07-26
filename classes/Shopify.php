@@ -611,7 +611,7 @@ class Shopify {
                 $shopify_request = 'admin/products/'.$everything_shopify_details['id'];
                 $products = $this->makeCall($shopify_request,'GET');
                 $product = $products->product;
-                $collection_context = array('title'=>$product->title,'body_html'=>$product->body_html);
+                $collection_context = array('title'=>$product->title,'body_html'=>$product->body_html,'image'=>array('src'=>$product->image->src));
                 $product->metafields = array('wiki_link' => get_field('joco_wiki_base_url','options').'Discography');
                 $albums[300099] = array('collection' => $collection_context, 'products' => array($product));
             }
