@@ -80,6 +80,9 @@
 		<div class="container">
 			<h2 class="section_header">Upcoming shows</h2>
 			<p class="featured-p">
+			{% if bandsintown|length < 1 %}
+				Sorry, nothing to list right now!
+			{% endif %}
 			{% for show in bandsintown|slice(0,6) %}
 				<div class="show_row col-xs-12 col-sm-10 col-sm-offset-1 col-md-8 col-md-offset-2">
 					<div class="col-xs-2"><a href="{{ show.url }}">{{ show.datetime|date("M j") }}</a></div>
