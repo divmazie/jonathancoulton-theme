@@ -79,10 +79,16 @@
     float: left;
     width: 3%;
     margin: 10px 3%;
+    height: 20px;
+    line-height: 20px;
+    vertical-align: middle;
   }
   .prev, .next {
     margin: 10px 3%;
-    width: 6%
+    width: 6%;
+    height: 20px;
+    line-height: 20px;
+    vertical-align: middle;
   }
   .prev {
     float: left;
@@ -91,6 +97,11 @@
   .next {
     float: right;
     text-align: right;
+  }
+}
+@media (max-width: @screen-sm) {
+  .tool-pagination {
+    font-size: 82%;
   }
 }
 .comment-author {
