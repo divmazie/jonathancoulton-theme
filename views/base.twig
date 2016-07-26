@@ -87,7 +87,9 @@
 						<h4 class="footer_title">FAQs</h4>
 						<p>
 							{% for faq in faqs if not faq.faq_is_header %}
-								{% if loop.index0 < 4 %}<a href="{{ site.url }}/faq/#{{ faq.slug }}" class="footer_link">{{ faq.title }}</a><br /><br />{% endif %}
+								{% if loop.index0 < 4 %}
+									<div class="footer_item"><a href="{{ site.url }}/faq/#{{ faq.slug }}" class="footer_link">{{ faq.title }}</a></div>
+								{% endif %}
 							{% endfor %}
 						</p>
 						<a href="{{ site.url }}/faq" class="no_underline"><div class="gray_arrow_right">All FAQs</div></a>
@@ -96,9 +98,10 @@
 						<h4 class="footer_title">Archives</h4>
 						<p>
 							{% for archive in archives %}
-								<a href="{{ archive.link }}" class="footer_link">{{ archive.title }}</a><br />
-								{{ archive.display_date }}<br />
-								<br />
+								<div class="footer_item">
+									<a href="{{ archive.link }}" class="footer_link">{{ archive.title }}</a><br />
+									{{ archive.display_date }}
+								</div>
 							{% endfor %}
 						</p>
 						<a href="{{ site.url }}/news" class="no_underline"><div class="gray_arrow_right">Older posts</div></a>
