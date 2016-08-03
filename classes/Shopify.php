@@ -591,7 +591,7 @@ class Shopify {
     }
 
     public function getStoreContext() {
-        if ($context = get_transient('store_context')) {
+        if ($context = get_option('store_context')) {
             return $context;
         } else {
             return false;
@@ -677,7 +677,7 @@ class Shopify {
                 }
             }
         }
-        set_transient('store_context',$context);
+        update_option('store_context',$context);
         return $context;
     }
 

@@ -6,7 +6,7 @@
  * Time: 17:03
  */
 
-delete_transient('store_context');
+delete_option('store_context');
 $apiKey = get_field('shopify_api_key','options');
 $apiPassword = get_field('shopify_api_password','options');
 $handle = get_field('shopify_handle','options');

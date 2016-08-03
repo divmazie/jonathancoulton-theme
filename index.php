@@ -39,7 +39,7 @@ foreach ($store as $category) {
 $context['store'] = $store;
 $bandsintown = get_transient('bandsintown');
 if (!$bandsintown) {
-    $bandsintown = json_decode(file_get_contents("http://api.bandsintown.com/artists/jonathancoulton/events.json?date=upcoming"));//2015-01-01,2017-01-31")); // to test w/ old shows
+    $bandsintown = json_decode(file_get_contents("http://api.bandsintown.com/artists/jonathancoulton/events.json?date=2015-01-01,2017-01-31")); // to test w/ old shows
     set_transient('bandsintown',$bandsintown,600);
 }
 $context['bandsintown'] = $bandsintown;
