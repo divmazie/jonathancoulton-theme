@@ -6,7 +6,6 @@
  * Time: 17:03
  */
 
-delete_option('store_context');
 $apiKey = get_field('shopify_api_key','options');
 $apiPassword = get_field('shopify_api_password','options');
 $handle = get_field('shopify_handle','options');
@@ -15,6 +14,7 @@ $albums_to_go = $shopify->getAlbumsFromShopify();
 if ($albums_to_go>0) {
     reload($albums_to_go);
 } else {
+    delete_option('store_context');
     $shopify->getAllShopifyContext();
     delete_transient('collections_to_go');
     delete_transient('temporary_albums_context');

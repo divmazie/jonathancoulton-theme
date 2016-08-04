@@ -31,9 +31,11 @@ $apiPassword = get_field('shopify_api_password','options');
 $handle = get_field('shopify_handle','options');
 $shopify = new jct\Shopify($apiKey,$apiPassword,$handle);
 $store = $shopify->getStoreContext();
-foreach ($store as $category) {
-    if ($category['shopify_type'] == "Music download") {
-        $context['albums'] = $category['products'];
+if (is_array($store)) {
+    foreach ($store as $category) {
+        if ($category['shopify_type'] == "Music download") {
+            $context['albums'] = $category['products'];
+        }
     }
 }
 $context['store'] = $store;
