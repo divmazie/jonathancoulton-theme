@@ -591,8 +591,12 @@ class Shopify {
     }
 
     public function getStoreContext() {
-        if ($context = get_option('store_context')) {
-            return $context;
+        $file_name = get_template_directory().'/cache/cached_store_context.php';
+        if (file_exists($file_name)) {
+            include($file_name);
+        }
+        if (isset($cached_store_context)) {
+            return $cached_store_context;
         } else {
             return false;
         }
@@ -677,7 +681,10 @@ class Shopify {
                 }
             }
         }
-        update_option('store_context',$context);
+        // Write store context to disk
+        $strFileContent = "<"."?php".PHP_EOL."$"."cached_store_context = ".var_export($context, true).PHP_EOL."?".">";
+        $strFileContent = str_replace("stdClass::__set_state", "(object)", $strFileContent); // I don't know why var_export() uses a non-existent method...
+        file_put_contents(get_template_directory().'/cache/cached_store_context.php', $strFileContent);
         return $context;
     }
 

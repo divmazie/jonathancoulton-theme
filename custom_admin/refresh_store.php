@@ -14,7 +14,6 @@ $albums_to_go = $shopify->getAlbumsFromShopify();
 if ($albums_to_go>0) {
     reload($albums_to_go);
 } else {
-    delete_option('store_context');
     $shopify->getAllShopifyContext();
     delete_transient('collections_to_go');
     delete_transient('temporary_albums_context');
