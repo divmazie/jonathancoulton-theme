@@ -68,6 +68,7 @@ if( function_exists('acf_add_options_page') ) {
 include __DIR__.'/include/cpt.php';
 include __DIR__.'/include/routes.php';
 include __DIR__.'/include/prepopulate.php';
+include __DIR__.'/include/filters.php';
 
 function base64_url_encode($input) {
 	return strtr(base64_encode($input), '+/=', '-_~');
@@ -77,8 +78,3 @@ function randstr($len) {
 	return substr(base64_url_encode(openssl_random_pseudo_bytes($len + 5, $did)), 0, $len);
 }
 
-add_filter('upload_mimes', function ($existing_mimes = []) {
-	// add as many as you like e.g.
-	$existing_mimes['flac'] = 'audio/x-flac';
-	return $existing_mimes;
-});
