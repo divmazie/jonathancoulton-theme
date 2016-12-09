@@ -70,6 +70,27 @@
             "disabled": 0
         },
         {
+            "key": "field_55b27eb7d0688",
+            "label": "Album description",
+            "name": "album_description",
+            "type": "text",
+            "instructions": "Appears underneath album art",
+            "required": 0,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "",
+                "class": "",
+                "id": ""
+            },
+            "default_value": "",
+            "placeholder": "",
+            "prepend": "",
+            "append": "",
+            "maxlength": "",
+            "readonly": 0,
+            "disabled": 0
+        },
+        {
             "key": "field_55b27b3915810",
             "label": "Album genre",
             "name": "album_genre",

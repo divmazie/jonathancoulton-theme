@@ -70,7 +70,7 @@ module.exports = function(grunt) {
         'sftp-deploy': {
             build: {
                 auth: {
-                    host: '45.79.162.208',
+                    host: 'jococom.sftp.wpengine.com',
                     port: 2222,
                     authKey: 'staging'
                 },

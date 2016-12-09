@@ -87,6 +87,7 @@
                                 </div>
                             {% endif %}
                         {% endfor %}
+                        {% if album.collection.metafields.album_description %}{{ album.collection.metafields.album_description }}{% endif %}
                     </div>
                     <div class="col-xs-12 col-sm-8">
                         <h3 class="album_title">{{ album.collection.title }}</h3>
