@@ -8,58 +8,49 @@
 
 namespace jct;
 
-abstract class ShopifyProduct {
+use Timber\Post;
+
+abstract class ShopifyProduct extends Post {
     public $postID;
-    public $shopify_id, $shopify_variant_ids, $shopify_variant_skus;
+
+    const META_SHOPIFY_ID = 'shopify_id';
+    const META_SHOPIFY_VARIANT_IDS = 'shopify_variant_ids';
+    const META_SHOPIFY_VARIANT_SKUS = 'shopify_variant_skus';
+    const META_WIKI_LINK = 'wiki_link';
 
     abstract function syncToStore($shopify);
 
     abstract function getTitle();
 
     public function getShopifyId() {
-        if(!isset($this->shopify_id)) {
-            $this->shopify_id = get_post_meta($this->postID, 'shopify_id', false)[0];
-        }
-        return $this->shopify_id;
+        return $this->get_field(self::META_SHOPIFY_ID);
     }
 
     public function setShopifyId($id) {
-        if(update_post_meta($this->postID, 'shopify_id', $id)) {
-            $this->shopify_id = $id;
-        }
+        $this->update(self::META_SHOPIFY_ID, $id);
     }
 
     public function getShopifyVariantIds() {
-        if(!isset($this->shopify_variant_ids)) {
-            $this->shopify_variant_ids = unserialize(get_post_meta($this->postID, 'shopify_variant_ids', false)[0]);
-        }
-        return $this->shopify_variant_ids;
+        return $this->get_field(self::META_SHOPIFY_VARIANT_IDS);
     }
 
-    public function setShopifyVariantIds($ids) {
-        if(update_post_meta($this->postID, 'shopify_variant_ids', serialize($ids))) {
-            $this->shopify_variant_ids = $ids;
-        }
+    public function setShopifyVariantIds(array $ids) {
+        $this->update(self::META_SHOPIFY_VARIANT_IDS, $ids);
     }
 
     public function getShopifyVariantSkus() {
-        if(!isset($this->shopify_variant_skus)) {
-            $this->shopify_variant_skus = unserialize(get_post_meta($this->postID, 'shopify_variant_skus', false)[0]);
-        }
-        return $this->shopify_variant_skus;
+        return $this->get_field(self::META_SHOPIFY_VARIANT_SKUS);
     }
 
-    public function setShopifyVariantSkus($skus) {
-        if(update_post_meta($this->postID, 'shopify_variant_skus', serialize($skus))) {
-            $this->shopify_variant_skus = $skus;
-        }
+    public function setShopifyVariantSkus(array $skus) {
+        $this->update(self::META_SHOPIFY_VARIANT_SKUS, $skus);
     }
 
     public function getWikiLink() {
-        $wiki_link = get_field('wiki_link', $this->postID);
+        $wiki_link = $this->get_field(self::META_WIKI_LINK);
         if(!$wiki_link) {
-            $wiki_link =
-                get_field('joco_wiki_base_url', 'options') . urlencode(preg_replace('/\s+/', '_', $this->getTitle()));
+            $wiki_link = Util::get_user_option('joco_wiki_base_url') .
+                         urlencode(preg_replace('/\s+/', '_', $this->getTitle()));
         }
         return $wiki_link;
     }
