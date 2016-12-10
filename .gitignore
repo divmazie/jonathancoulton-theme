@@ -1,5 +1,4 @@
 vendor/
-wp-content
 /twig_cache/*
 /bower_components/
 /node_modules/
@@ -17,6 +16,10 @@ docker/docker-compose.yml
 # only track php in html dir
 docker/encodebot/www/html/*
 !docker/encodebot/www/html/*.php
+
+# don't track wordpress assets
+docker/wordpress/wp-content/*
+
 
 # Grunt Deploy
 .ftppass
