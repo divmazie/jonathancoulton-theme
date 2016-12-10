@@ -2,39 +2,103 @@
 
 namespace jct;
 
+use Timber\Timber;
+
 class Track extends ShopifyProduct {
 
-    private $trackNumber, $trackPrice, $trackTitle, $trackArtist, $trackGenre, $trackYear, $trackComment, $trackArtObject, $trackSourceFileObject;
+    const CPT_NAME = 'track';
+
+
+    private $trackArtObject, $trackSourceFileObject;
     private $wpPost, $encode_types;
     private $parentAlbum;
 
+    // auto complete acf props
+    public $track_album, $track_source, $track_number, $track_price, $track_artist, $track_year, $track_genre, $track_art, $track_comment, $wiki_link;
+
+
     /**
-     * @param \WP_Post $post the parent post object whence the fields
-     *
+     * @return Album
      */
-    public function __construct(\WP_Post $post, Album $parentAlbum = NULL) {
-        if(!$parentAlbum) {
-            $parent_post = get_field('track_album', $post->ID);
-            $parentAlbum = new Album($parent_post);
+    public function getAlbum() {
+        return $this->parentAlbum;
+    }
+
+    public function getPostID() {
+        return $this->postID;
+    }
+
+    public function getTrackTitle() {
+        return $this->title();
+    }
+
+    public function getTitle() {
+        return $this->getTrackTitle();
+    }
+
+    public function getTrackNumber() {
+        return abs(intval($this->track_number));
+    }
+
+    public function getTrackPrice() {
+        return abs(intval($this->track_price));
+    }
+
+    public function getTrackArtist() {
+        return $this->track_artist ? $this->track_artist : $this->getAlbum()->getAlbumArtist();
+    }
+
+    public function getTrackGenre() {
+        return $this->track_genre ? $this->track_genre : $this->getAlbum()->getAlbumGenre();
+    }
+
+    public function getTrackYear() {
+        return $this->track_year ? $this->track_year : $this->getAlbum()->getAlbumYear();
+    }
+
+    public function getTrackComment() {
+        return $this->track_comment ? $this->track_comment : $this->getAlbum()->getAlbumComment();
+    }
+
+    public function getTrackArtObject() {
+        if(!isset($this->trackArtObject)) {
+            $this->trackArtObject =
+                get_field('track_art', $this->postID) ? new WPAttachment(get_field('track_art', $this->postID)) : false;
         }
-        $post_id = $post->ID;
-        $this->postID = $post_id;
-        // fill in private fields from post object/acf/postmeta
-        $this->wpPost = $post;
-        $this->parentAlbum = $parentAlbum;
-        $this->trackTitle = $post->post_title;
-        //$this->trackNumber = get_field('track_number',$post_id);
-        //$this->trackPrice = get_field('track_price',$post_id);
-        //$this->trackArtist = get_field('track_artist',$post_id);
-        //$this->trackGenre = get_field('track_genre',$post_id);
-        //$this->trackYear = get_field('track_year',$post_id);
-        //$this->trackComment = get_field('track_comment',$post_id);
-        //$this->trackArtObject = get_field('track_art',$post_id) ? new WPAttachment(get_field('track_art',$post_id)) : false;
-        //$this->trackSourceFileObject = get_field('track_source',$post_id) ? new WPAttachment(get_field('track_source',$post_id)) : false;
-        $this->encode_types = include(get_template_directory() . '/config/encode_types.php');
-        //$this->shopify_id = get_post_meta($post_id,'shopify_id',false)[0];
-        //$this->shopify_variant_ids = unserialize(get_post_meta($post_id,'shopify_variant_ids',false)[0]);
-        //$this->shopify_variant_skus = unserialize(get_post_meta($post_id,'shopify_variant_skus',false)[0]);
+        return $this->trackArtObject ? $this->trackArtObject : $this->parentAlbum->getAlbumArtObject();
+    }
+
+    public function getTrackSourceFileObject() {
+        if(!isset($this->trackSourceFileObject)) {
+            $this->trackSourceFileObject =
+                get_field('track_source', $this->postID) ? new WPAttachment(get_field('track_source', $this->postID)) : false;
+        }
+        return $this->trackSourceFileObject;
+    }
+
+    public function getTrackContext() {
+        $context = ['title' => $this->getTrackTitle(), 'artist' => $this->getTrackArtist()];
+        $context['number'] = $this->getTrackNumber();
+        //$context['price'] = $this->getTrackPrice();
+        $context['encode_worthy'] = $this->isEncodeWorthy();
+        $context['art'] = $this->getTrackArtObject() ?
+            [
+                'filename' => basename($this->getTrackArtObject()->getPath()),
+                'exists'   => file_exists($this->getTrackArtObject()->getPath()),
+            ]
+            : ['filename' => 'MISSING!!!', 'exists' => false];
+        $context['source'] = $this->getTrackSourceFileObject() ?
+            [
+                'filename' => basename($this->getTrackSourceFileObject()->getPath()),
+                'exists'   => file_exists($this->getTrackSourceFileObject()->getPath()),
+            ]
+            : ['filename' => 'MISSING', 'exists' => false];
+        $context['encodes'] = [];
+        $context['track_num_conflict'] = false;
+        foreach($this->getAllChildEncodes() as $encode) {
+            $context['encodes'][] = $encode->getEncodeContext();
+        }
+        return $context;
     }
 
     public function isEncodeWorthy() {
@@ -94,113 +158,30 @@ class Track extends ShopifyProduct {
         return $needed_encodes;
     }
 
-    public function getAlbum() {
-        return $this->parentAlbum;
-    }
-
-    public function getPostID() {
-        return $this->postID;
-    }
-
-    /**
-     * @return mixed
-     */
-    public function getTrackTitle() {
-        return $this->trackTitle;
-    }
-
-    public function getTitle() {
-        return $this->getTrackTitle();
-    }
-
-    /**
-     * @return mixed
-     */
-    public function getTrackNumber() {
-        if(!isset($this->trackNumber)) $this->trackNumber = get_field('track_number', $this->postID);
-        return abs(intval($this->trackNumber));
-    }
-
-    public function getTrackPrice() {
-        if(!isset($this->trackPrice)) $this->trackPrice = get_field('track_price', $this->postID);
-        return abs(intval($this->trackPrice));
-    }
-
-
-    /**
-     * @return mixed
-     */
-    public function getTrackArtist() {
-        if(!isset($this->trackArtist)) $this->trackArtist = get_field('track_artist', $this->postID);
-        return $this->trackArtist ? $this->trackArtist : $this->parentAlbum->getAlbumArtist();
-    }
-
-    /**
-     * @return mixed
-     */
-    public function getTrackGenre() {
-        if(!isset($this->trackGenre)) $this->trackGenre = get_field('track_genre', $this->postID);
-        return $this->trackGenre ? $this->trackGenre : $this->parentAlbum->getAlbumGenre();
-    }
-
-    /**
-     * @return mixed
-     */
-    public function getTrackYear() {
-        if(!isset($this->trackYear)) $this->trackYear = get_field('track_year', $this->postID);
-        return $this->trackYear ? $this->trackYear : $this->parentAlbum->getAlbumYear();
-    }
-
-    /**
-     * @return mixed
-     */
-    public function getTrackComment() {
-        if(!isset($this->trackComment)) $this->trackComment = get_field('track_comment', $this->postID);
-        return $this->trackComment ? $this->trackComment : $this->parentAlbum->getAlbumComment();
-    }
-
-    /**
-     * @return mixed
-     */
-    public function getTrackArtObject() {
-        if(!isset($this->trackArtObject)) $this->trackArtObject =
-            get_field('track_art', $this->postID) ? new WPAttachment(get_field('track_art', $this->postID)) : false;
-        return $this->trackArtObject ? $this->trackArtObject : $this->parentAlbum->getAlbumArtObject();
-    }
-
-    public function getTrackSourceFileObject() {
-        if(!isset($this->trackSourceFileObject)) $this->trackSourceFileObject =
-            get_field('track_source', $this->postID) ? new WPAttachment(get_field('track_source', $this->postID)) : false;
-        return $this->trackSourceFileObject;
-    }
-
-    public function getTrackContext() {
-        $context = ['title' => $this->getTrackTitle(), 'artist' => $this->getTrackArtist()];
-        $context['number'] = $this->getTrackNumber();
-        //$context['price'] = $this->getTrackPrice();
-        $context['encode_worthy'] = $this->isEncodeWorthy();
-        $context['art'] = $this->getTrackArtObject() ?
-            [
-                'filename' => basename($this->getTrackArtObject()->getPath()),
-                'exists'   => file_exists($this->getTrackArtObject()->getPath()),
-            ]
-            : ['filename' => 'MISSING!!!', 'exists' => false];
-        $context['source'] = $this->getTrackSourceFileObject() ?
-            [
-                'filename' => basename($this->getTrackSourceFileObject()->getPath()),
-                'exists'   => file_exists($this->getTrackSourceFileObject()->getPath()),
-            ]
-            : ['filename' => 'MISSING', 'exists' => false];
-        $context['encodes'] = [];
-        $context['track_num_conflict'] = false;
-        foreach($this->getAllChildEncodes() as $encode) {
-            $context['encodes'][] = $encode->getEncodeContext();
-        }
-        return $context;
-    }
-
     public function syncToStore($shopify) {
         return $shopify->syncProduct($this);
+    }
+
+    public static function getTracksForAlbum(Album $album) {
+        $tracks = Timber::get_posts([
+                                        'post_type'      => self::CPT_NAME,
+                                        'posts_per_page' => -1,
+                                        'meta_query'     => [
+                                            'key'   => 'track_album',
+                                            'value' => $album->getPostID(),
+                                        ],
+                                    ], self::class);
+
+
+        usort($tracks, function (Track $left, Track $right) {
+            $ltn = $left->getTrackNumber();
+            $rtn = $right->getTrackNumber();
+
+            return $ltn === $rtn ? 0 : ($ltn < $rtn ? -1 : 1);
+        });
+
+        return $tracks;
+
     }
 
 }

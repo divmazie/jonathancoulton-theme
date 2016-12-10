@@ -65,7 +65,14 @@ if( function_exists('acf_add_options_page') ) {
 	));
 }
 
-include __DIR__.'/include/cpt.php';
+add_action('init', function(){
+	// register CPT not assoc with a class...
+	\jct\Util::register_generic_cpt("Showcase Tile");
+	\jct\Util::register_generic_cpt("FAQ");
+	\jct\Util::register_generic_cpt('Album');
+	\jct\Util::register_generic_cpt('Track');
+});
+
 include __DIR__.'/include/routes.php';
 include __DIR__.'/include/prepopulate.php';
 include __DIR__.'/include/filters.php';

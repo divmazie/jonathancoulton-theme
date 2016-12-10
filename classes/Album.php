@@ -2,288 +2,107 @@
 
 namespace jct;
 
+use Timber\Timber;
+
 class Album extends ShopifyProduct {
 
+    const CPT_NAME = 'album';
 
-    private $albumTitle, $albumArtist, $albumPrice, $albumYear, $albumGenre, $albumComment, $albumArtObject, $albumBonusAssetObjects, $albumShow, $albumSortOrder, $albumDescription;
-    // the parent post object
-    private $encode_types, $wpPost;
-    //
+    private $albumArtObject, $albumBonusAssetObjects, $albumShow;
     private $albumTracks = [];
-    private $shopify_collection_id, $shopify_collect_ids;
+
+    // meta fields acf will load (here for autocomplete purposes)=
+    public $album_artist, $album_price, $album_year, $album_genre, $album_art, $album_comment, $album_sort_order, $album_description, $shopify_collection_id, $bonus_assets, $show_album_in_store;
 
     /**
      * @param \WP_Post $postObject the post in the blog that forms the base of this
      * album. The post contains ACF fields and post_meta data that will define the
      * internal variables of this class
      **/
-    public function __construct(\WP_Post $post) {
-        $post_id = $post->ID;
-        $this->postID = $post_id;
-        // fill in private fields from post object/acf/postmeta
-        $this->wpPost = $post;
-        $this->albumTitle = $post->post_title;
-        //$this->albumArtist = get_field('album_artist',$post_id);
-        //$this->albumPrice = get_field('album_price',$post_id);
-        //$this->albumYear = get_field('album_year',$post_id);
-        //$this->albumGenre = get_field('album_genre',$post_id);
-        //$this->albumComment = get_field('album_comment',$post_id);
-        //$this->albumArtObject = get_field('album_art',$post_id) ? new WPAttachment(get_field('album_art',$post_id)) : false;
-        /*
-        $this->albumBonusAssetObjects = array();
-        $bonus_asset_rows = get_field('bonus_assets',$post_id);
-        if (is_array($bonus_asset_rows)) {
-            foreach ($bonus_asset_rows as $row) {
-                $this->albumBonusAssetObjects[] = new WPAttachment($row['bonus_asset']);
-            }
-        }
-        */
-        //$this->albumShow = get_field('show_album_in_store',$post_id);
-        //$this->albumSortOrder = get_field('album_sort_order',$post_id);
-        $this->encode_types = include(get_template_directory() . '/config/encode_types.php');
+    public function __construct($pid) {
         //$this->shopify_id = get_post_meta($post_id,'shopify_id',false)[0];
         //$this->shopify_variant_ids = unserialize(get_post_meta($post_id,'shopify_variant_ids',false)[0]);
         //$this->shopify_variant_skus = unserialize(get_post_meta($post_id,'shopify_variant_skus',false)[0]);
         //$this->shopify_collection_id = get_post_meta($post_id,'shopify_collection_id',false)[0];
         // Tracks now gotten in getAlbumTracks() to reduce database hits
+        parent::__construct($pid);
     }
 
-    static function getAllAlbums() {
-        $albums = [];
-        $album_posts = get_posts(['post_type' => 'album', 'numberposts' => -1]);
-        foreach($album_posts as $album_post) {
-            $album = new Album($album_post);
-            if($album->getAlbumShow())
-                $albums[] = $album;
-        }
-        return $albums;
-    }
-
-    public function getAlbumContext() {
-        $context = ['title' => $this->getAlbumTitle(), 'artist' => $this->getAlbumArtist()];
-        $context['show_album'] = $this->getAlbumShow() ? true : false;
-        $context['encode_worthy'] = $this->isEncodeWorthy() ? true : false;
-        //$context['year'] = $this->getAlbumYear();
-        //$context['price'] = $this->getAlbumPrice();
-        $context['sort_order'] = $this->getAlbumSortOrder();
-        $context['sort_order_conflict'] = false;
-        $context['art'] = $this->getAlbumArtObject() ?
-            [
-                'filename' => basename($this->getAlbumArtObject()->getPath()),
-                'url'      => $this->getAlbumArtObject()->getURL(),
-                'exists'   => file_exists($this->getAlbumArtObject()->getPath()),
-            ]
-            : ['filename' => 'MISSING!!!', 'url' => 'MISSING!!!', 'exists' => false];
-        $context['album_zips'] = [];
-        foreach($this->getAllChildZips() as $zip) {
-            $zip_context = $zip->getZipContext();
-            if(!is_array($zip_context)) $zip_context = ['exists' => false];
-            $context['album_zips'][] = $zip_context;
-        }
-        $context['tracks'] = [];
-        foreach($this->getAlbumTracks() as $key => $track) {
-            $context['tracks'][$key] = $track->getTrackContext();
-            if($key > 1000) {
-                $context['tracks'][$key]['track_num_conflict'] = true;
-            }
-        }
-        $context['bonus_assets'] = [];
-        foreach($this->getAlbumBonusAssetObjects() as $bonus_asset) {
-            $context['bonus_assets'][] =
-                ['filename' => basename($bonus_asset->getPath()), 'exists' => file_exists($bonus_asset->getPath())];
-        }
-        return $context;
-    }
-
-    public function isEncodeWorthy() {
-        $worthy = false;
-        if($this->getAlbumShow() && $this->getAlbumTitle() && $this->getAlbumArtist() && $this->getAlbumArtObject()) {
-            $worthy = true;
-        }
-        return $worthy;
-    }
-
-    public function getNeededEncodes() {
-        if(!$this->isEncodeWorthy()) {
-            return false;
-        }
-        $zips = $this->getAllChildZips();
-        $all_zips_exist = true;
-        foreach($zips as $zip) {
-            if(!$zip->fileAssetExists()) $all_zips_exist = false;
-        }
-        if($all_zips_exist) return false;
-        $encodes = [];
-        foreach($this->getAlbumTracks() as $track) {
-            $track_encodes = $track->getNeededEncodes();
-            if($track_encodes) {
-                $encodes = array_merge($encodes, $track_encodes);
-            }
-        }
-        return $encodes;
-    }
-
-    public function getAllChildZips() {
-        $zips = [];
-        foreach($this->encode_types as $key => $encode_type) {
-            $label = $key;
-            $format = $encode_type[0];
-            $flags = $encode_type[1];
-            $zips[$label] = $this->getChildZip($format, $flags, $label);
-        }
-        return $zips;
-    }
-
-    public function getChildZip($format, $flags, $label = '') {
-        if(!$label) {
-            $label = $format;
-        }
-        $zip = new AlbumZip($this, $format, $flags, $label);
-        return $zip;
-    }
-
-    public function cleanAttachments() {
-        $deleted = $this->deleteOldZips();
-        foreach($this->getAlbumTracks() as $track) {
-            $deleted = array_merge($deleted, $track->deleteOldEncodes());
-        }
-        return $deleted;
-    }
-
-    public function deleteOldZips() {
-        $goodKeys = [];
-        foreach($this->getAllChildZips() as $zip) {
-            $goodKeys[] = $zip->getUniqueKey();
-        }
-        return AlbumZip::deleteOldAttachments($this->postID, $goodKeys);
-    }
-
-    public function getNumberOfAlbumTracks() {
-        return count($this->getAlbumTracks());
-    }
-
-    // @return array the album tracks IN ORDER
-    public function getAlbumTracks() {
-        if(!count($this->albumTracks)) {
-            $tracks = get_posts([
-                                    'post_type' => 'track', 'posts_per_page' => -1, 'meta_key' => 'track_album',
-                                    'meta_value' => $this->postID,
-                                ]);
-            foreach($tracks as $track) {
-                $track_num = intval(get_field('track_number', $track->ID));
-                while(isset($this->albumTracks[$track_num])) {
-                    $track_num = 1000 + $track_num;
-                }
-                $this->albumTracks[$track_num] = new Track($track, $this);
-            }
-            ksort($this->albumTracks);
-        }
-        return $this->albumTracks;
-    }
-
-    public function getPostID() {
-        return $this->postID;
-    }
-
-    /**
-     * @return mixed
-     */
     public function getAlbumTitle() {
-        return $this->albumTitle;
+        return $this->title();
     }
 
     public function getTitle() {
         return $this->getAlbumTitle();
     }
 
-    /**
-     * @return mixed
-     */
     public function getAlbumArtist() {
-        if(!isset($this->albumArtist)) $this->albumArtist = get_field('album_artist', $this->postID);
-        return $this->albumArtist;
+        return $this->album_artist;
     }
 
     public function getAlbumPrice() {
-        if(!isset($this->albumPrice)) $this->albumPrice = get_field('album_price', $this->postID);
-        return abs(intval($this->albumPrice));
+        return abs(intval($this->album_price));
     }
 
-    /**
-     * @return mixed
-     */
     public function getAlbumYear() {
-        if(!isset($this->albumYear)) $this->albumYear = get_field('album_year', $this->postID);
-        return $this->albumYear;
+        return $this->album_year;
     }
 
-    /**
-     * @return mixed
-     */
     public function getAlbumGenre() {
-        if(!isset($this->albumGenre)) $this->albumGenre = get_field('album_genre', $this->postID);
-        return $this->albumGenre;
+        return $this->album_genre;
     }
 
-    /**
-     * @return mixed
-     */
     public function getAlbumArtObject() {
-        if(!isset($this->albumArtObject)) $this->albumArtObject =
-            get_field('album_art', $this->postID) ? new WPAttachment(get_field('album_art', $this->postID)) : false;
-        return $this->albumArtObject;
+        return Timber::get_post($this->album_art, AlbumArt::class);
     }
 
-    /**
-     * @return mixed
-     */
-    public function getAlbumBonusAssetObjects() {
-        if(!isset($this->albumBonusAssetObjects)) {
-            $this->albumBonusAssetObjects = [];
-            $bonus_asset_rows = get_field('bonus_assets', $this->postID);
-            if(is_array($bonus_asset_rows)) {
-                foreach($bonus_asset_rows as $row) {
-                    $this->albumBonusAssetObjects[] = new WPAttachment($row['bonus_asset']);
-                }
-            }
-        }
-        return $this->albumBonusAssetObjects;
-    }
-
-    public function getAlbumShow() {
-        if(!isset($this->albumShow)) $this->albumShow = get_field('show_album_in_store', $this->postID);
-        return $this->albumShow;
-    }
-
-    /**
-     * @return mixed
-     */
     public function getAlbumComment() {
-        if(!isset($this->albumComment)) $this->albumComment = get_field('album_comment', $this->postID);
-        return $this->albumComment;
+        return $this->album_comment;
     }
 
     public function getAlbumSortOrder() {
-        if(!isset($this->albumSortOrder)) $this->albumSortOrder = get_field('album_sort_order', $this->postID);
-        return $this->albumSortOrder;
+        return $this->album_sort_order;
     }
 
     public function getAlbumDescription() {
-        if(!isset($this->albumDescription)) $this->albumDescription = get_field('album_description', $this->postID);
-        return $this->albumDescription;
+        return $this->album_description;
     }
 
     public function getShopifyCollectionId() {
-        if(!isset($this->shopify_collection_id)) $this->shopify_collection_id =
-            get_post_meta($this->postID, 'shopify_collection_id', false)[0];
         return $this->shopify_collection_id;
     }
 
     public function setShopifyCollectionId($id) {
-        if(update_post_meta($this->postID, 'shopify_collection_id', $id)) {
-            $this->shopify_collection_id = $id;
-        }
+        $this->update('shopify_collection_id', $id);
+        $this->shopify_collection_id = $id;
     }
+
+    public function getAlbumShow() {
+        return $this->show_album_in_store;
+    }
+
+    // @return Track[] the album tracks IN ORDER
+    public function getAlbumTracks() {
+        return Track::getTracksForAlbum($this);
+    }
+
+    /**
+     * @return BonusAsset[]
+     */
+    public function getAlbumBonusAssetObjects() {
+        return Timber::get_posts([
+                                     'post__in'    => array_map(function ($idx) {
+                                         // get the ids of each of the bonus assets
+                                         return $this->{sprintf('bonus_assets_%d_bonus_asset', $idx)};
+                                         // bonus_assets is the number of
+                                     }, range(0, intval($this->bonus_assets) - 1)),
+                                     // the things ACF will put in here are pretty widely variable
+                                     // so
+                                     'post_type'   => 'any',
+                                     'post_status' => 'any',
+                                 ], BonusAsset::class);
+    }
+
 
     public function syncToStore($shopify, $step = 0) {
         if($step == 0) {
@@ -329,5 +148,122 @@ class Album extends ShopifyProduct {
         delete_transient('track_product_ids');
         return $response;
     }
+
+    public function getAlbumContext() {
+        $context = ['title' => $this->getAlbumTitle(), 'artist' => $this->getAlbumArtist()];
+        $context['show_album'] = $this->getAlbumShow() ? true : false;
+        $context['encode_worthy'] = $this->isEncodeWorthy() ? true : false;
+        //$context['year'] = $this->getAlbumYear();
+        //$context['price'] = $this->getAlbumPrice();
+        $context['sort_order'] = $this->getAlbumSortOrder();
+        $context['sort_order_conflict'] = false;
+        $context['art'] = $this->getAlbumArtObject() ?
+            [
+                'filename' => basename($this->getAlbumArtObject()->getPath()),
+                'url'      => $this->getAlbumArtObject()->getURL(),
+                'exists'   => file_exists($this->getAlbumArtObject()->getPath()),
+            ]
+            : ['filename' => 'MISSING!!!', 'url' => 'MISSING!!!', 'exists' => false];
+        $context['album_zips'] = [];
+        foreach($this->getAllChildZips() as $zip) {
+            $zip_context = $zip->getZipContext();
+            if(!is_array($zip_context)) {
+                $zip_context = ['exists' => false];
+            }
+            $context['album_zips'][] = $zip_context;
+        }
+        $context['tracks'] = [];
+        foreach($this->getAlbumTracks() as $key => $track) {
+            $context['tracks'][$key] = $track->getTrackContext();
+            if($key > 1000) {
+                $context['tracks'][$key]['track_num_conflict'] = true;
+            }
+        }
+        $context['bonus_assets'] = [];
+        foreach($this->getAlbumBonusAssetObjects() as $bonus_asset) {
+            $context['bonus_assets'][] =
+                ['filename' => basename($bonus_asset->getPath()), 'exists' => file_exists($bonus_asset->getPath())];
+        }
+        return $context;
+    }
+
+    public function isEncodeWorthy() {
+        $worthy = false;
+        if($this->getAlbumShow() && $this->getAlbumTitle() && $this->getAlbumArtist() && $this->getAlbumArtObject()) {
+            $worthy = true;
+        }
+        return $worthy;
+    }
+
+    public function getNeededEncodes() {
+        if(!$this->isEncodeWorthy()) {
+            return false;
+        }
+        $zips = $this->getAllChildZips();
+        $all_zips_exist = true;
+        foreach($zips as $zip) {
+            if(!$zip->fileAssetExists()) {
+                $all_zips_exist = false;
+            }
+        }
+        if($all_zips_exist) {
+            return false;
+        }
+        $encodes = [];
+        foreach($this->getAlbumTracks() as $track) {
+            $track_encodes = $track->getNeededEncodes();
+            if($track_encodes) {
+                $encodes = array_merge($encodes, $track_encodes);
+            }
+        }
+        return $encodes;
+    }
+
+    public function getAllChildZips() {
+        $encode_types = include(dirname(__DIR__) . '/config/encode_types.php');
+
+        $zips = [];
+        foreach($encode_types as $key => $encode_type) {
+            $label = $key;
+            $format = $encode_type[0];
+            $flags = $encode_type[1];
+            $zips[$label] = $this->getChildZip($format, $flags, $label);
+        }
+        return $zips;
+    }
+
+    public function getChildZip($format, $flags, $label = '') {
+        if(!$label) {
+            $label = $format;
+        }
+        $zip = new AlbumZip($this, $format, $flags, $label);
+        return $zip;
+    }
+
+    public function cleanAttachments() {
+        $deleted = $this->deleteOldZips();
+        foreach($this->getAlbumTracks() as $track) {
+            $deleted = array_merge($deleted, $track->deleteOldEncodes());
+        }
+        return $deleted;
+    }
+
+    public function deleteOldZips() {
+        $goodKeys = [];
+        foreach($this->getAllChildZips() as $zip) {
+            $goodKeys[] = $zip->getUniqueKey();
+        }
+        return AlbumZip::deleteOldAttachments($this->postID, $goodKeys);
+    }
+
+    public function getNumberOfAlbumTracks() {
+        return count($this->getAlbumTracks());
+    }
+
+
+    public static function getAllAlbums() {
+        return Timber::get_posts(['post_type' => 'album', 'numberposts' => -1], Album::class);
+    }
+
 
 }

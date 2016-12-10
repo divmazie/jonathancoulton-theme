@@ -10,7 +10,7 @@ namespace jct;
 
 use Timber\Post;
 
-abstract class ShopifyProduct extends Post {
+abstract class ShopifyProduct extends JCTPost {
     public $postID;
 
     const META_SHOPIFY_ID = 'shopify_id';
