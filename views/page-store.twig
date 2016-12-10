@@ -25,7 +25,7 @@
                 </div>
             </div>
         </div>
-    {% else %}
+    {% elseif variants|length == 1 %}
         <script>
             function add_{{ id }}_to_cart() {
                 addToCart({{ id }},"{{ name }}",{{ variants[0].price|number_format }},{{ variants_json|json_encode() }},{{ variants[0].id }},{{ allow_multiple }});
