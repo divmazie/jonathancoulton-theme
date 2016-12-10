@@ -79,7 +79,7 @@ class Encode extends KeyedWPAttachment {
             'encode_format' => $this->getEncodeFormat(),
             'dest_url'      =>
                 $forUseInUniqueKey ?
-                    'n/a' :
+                    '' :
                     (get_site_url() . "/api/$authcode/receiveencode/" . $this->getUniqueKey()),
             'art_url'       =>
                 $forUseInUniqueKey ?
