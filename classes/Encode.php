@@ -73,7 +73,7 @@ class Encode extends KeyedWPAttachment {
             'source_url'    =>
                 $forUseInUniqueKey ?
                     // post id will not change over site url changes
-                    $parent->getPostID() :
+                    '' :
                     ($parent->getTrackSourceFileObject() ? $parent->getTrackSourceFileObject()->getURL() : 'shit...'),
             'source_md5'    => $parent->getTrackSourceFileObject() ? md5_file($parent->getTrackSourceFileObject()->getPath()) : 'shit...',
             'encode_format' => $this->getEncodeFormat(),
@@ -83,7 +83,7 @@ class Encode extends KeyedWPAttachment {
                     (get_site_url() . "/api/$authcode/receiveencode/" . $this->getUniqueKey()),
             'art_url'       =>
                 $forUseInUniqueKey ?
-                    $parent->getTrackArtObject()->getAttachmentID() :
+                    '' :
                     ($parent->getTrackArtObject() ? $parent->getTrackArtObject()->getURL() : 'MISSING!!!'),
             'art_md5'       => $parent->getTrackArtObject() ? md5_file($parent->getTrackArtObject()->getPath()) : 'MISSING!!!',
             'metadata'      => [
