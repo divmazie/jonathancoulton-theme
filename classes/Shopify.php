@@ -440,13 +440,19 @@ class Shopify {
             $args['custom_collection']['id'] = $collection_id;
             $response = $this->makeCall('admin/custom_collections/'.$collection_id,'PUT',$args);
             $metafields = $this->makeCall('admin/custom_collections/'.$collection_id.'/metafields');
+            $has_description = false;
             foreach ($metafields->metafields as $metafield) {
                 if ($metafield->key == 'album_sort_order') {
                     $this->updateMetafield($metafield,$album->getAlbumSortOrder());
                 }
                 if ($metafield->key == 'album_description') {
                     $this->updateMetafield($metafield,$album->getAlbumDescription());
+                    $has_description = true;
                 }
+            }
+            if (!$has_description) {
+                $args = array('metafield' => array('key'=>'album_description','value_type'=>'string','namespace'=>'global','value'=>$album->getAlbumDescription()));
+                $this->makeCall('admin/custom_collections/#'.$collection_id.'/metafields','POST',$args);
             }
             return $response;
         } else {
