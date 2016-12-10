@@ -332,7 +332,7 @@ class Shopify {
         if (!$allAlbums) {
             $allAlbums = \jct\Album::getAllAlbums();
         }
-        $everything_shopify_details = get_transient('everything_shopify_details');
+        $everything_shopify_details = $this->getEverythingProductDetails();
         $update = false;
         if ($everything_shopify_details && $this->productExists($everything_shopify_details['id'])) {
             $update = true;
@@ -386,7 +386,7 @@ class Shopify {
             $everything_ids = $variant_ids;
             $everything_skus = $variant_skus;
             $everything_shopify_details = array('id'=>$everything_id,'ids'=>$everything_ids,'skus'=>$everything_skus);
-            set_transient('everything_shopify_details',$everything_shopify_details);
+            $this->setEverythingProductDetails($everything_shopify_details);
         }
         $missing_files = array();
         foreach ($encode_types as $encode_type => $encode_details) {
@@ -462,6 +462,26 @@ class Shopify {
             return $response;
         }
     }
+    
+    private function getEverythingProductDetails() {
+        $file_name = get_template_directory().'/cache/cached_everything_product_details.php';
+        if (file_exists($file_name)) {
+            include($file_name);
+        }
+        if (isset($everything_shopify_details)) {
+            return $everything_shopify_details;
+        } else if ($details = get_transient('everything_shopify_details')) {
+            return $details;
+        } else {
+            return false;
+        }
+    }
+
+    private function setEverythingProductDetails($everything_shopify_details) {
+        set_transient('everything_shopify_details',$everything_shopify_details);
+        $strFileContent = "<"."?php".PHP_EOL."$"."everything_shopify_details = ".var_export($everything_shopify_details, true).PHP_EOL."?".">";
+        file_put_contents(get_template_directory().'/cache/cached_everything_product_details.php', $strFileContent);
+    }
 
     public function deleteUnusedProducts($allAlbums = false) {
         $this->forceGetAllProducts();
@@ -469,7 +489,7 @@ class Shopify {
             $allAlbums = \jct\Album::getAllAlbums();
         }
         $usedIds = array();
-        if ($everything_shopify_details = get_transient('everything_shopify_details')) {
+        if ($everything_shopify_details = $this->getEverythingProductDetails()) {
             $usedIds = array($everything_shopify_details['id']);
         }
         foreach ($allAlbums as $album) {
@@ -568,7 +588,7 @@ class Shopify {
     public function deleteUnusedFetchProducts($allAlbums = false) {
         $this->forceGetFetchProducts();
         $used_skus = array();
-        if ($everything_shopify_details = get_transient('everything_shopify_details')) {
+        if ($everything_shopify_details = $this->getEverythingProductDetails()) {
             $used_skus = $everything_shopify_details['skus'];
         }
         $used_skus = array_merge($used_skus,$this->getKaraokeSkus());
@@ -615,7 +635,7 @@ class Shopify {
         if (!is_array($collections_to_go) || !is_array($albums)) {
             $collections_to_go = $this->getAllCollections();
             $albums = array();
-            if ($everything_shopify_details = get_transient('everything_shopify_details')) {
+            if ($everything_shopify_details = $this->getEverythingProductDetails()) {
                 $shopify_request = 'admin/products/'.$everything_shopify_details['id'];
                 $products = $this->makeCall($shopify_request,'GET');
                 $product = $products->product;
