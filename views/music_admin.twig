@@ -84,7 +84,7 @@
                     {% for zip in album.album_zips %}
                         <div class="admin_zip">
                             {{ dump(zip) }}
-                            {% if not zip.exists %} {{ macros.go_warning(zip.format,' zip non-existant!') }} {% endif %}
+                            {% if not zip.exists %} {{ macros.go_warning(zip.format,' zip non-existent!') }} {% endif %}
                             {% if zip.exists %} {{ macros.good_warning(zip.format," zip good to go.") }} {% endif %}
                             {% if not zip.zip_worthy %} {{ macros.go_warning(zip.format," zip not zip-worthy!") }} {% endif %}
                             {% if zip.missing_encodes %} {{ macros.go_warning(zip.format," encodes missing!") }} {% endif %}
