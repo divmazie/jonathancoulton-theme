@@ -8,7 +8,6 @@ wp-content
 style.css
 /js/bower.js
 /js/bower.min.js
-.idea/workspace.xml
 .idea/*
 docker/docker-compose.yml
 
