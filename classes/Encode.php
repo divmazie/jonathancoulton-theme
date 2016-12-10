@@ -62,16 +62,29 @@ class Encode extends KeyedWPAttachment {
         return md5(serialize($this->getEncodeConfig(true))); // This gets config without unique key or filename to prevent infinite loop
     }
 
-    public function getEncodeConfig($skipUniqueKeys = false) {
+    public function getEncodeConfig($forUseInUniqueKey = false) {
+        // what is $forUseInUniqueKey:
+        // the encode config is a great determinant of whether a file is unique
+        // this function both uses a file's unique key and is used to generate it
+        // so this flag let's us skip the pieces that would cause infinite recursion
         $authcode = get_transient('do_secret');
         $parent = $this->parentTrack;
         $config = [
-            'source_url'    => $parent->getTrackSourceFileObject() ? $parent->getTrackSourceFileObject()->getURL() : 'shit...',
+            'source_url'    =>
+                $forUseInUniqueKey ?
+                    // post id will not change over site url changes
+                    $parent->getPostID() :
+                    ($parent->getTrackSourceFileObject() ? $parent->getTrackSourceFileObject()->getURL() : 'shit...'),
             'source_md5'    => $parent->getTrackSourceFileObject() ? md5_file($parent->getTrackSourceFileObject()->getPath()) : 'shit...',
             'encode_format' => $this->getEncodeFormat(),
-            'dest_url'      => get_site_url() . "/api/" . ($skipUniqueKeys ? '' : $authcode) . "/receiveencode/" .
-                               ($skipUniqueKeys ? '' : $this->getUniqueKey()),
-            'art_url'       => $parent->getTrackArtObject() ? $parent->getTrackArtObject()->getURL() : 'MISSING!!!',
+            'dest_url'      =>
+                $forUseInUniqueKey ?
+                    'n/a' :
+                    (get_site_url() . "/api/$authcode/receiveencode/" . $this->getUniqueKey()),
+            'art_url'       =>
+                $forUseInUniqueKey ?
+                    $parent->getTrackArtObject()->getAttachmentID() :
+                    ($parent->getTrackArtObject() ? $parent->getTrackArtObject()->getURL() : 'MISSING!!!'),
             'art_md5'       => $parent->getTrackArtObject() ? md5_file($parent->getTrackArtObject()->getPath()) : 'MISSING!!!',
             'metadata'      => [
                 'title'        => $parent->getTrackTitle(),
@@ -81,7 +94,7 @@ class Encode extends KeyedWPAttachment {
                 'artist'       => $parent->getTrackArtist(),
                 'comment'      => $parent->getTrackComment(),
                 'genre'        => $parent->getTrackGenre(),
-                'filename'     => $skipUniqueKeys ? '' : $this->getFileAssetFileName(),
+                'filename'     => $forUseInUniqueKey ? '' : $this->getFileAssetFileName(),
             ],
         ];
         if($this->encodeCLIFlags) {
