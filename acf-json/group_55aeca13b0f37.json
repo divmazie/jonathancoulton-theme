@@ -103,6 +103,27 @@
             "disabled": 0
         },
         {
+            "key": "field_55aeca86038c9",
+            "label": "Buy something modal text",
+            "name": "buy_something_modal_text",
+            "type": "text",
+            "instructions": "This pops up after user has listened to 10 songs in the store",
+            "required": 0,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "",
+                "class": "",
+                "id": ""
+            },
+            "default_value": "Hey! Thanks for listening to so many songs! Why don't you buy them and then you'll have them forever!",
+            "placeholder": "",
+            "prepend": "",
+            "append": "",
+            "maxlength": "",
+            "readonly": 0,
+            "disabled": 0
+        },
+        {
             "key": "field_55df765a93c27",
             "label": "Social Media Connections",
             "name": "",

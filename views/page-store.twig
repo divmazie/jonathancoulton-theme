@@ -255,11 +255,27 @@
             </div>
         </div>
     </div>
+    <div id="buy_something_modal" class="modal fade" role="dialog">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    <h4 class="modal-title">Buy something?</h4>
+                </div>
+                <div class="modal-body">
+                    {{ theme_options.buy_something_modal_text }}<br />
+                    <br />
+                    <a onclick="$('#buy_something_modal').modal('hide')" class="no_underline"><div class="blue_arrow_left">Back</div></a>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <script type="application/javascript">
         //var store_section = '{{ get_vars.store_section|default('downloads') }}';
         var store_section = 'downloads';
         var scrollto = '';
+        var listentotal = 0;
         var hash = window.location.hash.split('#')[1];
         if (hash) {
             var parts = hash.split('-'); // This means anchor IDs can't have dashes in them
@@ -349,11 +365,20 @@
                             autoLoad: true,
                             autoPlay: true,
                             onfinish: function () {
+                                incrementListenTotal();
                                 playSound(next_id);
                             }
                         });
                     }
                 }
+            }
+        }
+
+        function incrementListenTotal() {
+            listentotal++;
+            if (listentotal>=10) {
+                $('#buy_something_modal').modal('show');
+                listentotal = 0;
             }
         }
 
