@@ -9,7 +9,14 @@ style.css
 /js/bower.js
 /js/bower.min.js
 .idea/*
+
+# docker stuff
+# don't track compose.yml, this is user supplied
 docker/docker-compose.yml
+
+# only track php in html dir
+docker/encodebot/www/html/*
+!docker/encodebot/www/html/*.php
 
 # Grunt Deploy
 .ftppass
