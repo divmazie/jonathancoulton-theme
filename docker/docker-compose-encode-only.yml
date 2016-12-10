@@ -1,0 +1,11 @@
+encodebot:
+  hostname: encodebot
+  build: ./encodebot
+  ports:
+  - "1333:80"
+  volumes:
+    - "./encodebot/www/:/var/www/"
+    - "./encodebot/lighttpd/:/etc/lighttpd/"
+  environment:
+    ENCODE_ACCESS_KEY:
+
