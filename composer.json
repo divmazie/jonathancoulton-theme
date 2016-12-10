@@ -1,44 +1,14 @@
 {
-    "name": "upstatement/timber-starter-theme",
-    "description": "Starter theme to build a Timber theme",
-    "type":"wordpress-theme",
-    "minimum-stability" : "dev",
-    "authors": [
-        {
-            "name": "jarednova",
-            "email": "jared@upstatement.com"
-        }
-    ],
-	"require-dev": {
-		"jarednova/timber": "dev-master"
-	},
-	"repositories": [
-		{
-			"type" : "package",
-			"package" : {
-				"name" : "jarednova/php-router",
-				"version" : "1.0.1",
-				"dist" : {
-					"url" : "https://github.com/jarednova/PHP-Router/archive/fix_psr_0.zip",
-					"type" : "zip"
-				},
-				"autoload": {
-					"psr-0": {
-						"PHPRouter": "src/"
-					}
-				}
-			}
-		}
-	],
-    "require": {
-        "tgmpa/tgm-plugin-activation": "dev-master",
-	  "fetchapp/fetchapp": "dev-master",
-	  "ricardoper/twitteroauth": "2.*",
-        "cosenary/instagram": "^2.4@dev",
-	  "fetchapp/fetchapp": "dev-master",
-        "aws/aws-sdk-php": "^3.18"
-	},
+  "require": {
+    "tgmpa/tgm-plugin-activation": "dev-master",
+    "ricardoper/twitteroauth": "2.*",
+    "cosenary/instagram": "^2.4@dev",
+    "fetchapp/fetchapp": "dev-master",
+    "aws/aws-sdk-php": "^3.18"
+  },
   "autoload": {
-	"psr-4": {"jct\\": "classes/"}
+    "psr-4": {
+      "jct\\": "classes/"
+    }
   }
 }
