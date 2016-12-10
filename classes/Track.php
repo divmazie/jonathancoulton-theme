@@ -13,8 +13,8 @@ class Track extends ShopifyProduct {
      *
      */
     public function __construct(\WP_Post $post, Album $parentAlbum = NULL) {
-        if (!$parentAlbum) {
-            $parent_post = get_field('track_album',$post->ID);
+        if(!$parentAlbum) {
+            $parent_post = get_field('track_album', $post->ID);
             $parentAlbum = new Album($parent_post);
         }
         $post_id = $post->ID;
@@ -31,7 +31,7 @@ class Track extends ShopifyProduct {
         //$this->trackComment = get_field('track_comment',$post_id);
         //$this->trackArtObject = get_field('track_art',$post_id) ? new WPAttachment(get_field('track_art',$post_id)) : false;
         //$this->trackSourceFileObject = get_field('track_source',$post_id) ? new WPAttachment(get_field('track_source',$post_id)) : false;
-        $this->encode_types = include(get_template_directory().'/config/encode_types.php');
+        $this->encode_types = include(get_template_directory() . '/config/encode_types.php');
         //$this->shopify_id = get_post_meta($post_id,'shopify_id',false)[0];
         //$this->shopify_variant_ids = unserialize(get_post_meta($post_id,'shopify_variant_ids',false)[0]);
         //$this->shopify_variant_skus = unserialize(get_post_meta($post_id,'shopify_variant_skus',false)[0]);
@@ -39,9 +39,11 @@ class Track extends ShopifyProduct {
 
     public function isEncodeWorthy() {
         $worthy = false;
-        if ($this->parentAlbum->isEncodeWorthy()) {
+        if($this->parentAlbum->isEncodeWorthy()) {
             //$worthy = true;
-            if ($this->getTrackTitle() && $this->getTrackArtist() && $this->getTrackSourceFileObject() && $this->getTrackArtObject()) {
+            if($this->getTrackTitle() && $this->getTrackArtist() && $this->getTrackSourceFileObject() &&
+               $this->getTrackArtObject()
+            ) {
                 $worthy = true;
             }
         }
@@ -49,40 +51,41 @@ class Track extends ShopifyProduct {
     }
 
     public function getAllChildEncodes() {
-        $encodes = array();
-        foreach ($this->encode_types as $key => $encode_type) {
+        $encodes = [];
+        foreach($this->encode_types as $key => $encode_type) {
             $label = $key;
             $format = $encode_type[0];
             $flags = $encode_type[1];
-            $encodes[$label] = $this->getChildEncode($format,$flags,$label);
+            $encodes[$label] = $this->getChildEncode($format, $flags, $label);
         }
         return $encodes;
     }
 
-    public function getChildEncode($format,$flags,$label) {
+    public function getChildEncode($format, $flags, $label) {
         $encode = new Encode($this, $format, $flags, $label);
         return $encode;
     }
 
     public function getMusicLink() {
         $encode_label = "MP3";
-        $encode = $this->getChildEncode($this->encode_types[$encode_label][0],$this->encode_types[$encode_label][1],$encode_label);
+        $encode =
+            $this->getChildEncode($this->encode_types[$encode_label][0], $this->encode_types[$encode_label][1], $encode_label);
         return $encode->getURL();
     }
 
     public function deleteOldEncodes() {
-        $goodKeys = array();
-        foreach ($this->getAllChildEncodes() as $encode) {
+        $goodKeys = [];
+        foreach($this->getAllChildEncodes() as $encode) {
             $goodKeys[] = $encode->getUniqueKey();
         }
-        return Encode::deleteOldAttachments($this->postID,$goodKeys);
+        return Encode::deleteOldAttachments($this->postID, $goodKeys);
     }
 
     public function getNeededEncodes() {
         if(!$this->isEncodeWorthy()) {
             return false;
         }
-        $needed_encodes = array();
+        $needed_encodes = [];
         foreach($this->getAllChildEncodes() as $encode) {
             if($encode->encodeIsNeeded()) {
                 $needed_encodes[] = $encode;
@@ -105,18 +108,21 @@ class Track extends ShopifyProduct {
     public function getTrackTitle() {
         return $this->trackTitle;
     }
-    public function getTitle() { return $this->getTrackTitle(); }
+
+    public function getTitle() {
+        return $this->getTrackTitle();
+    }
 
     /**
      * @return mixed
      */
     public function getTrackNumber() {
-        if (!isset($this->trackNumber)) $this->trackNumber = get_field('track_number',$this->postID);
+        if(!isset($this->trackNumber)) $this->trackNumber = get_field('track_number', $this->postID);
         return abs(intval($this->trackNumber));
     }
 
     public function getTrackPrice() {
-        if (!isset($this->trackPrice)) $this->trackPrice = get_field('track_price',$this->postID);
+        if(!isset($this->trackPrice)) $this->trackPrice = get_field('track_price', $this->postID);
         return abs(intval($this->trackPrice));
     }
 
@@ -125,7 +131,7 @@ class Track extends ShopifyProduct {
      * @return mixed
      */
     public function getTrackArtist() {
-        if (!isset($this->trackArtist)) $this->trackArtist = get_field('track_artist',$this->postID);
+        if(!isset($this->trackArtist)) $this->trackArtist = get_field('track_artist', $this->postID);
         return $this->trackArtist ? $this->trackArtist : $this->parentAlbum->getAlbumArtist();
     }
 
@@ -133,7 +139,7 @@ class Track extends ShopifyProduct {
      * @return mixed
      */
     public function getTrackGenre() {
-        if (!isset($this->trackGenre)) $this->trackGenre = get_field('track_genre',$this->postID);
+        if(!isset($this->trackGenre)) $this->trackGenre = get_field('track_genre', $this->postID);
         return $this->trackGenre ? $this->trackGenre : $this->parentAlbum->getAlbumGenre();
     }
 
@@ -141,7 +147,7 @@ class Track extends ShopifyProduct {
      * @return mixed
      */
     public function getTrackYear() {
-        if (!isset($this->trackYear)) $this->trackYear = get_field('track_year',$this->postID);
+        if(!isset($this->trackYear)) $this->trackYear = get_field('track_year', $this->postID);
         return $this->trackYear ? $this->trackYear : $this->parentAlbum->getAlbumYear();
     }
 
@@ -149,7 +155,7 @@ class Track extends ShopifyProduct {
      * @return mixed
      */
     public function getTrackComment() {
-        if (!isset($this->trackComment)) $this->trackComment = get_field('track_comment',$this->postID);
+        if(!isset($this->trackComment)) $this->trackComment = get_field('track_comment', $this->postID);
         return $this->trackComment ? $this->trackComment : $this->parentAlbum->getAlbumComment();
     }
 
@@ -157,29 +163,37 @@ class Track extends ShopifyProduct {
      * @return mixed
      */
     public function getTrackArtObject() {
-        if (!isset($this->trackArtObject)) $this->trackArtObject = get_field('track_art',$this->postID) ? new WPAttachment(get_field('track_art',$this->postID)) : false;
+        if(!isset($this->trackArtObject)) $this->trackArtObject =
+            get_field('track_art', $this->postID) ? new WPAttachment(get_field('track_art', $this->postID)) : false;
         return $this->trackArtObject ? $this->trackArtObject : $this->parentAlbum->getAlbumArtObject();
     }
 
     public function getTrackSourceFileObject() {
-        if (!isset($this->trackSourceFileObject)) $this->trackSourceFileObject = get_field('track_source',$this->postID) ? new WPAttachment(get_field('track_source',$this->postID)) : false;
+        if(!isset($this->trackSourceFileObject)) $this->trackSourceFileObject =
+            get_field('track_source', $this->postID) ? new WPAttachment(get_field('track_source', $this->postID)) : false;
         return $this->trackSourceFileObject;
     }
 
     public function getTrackContext() {
-        $context = array('title' => $this->getTrackTitle(), 'artist' => $this->getTrackArtist());
+        $context = ['title' => $this->getTrackTitle(), 'artist' => $this->getTrackArtist()];
         $context['number'] = $this->getTrackNumber();
         //$context['price'] = $this->getTrackPrice();
         $context['encode_worthy'] = $this->isEncodeWorthy();
         $context['art'] = $this->getTrackArtObject() ?
-            array('filename'=>basename($this->getTrackArtObject()->getPath()),'exists'=>file_exists($this->getTrackArtObject()->getPath()))
-            : array('filename'=>'MISSING!!!','exists'=>false);
+            [
+                'filename' => basename($this->getTrackArtObject()->getPath()),
+                'exists'   => file_exists($this->getTrackArtObject()->getPath()),
+            ]
+            : ['filename' => 'MISSING!!!', 'exists' => false];
         $context['source'] = $this->getTrackSourceFileObject() ?
-            array('filename'=>basename($this->getTrackSourceFileObject()->getPath()),'exists'=>file_exists($this->getTrackSourceFileObject()->getPath()))
-            : array('filename'=>'MISSING','exists'=>false);
-        $context['encodes'] = array();
+            [
+                'filename' => basename($this->getTrackSourceFileObject()->getPath()),
+                'exists'   => file_exists($this->getTrackSourceFileObject()->getPath()),
+            ]
+            : ['filename' => 'MISSING', 'exists' => false];
+        $context['encodes'] = [];
         $context['track_num_conflict'] = false;
-        foreach ($this->getAllChildEncodes() as $encode) {
+        foreach($this->getAllChildEncodes() as $encode) {
             $context['encodes'][] = $encode->getEncodeContext();
         }
         return $context;

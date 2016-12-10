@@ -22,7 +22,7 @@ abstract class KeyedWPAttachment extends WPAttachment {
 
     public function hasCorrectUniqueKey() {
         $metadata = wp_get_attachment_metadata($this->getAttachmentID());
-        if ($metadata['unique_key'] == $this->getUniqueKey()) {
+        if($metadata['unique_key'] == $this->getUniqueKey()) {
             return true;
         } else {
             return false;
@@ -31,52 +31,60 @@ abstract class KeyedWPAttachment extends WPAttachment {
 
     public function setKeyedAttachmentID($attachment_id) {
         $this->attachment_id = $attachment_id;
-        if (!$attachment_id) { return false; }
-        return update_post_meta($this->parent_post_id, 'attachment_id_'.$this->getUniqueKey(), $attachment_id);
+        if(!$attachment_id) {
+            return false;
+        }
+        return update_post_meta($this->parent_post_id, 'attachment_id_' . $this->getUniqueKey(), $attachment_id);
     }
 
     public function getAttachmentID() { // Redefined from parent class, because property is not set in constructor for child objects
-        if (isset($this->attachment_id)) { return $this->attachment_id; }
-        $attachment_id = get_post_meta($this->parent_post_id,'attachment_id_'.$this->getUniqueKey(),false)[0];
+        if(isset($this->attachment_id)) {
+            return $this->attachment_id;
+        }
+        $attachment_id = get_post_meta($this->parent_post_id, 'attachment_id_' . $this->getUniqueKey(), false)[0];
         $this->attachment_id = $attachment_id;
         return $attachment_id ? $attachment_id : false;
     }
 
-    public function completeAttaching($attachment_id,$skip_renaming) {
+    public function completeAttaching($attachment_id, $skip_renaming) {
         $this->setKeyedAttachmentID($attachment_id);
-        if (!$skip_renaming) $this->fixAttachmentFileName();
+        if(!$skip_renaming) {
+            $this->fixAttachmentFileName();
+        }
     }
 
     public function fixAttachmentFileName() {
         $attachment_id = $this->getAttachmentID();
-        if (!$attachment_id) { return false; }
+        if(!$attachment_id) {
+            return false;
+        }
         $file = $this->getPath();
         $dir = pathinfo($file)['dirname'];
-        $newfile = $dir."/".$this->getFileAssetFileName();
+        $newfile = $dir . "/" . $this->getFileAssetFileName();
         rename($file, $newfile);
-        update_attached_file($attachment_id,$newfile);
+        update_attached_file($attachment_id, $newfile);
     }
 
-    static function deleteOldAttachments($post_id,$goodKeys) {
+    static function deleteOldAttachments($post_id, $goodKeys) {
         $metadata = get_post_meta($post_id);
-        $deleted = array();
-        foreach ($metadata as $key => $val) {
-            if (substr($key,0,14)=='attachment_id_' && !in_array(substr($key,-32),$goodKeys)) {
+        $deleted = [];
+        foreach($metadata as $key => $val) {
+            if(substr($key, 0, 14) == 'attachment_id_' && !in_array(substr($key, -32), $goodKeys)) {
                 $deleted[] = wp_delete_attachment(intval($val[0]));
             }
         }
         return $deleted;
     }
-    
+
     public function uploadToAws($s3) {
-        $bucket = get_field('aws_bucket_name','options');
+        $bucket = get_field('aws_bucket_name', 'options');
         $result = $s3->putObject([
-            'Bucket' => $bucket,
-            'Key' => $this->getAwsKey(),
-            'SourceFile' => $this->getPath(),
-            'Content-Disposition' => 'attachment'
-            //'ACL'   =>  'public-read' // Set permissions through bucket policy for referrals from joco.fetchapp.com
-        ]);
+                                     'Bucket'              => $bucket,
+                                     'Key'                 => $this->getAwsKey(),
+                                     'SourceFile'          => $this->getPath(),
+                                     'Content-Disposition' => 'attachment'
+                                     //'ACL'   =>  'public-read' // Set permissions through bucket policy for referrals from joco.fetchapp.com
+                                 ]);
         $url = $result->toArray()['ObjectURL'];
         $this->setAwsUrl($url);
         $this->setUploadedTime();
@@ -85,43 +93,50 @@ abstract class KeyedWPAttachment extends WPAttachment {
 
     public function setAwsUrl($url) {
         $this->awsUrl = $url;
-        return update_post_meta($this->parent_post_id, strtolower('aws_url_'.$this->encodeLabel), $url);
+        return update_post_meta($this->parent_post_id, strtolower('aws_url_' . $this->encodeLabel), $url);
     }
 
     public function getAwsUrl() {
-        if ($this->awsUrl) { return $this->awsUrl; }
-        $key = strtolower('aws_url_'.$this->encodeLabel);
-        $url = get_post_meta($this->parent_post_id,$key,false)[0];
+        if($this->awsUrl) {
+            return $this->awsUrl;
+        }
+        $key = strtolower('aws_url_' . $this->encodeLabel);
+        $url = get_post_meta($this->parent_post_id, $key, false)[0];
         $this->awsUrl = $url;
         return $url ? $url : false;
     }
 
     public function setCreatedTime() {
         $time = $this->createdTime = time();
-        return update_post_meta($this->parent_post_id, strtolower('encode_created_time_'.$this->encodeLabel), $time);
+        return update_post_meta($this->parent_post_id, strtolower('encode_created_time_' . $this->encodeLabel), $time);
     }
 
     public function getCreatedTime() {
-        if ($this->createdTime) {
+        if($this->createdTime) {
             return $this->createdTime;
         }
-        $time = get_post_meta($this->parent_post_id,strtolower('encode_created_time_'.$this->encodeLabel),false)[0];
-        if (!$time) $time = 1;
+        $time = get_post_meta($this->parent_post_id, strtolower('encode_created_time_' . $this->encodeLabel), false)[0];
+        if(!$time) {
+            $time = 1;
+        }
         $this->createdTime = $time;
         return $this->createdTime;
     }
 
     public function setUploadedTime() {
         $time = $this->uploadedTime = time();
-        return update_post_meta($this->parent_post_id, strtolower('encode_uploaded_time_'.$this->encodeLabel), $time);
+        return update_post_meta($this->parent_post_id, strtolower('encode_uploaded_time_' . $this->encodeLabel), $time);
     }
 
     public function getUploadedTime() {
-        if ($this->uploadedTime) {
+        if($this->uploadedTime) {
             return $this->uploadedTime;
         }
-        $time = get_post_meta($this->parent_post_id,strtolower('encode_uploaded_time_'.$this->encodeLabel),false)[0];
-        if (!$time) $time = 0;
+        $time =
+            get_post_meta($this->parent_post_id, strtolower('encode_uploaded_time_' . $this->encodeLabel), false)[0];
+        if(!$time) {
+            $time = 0;
+        }
         $this->uploadedTime = $time;
         return $this->uploadedTime;
     }

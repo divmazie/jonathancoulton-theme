@@ -7,10 +7,10 @@ class Album extends ShopifyProduct {
 
     private $albumTitle, $albumArtist, $albumPrice, $albumYear, $albumGenre, $albumComment, $albumArtObject, $albumBonusAssetObjects, $albumShow, $albumSortOrder, $albumDescription;
     // the parent post object
-    private $encode_types,$wpPost;
+    private $encode_types, $wpPost;
     //
-    private $albumTracks = array();
-    private $shopify_collection_id,$shopify_collect_ids;
+    private $albumTracks = [];
+    private $shopify_collection_id, $shopify_collect_ids;
 
     /**
      * @param \WP_Post $postObject the post in the blog that forms the base of this
@@ -40,7 +40,7 @@ class Album extends ShopifyProduct {
         */
         //$this->albumShow = get_field('show_album_in_store',$post_id);
         //$this->albumSortOrder = get_field('album_sort_order',$post_id);
-        $this->encode_types = include(get_template_directory().'/config/encode_types.php');
+        $this->encode_types = include(get_template_directory() . '/config/encode_types.php');
         //$this->shopify_id = get_post_meta($post_id,'shopify_id',false)[0];
         //$this->shopify_variant_ids = unserialize(get_post_meta($post_id,'shopify_variant_ids',false)[0]);
         //$this->shopify_variant_skus = unserialize(get_post_meta($post_id,'shopify_variant_skus',false)[0]);
@@ -49,18 +49,18 @@ class Album extends ShopifyProduct {
     }
 
     static function getAllAlbums() {
-        $albums = array();
-        $album_posts = get_posts(array('post_type' => 'album','numberposts' => -1));
-        foreach ($album_posts as $album_post) {
+        $albums = [];
+        $album_posts = get_posts(['post_type' => 'album', 'numberposts' => -1]);
+        foreach($album_posts as $album_post) {
             $album = new Album($album_post);
-            if ($album->getAlbumShow())
+            if($album->getAlbumShow())
                 $albums[] = $album;
         }
         return $albums;
     }
 
     public function getAlbumContext() {
-        $context = array('title' => $this->getAlbumTitle(), 'artist' => $this->getAlbumArtist());
+        $context = ['title' => $this->getAlbumTitle(), 'artist' => $this->getAlbumArtist()];
         $context['show_album'] = $this->getAlbumShow() ? true : false;
         $context['encode_worthy'] = $this->isEncodeWorthy() ? true : false;
         //$context['year'] = $this->getAlbumYear();
@@ -68,52 +68,55 @@ class Album extends ShopifyProduct {
         $context['sort_order'] = $this->getAlbumSortOrder();
         $context['sort_order_conflict'] = false;
         $context['art'] = $this->getAlbumArtObject() ?
-            array('filename'=> basename($this->getAlbumArtObject()->getPath()),
-                'url'=>$this->getAlbumArtObject()->getURL(),
-                'exists'=>file_exists($this->getAlbumArtObject()->getPath()))
-            : array('filename'=>'MISSING!!!', 'url'=>'MISSING!!!', 'exists'=>false);
-        $context['album_zips'] = array();
-        foreach ($this->getAllChildZips() as $zip) {
+            [
+                'filename' => basename($this->getAlbumArtObject()->getPath()),
+                'url'      => $this->getAlbumArtObject()->getURL(),
+                'exists'   => file_exists($this->getAlbumArtObject()->getPath()),
+            ]
+            : ['filename' => 'MISSING!!!', 'url' => 'MISSING!!!', 'exists' => false];
+        $context['album_zips'] = [];
+        foreach($this->getAllChildZips() as $zip) {
             $zip_context = $zip->getZipContext();
-            if (!is_array($zip_context)) $zip_context = array('exists'=>false);
+            if(!is_array($zip_context)) $zip_context = ['exists' => false];
             $context['album_zips'][] = $zip_context;
         }
-        $context['tracks'] = array();
-        foreach ($this->getAlbumTracks() as $key => $track) {
+        $context['tracks'] = [];
+        foreach($this->getAlbumTracks() as $key => $track) {
             $context['tracks'][$key] = $track->getTrackContext();
-            if ($key>1000) {
+            if($key > 1000) {
                 $context['tracks'][$key]['track_num_conflict'] = true;
             }
         }
-        $context['bonus_assets'] = array();
-        foreach ($this->getAlbumBonusAssetObjects() as $bonus_asset) {
-            $context['bonus_assets'][] = array('filename'=>basename($bonus_asset->getPath()),'exists'=>file_exists($bonus_asset->getPath()));
+        $context['bonus_assets'] = [];
+        foreach($this->getAlbumBonusAssetObjects() as $bonus_asset) {
+            $context['bonus_assets'][] =
+                ['filename' => basename($bonus_asset->getPath()), 'exists' => file_exists($bonus_asset->getPath())];
         }
         return $context;
     }
 
     public function isEncodeWorthy() {
         $worthy = false;
-        if ($this->getAlbumShow() && $this->getAlbumTitle() && $this->getAlbumArtist() && $this->getAlbumArtObject()) {
+        if($this->getAlbumShow() && $this->getAlbumTitle() && $this->getAlbumArtist() && $this->getAlbumArtObject()) {
             $worthy = true;
         }
         return $worthy;
     }
 
     public function getNeededEncodes() {
-        if (!$this->isEncodeWorthy()) {
+        if(!$this->isEncodeWorthy()) {
             return false;
         }
         $zips = $this->getAllChildZips();
         $all_zips_exist = true;
-        foreach ($zips as $zip) {
-            if (!$zip->fileAssetExists()) $all_zips_exist = false;
+        foreach($zips as $zip) {
+            if(!$zip->fileAssetExists()) $all_zips_exist = false;
         }
-        if ($all_zips_exist) return false;
-        $encodes = array();
-        foreach ($this->getAlbumTracks() as $track) {
+        if($all_zips_exist) return false;
+        $encodes = [];
+        foreach($this->getAlbumTracks() as $track) {
             $track_encodes = $track->getNeededEncodes();
-            if ($track_encodes) {
+            if($track_encodes) {
                 $encodes = array_merge($encodes, $track_encodes);
             }
         }
@@ -121,38 +124,38 @@ class Album extends ShopifyProduct {
     }
 
     public function getAllChildZips() {
-        $zips = array();
-        foreach ($this->encode_types as $key => $encode_type) {
+        $zips = [];
+        foreach($this->encode_types as $key => $encode_type) {
             $label = $key;
             $format = $encode_type[0];
             $flags = $encode_type[1];
-            $zips[$label] = $this->getChildZip($format,$flags,$label);
+            $zips[$label] = $this->getChildZip($format, $flags, $label);
         }
         return $zips;
     }
 
-    public function getChildZip($format,$flags,$label='') {
-        if (!$label) {
+    public function getChildZip($format, $flags, $label = '') {
+        if(!$label) {
             $label = $format;
         }
-        $zip = new AlbumZip($this,$format,$flags,$label);
+        $zip = new AlbumZip($this, $format, $flags, $label);
         return $zip;
     }
 
     public function cleanAttachments() {
         $deleted = $this->deleteOldZips();
-        foreach ($this->getAlbumTracks() as $track) {
-            $deleted = array_merge($deleted,$track->deleteOldEncodes());
+        foreach($this->getAlbumTracks() as $track) {
+            $deleted = array_merge($deleted, $track->deleteOldEncodes());
         }
         return $deleted;
     }
 
     public function deleteOldZips() {
-        $goodKeys = array();
-        foreach ($this->getAllChildZips() as $zip) {
+        $goodKeys = [];
+        foreach($this->getAllChildZips() as $zip) {
             $goodKeys[] = $zip->getUniqueKey();
         }
-        return AlbumZip::deleteOldAttachments($this->postID,$goodKeys);
+        return AlbumZip::deleteOldAttachments($this->postID, $goodKeys);
     }
 
     public function getNumberOfAlbumTracks() {
@@ -161,11 +164,14 @@ class Album extends ShopifyProduct {
 
     // @return array the album tracks IN ORDER
     public function getAlbumTracks() {
-        if (!count($this->albumTracks)) {
-            $tracks = get_posts(array('post_type' => 'track', 'posts_per_page' => -1, 'meta_key' => 'track_album', 'meta_value' => $this->postID));
-            foreach ($tracks as $track) {
+        if(!count($this->albumTracks)) {
+            $tracks = get_posts([
+                                    'post_type' => 'track', 'posts_per_page' => -1, 'meta_key' => 'track_album',
+                                    'meta_value' => $this->postID,
+                                ]);
+            foreach($tracks as $track) {
                 $track_num = intval(get_field('track_number', $track->ID));
-                while (isset($this->albumTracks[$track_num])) {
+                while(isset($this->albumTracks[$track_num])) {
                     $track_num = 1000 + $track_num;
                 }
                 $this->albumTracks[$track_num] = new Track($track, $this);
@@ -185,18 +191,21 @@ class Album extends ShopifyProduct {
     public function getAlbumTitle() {
         return $this->albumTitle;
     }
-    public function getTitle() { return $this->getAlbumTitle(); }
+
+    public function getTitle() {
+        return $this->getAlbumTitle();
+    }
 
     /**
      * @return mixed
      */
     public function getAlbumArtist() {
-        if (!isset($this->albumArtist)) $this->albumArtist = get_field('album_artist',$this->postID);
+        if(!isset($this->albumArtist)) $this->albumArtist = get_field('album_artist', $this->postID);
         return $this->albumArtist;
     }
 
     public function getAlbumPrice() {
-        if (!isset($this->albumPrice)) $this->albumPrice = get_field('album_price',$this->postID);
+        if(!isset($this->albumPrice)) $this->albumPrice = get_field('album_price', $this->postID);
         return abs(intval($this->albumPrice));
     }
 
@@ -204,7 +213,7 @@ class Album extends ShopifyProduct {
      * @return mixed
      */
     public function getAlbumYear() {
-        if (!isset($this->albumYear)) $this->albumYear = get_field('album_year',$this->postID);
+        if(!isset($this->albumYear)) $this->albumYear = get_field('album_year', $this->postID);
         return $this->albumYear;
     }
 
@@ -212,7 +221,7 @@ class Album extends ShopifyProduct {
      * @return mixed
      */
     public function getAlbumGenre() {
-        if (!isset($this->albumGenre)) $this->albumGenre = get_field('album_genre',$this->postID);
+        if(!isset($this->albumGenre)) $this->albumGenre = get_field('album_genre', $this->postID);
         return $this->albumGenre;
     }
 
@@ -220,7 +229,8 @@ class Album extends ShopifyProduct {
      * @return mixed
      */
     public function getAlbumArtObject() {
-        if (!isset($this->albumArtObject)) $this->albumArtObject = get_field('album_art',$this->postID) ? new WPAttachment(get_field('album_art',$this->postID)) : false;
+        if(!isset($this->albumArtObject)) $this->albumArtObject =
+            get_field('album_art', $this->postID) ? new WPAttachment(get_field('album_art', $this->postID)) : false;
         return $this->albumArtObject;
     }
 
@@ -228,11 +238,11 @@ class Album extends ShopifyProduct {
      * @return mixed
      */
     public function getAlbumBonusAssetObjects() {
-        if (!isset($this->albumBonusAssetObjects)) {
-            $this->albumBonusAssetObjects = array();
-            $bonus_asset_rows = get_field('bonus_assets',$this->postID);
-            if (is_array($bonus_asset_rows)) {
-                foreach ($bonus_asset_rows as $row) {
+        if(!isset($this->albumBonusAssetObjects)) {
+            $this->albumBonusAssetObjects = [];
+            $bonus_asset_rows = get_field('bonus_assets', $this->postID);
+            if(is_array($bonus_asset_rows)) {
+                foreach($bonus_asset_rows as $row) {
                     $this->albumBonusAssetObjects[] = new WPAttachment($row['bonus_asset']);
                 }
             }
@@ -241,7 +251,7 @@ class Album extends ShopifyProduct {
     }
 
     public function getAlbumShow() {
-        if (!isset($this->albumShow)) $this->albumShow = get_field('show_album_in_store',$this->postID);
+        if(!isset($this->albumShow)) $this->albumShow = get_field('show_album_in_store', $this->postID);
         return $this->albumShow;
     }
 
@@ -249,39 +259,40 @@ class Album extends ShopifyProduct {
      * @return mixed
      */
     public function getAlbumComment() {
-        if (!isset($this->albumComment)) $this->albumComment = get_field('album_comment',$this->postID);
+        if(!isset($this->albumComment)) $this->albumComment = get_field('album_comment', $this->postID);
         return $this->albumComment;
     }
 
     public function getAlbumSortOrder() {
-        if (!isset($this->albumSortOrder)) $this->albumSortOrder = get_field('album_sort_order',$this->postID);
+        if(!isset($this->albumSortOrder)) $this->albumSortOrder = get_field('album_sort_order', $this->postID);
         return $this->albumSortOrder;
     }
 
     public function getAlbumDescription() {
-        if (!isset($this->albumDescription)) $this->albumDescription = get_field('album_description',$this->postID);
+        if(!isset($this->albumDescription)) $this->albumDescription = get_field('album_description', $this->postID);
         return $this->albumDescription;
     }
 
     public function getShopifyCollectionId() {
-        if (!isset($this->shopify_collection_id)) $this->shopify_collection_id = get_post_meta($this->postID,'shopify_collection_id',false)[0];
+        if(!isset($this->shopify_collection_id)) $this->shopify_collection_id =
+            get_post_meta($this->postID, 'shopify_collection_id', false)[0];
         return $this->shopify_collection_id;
     }
 
     public function setShopifyCollectionId($id) {
-        if (update_post_meta($this->postID,'shopify_collection_id',$id)) {
+        if(update_post_meta($this->postID, 'shopify_collection_id', $id)) {
             $this->shopify_collection_id = $id;
         }
     }
 
-    public function syncToStore($shopify, $step=0) {
-        if ($step == 0) {
-            $context = array();
-            $context['sync_responses'] = array();
+    public function syncToStore($shopify, $step = 0) {
+        if($step == 0) {
+            $context = [];
+            $context['sync_responses'] = [];
             $response = $shopify->syncProduct($this);
             $context['sync_responses'][] = $response['response'];
             $missing_files = $response['missing_files'];
-            $track_product_ids = array(0 => $response['response']->product->id);
+            $track_product_ids = [0 => $response['response']->product->id];
         } else {
             $context = get_transient('temp_context');
             $missing_files = get_transient('temp_missing_files');
@@ -289,8 +300,8 @@ class Album extends ShopifyProduct {
         }
         $tracks = $this->getAlbumTracks();
         $track_counter = 0;
-        foreach ($tracks as $track) {
-            if (($step==0 && $track_counter<8) || ($step>0 && $track_counter>=8)) {
+        foreach($tracks as $track) {
+            if(($step == 0 && $track_counter < 8) || ($step > 0 && $track_counter >= 8)) {
                 $response = $track->syncToStore($shopify);
                 $context['sync_responses'][] = $response['response'];
                 $missing_files = array_merge($missing_files, $response['missing_files']);
@@ -298,10 +309,10 @@ class Album extends ShopifyProduct {
             }
             $track_counter++;
         }
-        set_transient('track_product_ids',$track_product_ids);
-        if ($step==0) {
+        set_transient('track_product_ids', $track_product_ids);
+        if($step == 0) {
             set_transient('temp_context', $context);
-            set_transient('temp_missing_files',$missing_files);
+            set_transient('temp_missing_files', $missing_files);
         } else {
             delete_transient('temp_context');
             delete_transient('temp_missing_files');
@@ -314,7 +325,7 @@ class Album extends ShopifyProduct {
 
     public function syncCollection($shopify) {
         $track_product_ids = get_transient('track_product_ids');
-        $response = $shopify->syncAlbumCollection($this,$track_product_ids);
+        $response = $shopify->syncAlbumCollection($this, $track_product_ids);
         delete_transient('track_product_ids');
         return $response;
     }

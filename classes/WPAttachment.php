@@ -16,7 +16,7 @@ class WPAttachment {
     private $path;
 
     public function __construct($attachment) {
-        if (is_array($attachment)) {
+        if(is_array($attachment)) {
             $this->attachment_id = $attachment['id'];
         } else {
             $this->attachment_id = $attachment;
@@ -33,7 +33,9 @@ class WPAttachment {
     }
 
     public function getPath() {
-        if (!isset($this->path)) $this->path = get_attached_file($this->getAttachmentID());
+        if(!isset($this->path)) {
+            $this->path = get_attached_file($this->getAttachmentID());
+        }
         return $this->path;
     }
 
@@ -42,7 +44,9 @@ class WPAttachment {
     }
 
     public function fileAssetExists() {
-        if ($this->getAttachmentID() && file_exists($this->getPath()) && filesize($this->getPath())) { // Checking filesize for hundreds of files slows things down?
+        if($this->getAttachmentID() && file_exists($this->getPath()) &&
+           filesize($this->getPath())
+        ) { // Checking filesize for hundreds of files slows things down?
             return true;
         } else {
             return false;
