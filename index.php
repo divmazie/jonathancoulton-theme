@@ -41,7 +41,7 @@ if (is_array($store)) {
 $context['store'] = $store;
 $bandsintown = get_transient('bandsintown');
 if (!$bandsintown) {
-    $bandsintown = json_decode(file_get_contents("http://api.bandsintown.com/artists/jonathancoulton/events.json?date=2015-01-01,2017-01-31")); // to test w/ old shows
+    $bandsintown = json_decode(file_get_contents("http://api.bandsintown.com/artists/jonathancoulton/events.json?api_version=2.0&app_id=".get_field('bandsintown_app_id','options')));
     set_transient('bandsintown',$bandsintown,600);
 }
 $context['bandsintown'] = $bandsintown;
