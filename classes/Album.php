@@ -8,23 +8,12 @@ class Album extends ShopifyProduct {
 
     const CPT_NAME = 'album';
 
-    private $albumArtObject, $albumBonusAssetObjects, $albumShow;
-    private $albumTracks = [];
+    private $bonusAssetsCache, $albumTracksCache, $albumArtCache;
 
-    // meta fields acf will load (here for autocomplete purposes)=
+    // meta fields acf will load (here for autocomplete purposes)
     public $album_artist, $album_price, $album_year, $album_genre, $album_art, $album_comment, $album_sort_order, $album_description, $shopify_collection_id, $bonus_assets, $show_album_in_store;
 
-    /**
-     * @param \WP_Post $postObject the post in the blog that forms the base of this
-     * album. The post contains ACF fields and post_meta data that will define the
-     * internal variables of this class
-     **/
     public function __construct($pid) {
-        //$this->shopify_id = get_post_meta($post_id,'shopify_id',false)[0];
-        //$this->shopify_variant_ids = unserialize(get_post_meta($post_id,'shopify_variant_ids',false)[0]);
-        //$this->shopify_variant_skus = unserialize(get_post_meta($post_id,'shopify_variant_skus',false)[0]);
-        //$this->shopify_collection_id = get_post_meta($post_id,'shopify_collection_id',false)[0];
-        // Tracks now gotten in getAlbumTracks() to reduce database hits
         parent::__construct($pid);
     }
 
@@ -52,10 +41,6 @@ class Album extends ShopifyProduct {
         return $this->album_genre;
     }
 
-    public function getAlbumArtObject() {
-        return Timber::get_post($this->album_art, AlbumArt::class);
-    }
-
     public function getAlbumComment() {
         return $this->album_comment;
     }
@@ -81,26 +66,56 @@ class Album extends ShopifyProduct {
         return $this->show_album_in_store;
     }
 
+    public function getAlbumArtObject() {
+        return $this->albumArtCache ? $this->albumArtCache :
+            $this->albumArtCache = Timber::get_post($this->album_art, AlbumArt::class);
+    }
+
     // @return Track[] the album tracks IN ORDER
     public function getAlbumTracks() {
-        return Track::getTracksForAlbum($this);
+        return $this->albumTracksCache ? $this->albumTracksCache :
+            $this->albumTracksCache = Track::getTracksForAlbum($this);
     }
 
     /**
      * @return BonusAsset[]
      */
     public function getAlbumBonusAssetObjects() {
-        return Timber::get_posts([
-                                     'post__in'    => array_map(function ($idx) {
-                                         // get the ids of each of the bonus assets
-                                         return $this->{sprintf('bonus_assets_%d_bonus_asset', $idx)};
-                                         // bonus_assets is the number of
-                                     }, range(0, intval($this->bonus_assets) - 1)),
-                                     // the things ACF will put in here are pretty widely variable
-                                     // so
-                                     'post_type'   => 'any',
-                                     'post_status' => 'any',
-                                 ], BonusAsset::class);
+        return $this->bonusAssetsCache ? $this->bonusAssetsCache :
+            $this->bonusAssetsCache =
+                Timber::get_posts([
+                                      'post__in'    => array_map(function ($idx) {
+                                          // get the ids of each of the bonus assets
+                                          return $this->{sprintf('bonus_assets_%d_bonus_asset', $idx)};
+                                          // bonus_assets is the number of
+                                      }, range(0, intval($this->bonus_assets) -
+                                                  1)),
+                                      // the things ACF will put in here are pretty widely variable
+                                      // so
+                                      'post_type'   => 'any',
+                                      'post_status' => 'any',
+                                  ], BonusAsset::class);
+    }
+
+    public function getAllChildZips() {
+        $encode_types = Util::get_encode_types();
+
+        $zips = [];
+        foreach($encode_types as $key => $encode_type) {
+            $label = $key;
+            $format = $encode_type[0];
+            $flags = $encode_type[1];
+            $zips[$label] = $this->getChildZip($format, $flags, $label);
+        }
+        return $zips;
+    }
+
+    public function getChildZip($format, $flags, $label = '') {
+        if(!$label) {
+            $label = $format;
+        }
+        $zip = new AlbumZip($this, $format, $flags, $label);
+        return $zip;
     }
 
 
@@ -188,17 +203,15 @@ class Album extends ShopifyProduct {
     }
 
     public function isEncodeWorthy() {
-        $worthy = false;
-        if($this->getAlbumShow() && $this->getAlbumTitle() && $this->getAlbumArtist() && $this->getAlbumArtObject()) {
-            $worthy = true;
-        }
-        return $worthy;
+        return ($this->getAlbumShow() && $this->getAlbumTitle() && $this->getAlbumArtist() &&
+                $this->getAlbumArtObject());
     }
 
     public function getNeededEncodes() {
         if(!$this->isEncodeWorthy()) {
             return false;
         }
+
         $zips = $this->getAllChildZips();
         $all_zips_exist = true;
         foreach($zips as $zip) {
@@ -217,27 +230,6 @@ class Album extends ShopifyProduct {
             }
         }
         return $encodes;
-    }
-
-    public function getAllChildZips() {
-        $encode_types = include(dirname(__DIR__) . '/config/encode_types.php');
-
-        $zips = [];
-        foreach($encode_types as $key => $encode_type) {
-            $label = $key;
-            $format = $encode_type[0];
-            $flags = $encode_type[1];
-            $zips[$label] = $this->getChildZip($format, $flags, $label);
-        }
-        return $zips;
-    }
-
-    public function getChildZip($format, $flags, $label = '') {
-        if(!$label) {
-            $label = $format;
-        }
-        $zip = new AlbumZip($this, $format, $flags, $label);
-        return $zip;
     }
 
     public function cleanAttachments() {

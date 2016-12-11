@@ -2,6 +2,6 @@
 
 namespace jct;
 
-class BonusAsset extends JCTPost {
+class BonusAsset extends WPAttachment {
 
 }

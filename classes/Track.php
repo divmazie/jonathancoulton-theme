@@ -61,11 +61,8 @@ class Track extends ShopifyProduct {
     }
 
     public function getTrackArtObject() {
-        if(!isset($this->trackArtObject)) {
-            $this->trackArtObject =
-                get_field('track_art', $this->postID) ? new WPAttachment(get_field('track_art', $this->postID)) : false;
-        }
-        return $this->trackArtObject ? $this->trackArtObject : $this->parentAlbum->getAlbumArtObject();
+        $trackArtObject = Timber::get_post($this->track_art);
+        return $trackArtObject ? $trackArtObject : $this->getAlbum()->getAlbumArtObject();
     }
 
     public function getTrackSourceFileObject() {

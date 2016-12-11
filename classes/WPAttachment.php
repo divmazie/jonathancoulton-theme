@@ -9,23 +9,14 @@
 namespace jct;
 
 
-class WPAttachment {
+class WPAttachment extends JCTPost {
 
-    public $attachment_id;
-    public $parent_post_id;
-    private $path;
-
-    public function __construct($attachment) {
-        if(is_array($attachment)) {
-            $this->attachment_id = $attachment['id'];
-        } else {
-            $this->attachment_id = $attachment;
-        }
-        $this->parent_post_id = wp_get_post_parent_id($this->attachment_id);
+    public function __construct($id) {
+        parent::__construct($id);
     }
 
     public function getAttachmentID() { // must use this function instead of property because it gets redefined in KeyedWPAttachment
-        return $this->attachment_id;
+        return $this->getPostID();
     }
 
     public function getFilename() {
@@ -33,24 +24,15 @@ class WPAttachment {
     }
 
     public function getPath() {
-        if(!isset($this->path)) {
-            $this->path = get_attached_file($this->getAttachmentID());
-        }
-        return $this->path;
+        return get_attached_file($this->ID);
     }
 
     public function getURL() {
-        return wp_get_attachment_url($this->getAttachmentID());
+        return wp_get_attachment_url($this->ID);
     }
 
     public function fileAssetExists() {
-        if($this->getAttachmentID() && file_exists($this->getPath()) &&
-           filesize($this->getPath())
-        ) { // Checking filesize for hundreds of files slows things down?
-            return true;
-        } else {
-            return false;
-        }
+        return $this->ID && file_exists($this->getPath()) && filesize($this->getPath());
     }
 
 }

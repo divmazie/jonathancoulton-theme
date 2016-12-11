@@ -2,7 +2,7 @@
 
 namespace jct;
 
-class AlbumArt extends JCTPost {
+class AlbumArt extends WPAttachment {
 
 }
 

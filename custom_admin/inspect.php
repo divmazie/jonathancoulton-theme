@@ -34,6 +34,21 @@ switch($class) {
 
         new_section('tracks');
         var_dump($post->getAlbumTracks());
+
+        new_section('art');
+        var_dump($post->getAlbumArtObject());
+        break;
+
+
+    case WPAttachment::class:
+    case AlbumArt::class:
+    case BonusAsset::class:
+        var_dump([
+                     'getPath'         => $post->getPath(),
+                     'fileName'        => $post->getFilename(),
+                     'getUrl'          => $post->getURL(),
+                     'fileAssetExists' => $post->fileAssetExists(),
+                 ]);
         break;
 }
 
