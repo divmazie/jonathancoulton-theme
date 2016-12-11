@@ -8,8 +8,6 @@ class Album extends ShopifyProduct {
 
     const CPT_NAME = 'album';
 
-    private $bonusAssetsCache, $albumTracksCache, $albumArtCache;
-
     // meta fields acf will load (here for autocomplete purposes)
     public $album_artist, $album_price, $album_year, $album_genre, $album_art, $album_comment, $album_sort_order, $album_description, $shopify_collection_id, $bonus_assets, $show_album_in_store;
 
@@ -67,34 +65,30 @@ class Album extends ShopifyProduct {
     }
 
     public function getAlbumArtObject() {
-        return $this->albumArtCache ? $this->albumArtCache :
-            $this->albumArtCache = Timber::get_post($this->album_art, AlbumArt::class);
+        return Util::get_posts_cached($this->album_art, CoverArt::class);
     }
 
     // @return Track[] the album tracks IN ORDER
     public function getAlbumTracks() {
-        return $this->albumTracksCache ? $this->albumTracksCache :
-            $this->albumTracksCache = Track::getTracksForAlbum($this);
+        return Track::getTracksForAlbum($this);
     }
 
     /**
      * @return BonusAsset[]
      */
     public function getAlbumBonusAssetObjects() {
-        return $this->bonusAssetsCache ? $this->bonusAssetsCache :
-            $this->bonusAssetsCache =
-                Timber::get_posts([
-                                      'post__in'    => array_map(function ($idx) {
-                                          // get the ids of each of the bonus assets
-                                          return $this->{sprintf('bonus_assets_%d_bonus_asset', $idx)};
-                                          // bonus_assets is the number of
-                                      }, range(0, intval($this->bonus_assets) -
-                                                  1)),
-                                      // the things ACF will put in here are pretty widely variable
-                                      // so
-                                      'post_type'   => 'any',
-                                      'post_status' => 'any',
-                                  ], BonusAsset::class);
+        return Util::get_posts_cached([
+                                          'post__in'    => array_map(function ($idx) {
+                                              // get the ids of each of the bonus assets
+                                              return $this->{sprintf('bonus_assets_%d_bonus_asset', $idx)};
+                                              // bonus_assets is the number of
+                                          }, range(0, intval($this->bonus_assets) -
+                                                      1)),
+                                          // the things ACF will put in here are pretty widely variable
+                                          // so
+                                          'post_type'   => 'any',
+                                          'post_status' => 'any',
+                                      ], BonusAsset::class);
     }
 
     public function getAllChildZips() {
@@ -254,7 +248,11 @@ class Album extends ShopifyProduct {
 
 
     public static function getAllAlbums() {
-        return Timber::get_posts(['post_type' => 'album', 'numberposts' => -1], Album::class);
+        return Util::get_posts_cached(['post_type' => self::CPT_NAME, 'numberposts' => -1], Album::class);
+    }
+
+    public static function getAlbumByID($id) {
+        return Util::get_posts_cached($id, self::class);
     }
 
 

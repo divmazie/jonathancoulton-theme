@@ -37,12 +37,26 @@ switch($class) {
 
         new_section('art');
         var_dump($post->getAlbumArtObject());
+
+        new_section('all child zips');
+        var_dump($post->getAllChildZips());
+        break;
+
+    case Track::class;
+        /** @var $post Track */
+        new_section('track art');
+        var_dump($post->getTrackArtObject());
+die();
+        new_section('track src');
+        var_dump($post->getTrackSourceFileObject());
+
         break;
 
 
     case WPAttachment::class:
-    case AlbumArt::class:
+    case CoverArt::class:
     case BonusAsset::class:
+        /** @var $post WPAttachment */
         var_dump([
                      'getPath'         => $post->getPath(),
                      'fileName'        => $post->getFilename(),

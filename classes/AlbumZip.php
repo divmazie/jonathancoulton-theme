@@ -11,7 +11,7 @@ namespace jct;
 
 class AlbumZip extends KeyedWPAttachment {
 
-    private $parentAlbum;
+    private $parentAlbum, $encodeCLIFlags, $encodeFormat, $encodeLabel;
 
     public function __construct(Album $parentAlbum, $encodeFormat, $encodeCLIFlags, $encodeLabel = "") {
         if(!$encodeLabel) {
@@ -24,12 +24,29 @@ class AlbumZip extends KeyedWPAttachment {
         $this->encodeLabel = $encodeLabel;
     }
 
+
+    public function getParentAlbum() {
+        return $this->parentAlbum;
+    }
+
+    public function getEncodeFormat() {
+        return $this->encodeFormat;
+    }
+
+    public function getEncodeCLIFlags() {
+        return $this->encodeCLIFlags;
+    }
+
+    public function getEncodeLabel() {
+        return $this->encodeLabel;
+    }
+
+
     public function getUniqueKey() {
-        $parent_album = $this->parentAlbum;
         $album_info = [
-            $parent_album->getAlbumTitle(),
+            $this->getParentAlbum()->getAlbumTitle(),
         ];
-        foreach($parent_album->getAlbumBonusAssetObjects() as $bonus_asset) {
+        foreach($this->getParentAlbum()->getAlbumBonusAssetObjects() as $bonus_asset) {
             $album_info[] = md5_file($bonus_asset->getPath());
         }
         foreach($this->getEncodesToZip() as $encode) {
@@ -51,6 +68,9 @@ class AlbumZip extends KeyedWPAttachment {
         return sprintf('%s_%s_%s.%s', $title, $this->encodeFormat, $this->getShortUniqueKey(), "zip");
     }
 
+    /**
+     * @return Encode[]
+     */
     public function getEncodesToZip() {
         $parent_album = $this->getParentAlbum();
         $tracks = $parent_album->getAlbumTracks();
@@ -90,7 +110,7 @@ class AlbumZip extends KeyedWPAttachment {
             $filecount = 0;
             $filename = $upload_dir['path'] . "/" . $this->getFileAssetFileName();
             $filetype = wp_check_filetype(basename($filename), null);
-            if($zip->open($filename, \ZipArchive::CREATE) !== TRUE) {
+            if($zip->open($filename, \ZipArchive::CREATE) !== true) {
                 return [false, "Cannot open zip file: <$filename>\n"];
             }
             $zip_dir_name = $this->parentAlbum->getAlbumTitle() . "/";
@@ -144,22 +164,6 @@ class AlbumZip extends KeyedWPAttachment {
             $this->setCreatedTime();
             return [true, "Zip created successfully!\n"];
         }
-    }
-
-    public function getParentAlbum() {
-        return $this->parentAlbum;
-    }
-
-    public function getEncodeFormat() {
-        return $this->encodeFormat;
-    }
-
-    public function getEncodeCLIFlags() {
-        return $this->encodeCLIFlags;
-    }
-
-    public function getEncodeLabel() {
-        return $this->encodeLabel;
     }
 
     public function getZipContext() {

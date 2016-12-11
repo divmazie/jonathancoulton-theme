@@ -8,20 +8,14 @@ class Track extends ShopifyProduct {
 
     const CPT_NAME = 'track';
 
-
-    private $trackArtObject, $trackSourceFileObject;
-    private $wpPost, $encode_types;
-    private $parentAlbum;
-
     // auto complete acf props
     public $track_album, $track_source, $track_number, $track_price, $track_artist, $track_year, $track_genre, $track_art, $track_comment, $wiki_link;
-
 
     /**
      * @return Album
      */
     public function getAlbum() {
-        return $this->parentAlbum;
+        return Album::getAlbumByID($this->track_album);
     }
 
     public function getPostID() {
@@ -61,16 +55,12 @@ class Track extends ShopifyProduct {
     }
 
     public function getTrackArtObject() {
-        $trackArtObject = Timber::get_post($this->track_art);
+        $trackArtObject = $this->track_art ? Util::get_posts_cached($this->track_art, CoverArt::class) : null;
         return $trackArtObject ? $trackArtObject : $this->getAlbum()->getAlbumArtObject();
     }
 
     public function getTrackSourceFileObject() {
-        if(!isset($this->trackSourceFileObject)) {
-            $this->trackSourceFileObject =
-                get_field('track_source', $this->postID) ? new WPAttachment(get_field('track_source', $this->postID)) : false;
-        }
-        return $this->trackSourceFileObject;
+        return Util::get_posts_cached($this->track_source, WPAttachment::class);
     }
 
     public function getTrackContext() {
@@ -113,7 +103,7 @@ class Track extends ShopifyProduct {
 
     public function getAllChildEncodes() {
         $encodes = [];
-        foreach($this->encode_types as $key => $encode_type) {
+        foreach(Util::get_encode_types() as $key => $encode_type) {
             $label = $key;
             $format = $encode_type[0];
             $flags = $encode_type[1];
@@ -130,7 +120,7 @@ class Track extends ShopifyProduct {
     public function getMusicLink() {
         $encode_label = "MP3";
         $encode =
-            $this->getChildEncode($this->encode_types[$encode_label][0], $this->encode_types[$encode_label][1], $encode_label);
+            $this->getChildEncode(Util::get_encode_types()[$encode_label][0], Util::get_encode_types()[$encode_label][1], $encode_label);
         return $encode->getURL();
     }
 
@@ -160,14 +150,14 @@ class Track extends ShopifyProduct {
     }
 
     public static function getTracksForAlbum(Album $album) {
-        $tracks = Timber::get_posts([
-                                        'post_type'      => self::CPT_NAME,
-                                        'posts_per_page' => -1,
-                                        'meta_query'     => [
-                                            'key'   => 'track_album',
-                                            'value' => $album->getPostID(),
-                                        ],
-                                    ], self::class);
+        $tracks = Util::get_posts_cached([
+                                             'post_type'      => self::CPT_NAME,
+                                             'posts_per_page' => -1,
+                                             'meta_query'     => [
+                                                 'key'   => 'track_album',
+                                                 'value' => $album->getPostID(),
+                                             ],
+                                         ], self::class);
 
 
         usort($tracks, function (Track $left, Track $right) {

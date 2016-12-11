@@ -2,12 +2,34 @@
 
 namespace jct;
 
+use Timber\Timber;
+
 class Util {
 
+    public static function get_posts_cached($args, $returnClass) {
+        static $res_cache = [];
+        $cache_key = md5(serialize(func_get_args()));
+        if(isset($res_cache[$cache_key])) {
+            return $res_cache[$cache_key];
+        }
 
+        if(is_array($args)) {
+            $result = Timber::get_posts($args, $returnClass);
+        } else {
+            $result = Timber::get_post($args, $returnClass);
+        }
+        return $res_cache[$cache_key] = $result;
+    }
+
+    /**
+     * @return array
+     */
     public static function get_encode_types() {
-        static $encodeTypes = include(dirname(__DIR__) . '/config/encode_types.php');
-        return $encodeTypes;
+        static $encodeTypes = null;
+        if($encodeTypes) {
+            return $encodeTypes;
+        }
+        return $encodeTypes = include(dirname(__DIR__) . '/config/encode_types.php');
     }
 
     public static function get_user_option($option_name) {
