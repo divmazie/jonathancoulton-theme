@@ -64,6 +64,7 @@ class Album extends ShopifyProduct {
         return $this->show_album_in_store;
     }
 
+    /** @return CoverArt */
     public function getAlbumArtObject() {
         return Util::get_posts_cached($this->album_art, CoverArt::class);
     }
@@ -247,10 +248,12 @@ class Album extends ShopifyProduct {
     }
 
 
+    /** @return Album[] */
     public static function getAllAlbums() {
         return Util::get_posts_cached(['post_type' => self::CPT_NAME, 'numberposts' => -1], Album::class);
     }
 
+    /** @return Album */
     public static function getAlbumByID($id) {
         return Util::get_posts_cached($id, self::class);
     }

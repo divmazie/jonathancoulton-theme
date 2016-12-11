@@ -4,108 +4,36 @@ namespace jct;
 
 class Encode extends KeyedWPAttachment {
 
-    private $parentTrack;
+    const META_UNIQUE_KEY = 'encode_unique_key';
+    const META_ENCODE_CONFIG_KEY = 'encode_config';
+    const META_PARENT_TRACK_KEY = 'encode_parent_track';
 
-    static function recoverFromTransient($transient_key) {
-        $encode_details = get_transient($transient_key);
-        if(!$encode_details) {
-            return false;
-        }
-        $track_post_id = $encode_details[0];
-        $encode_format = $encode_details[1];
-        $encode_flags = $encode_details[2];
-        $encode_label = $encode_details[3];
-        $track_post = get_post($track_post_id);
-        $track = new Track($track_post);
-        return new Encode($track, $encode_format, $encode_flags, $encode_label);
+    /**
+     * @return Track
+     */
+    public function getParentTrack() {
+        return $this->getParentPost(Track::class);
     }
 
-    public function __construct(Track $parentTrack, $encodeFormat, $encodeCLIFlags, $encodeLabel) {
-        $this->parentTrack = $parentTrack;
-        $this->parent_post_id = $parentTrack->getPostID();
-        $this->encodeCLIFlags = $encodeCLIFlags;
-        $this->encodeFormat = $encodeFormat;
-        $this->encodeLabel = $encodeLabel;
+    public function setParentTrack(Track $track) {
+        $this->setParentPost($track);
+    }
+
+    /**
+     * @return EncodeConfig
+     */
+    public function getEncodeConfig() {
+        return EncodeConfig::fromPersistableArray($this->getAttachmentMetaPayloadArray());
+    }
+
+    public function setEncodeConfig(EncodeConfig $encodeConfig) {
+        $this->setAttachmentMetaPayloadArray($encodeConfig->toPersistableArray());
     }
 
     public function getFileAssetFileName() {
-        $title = $this->parentTrack->getTrackTitle();
-        $title = iconv('UTF-8', 'ASCII//TRANSLIT', $title);
-        // replace spaces with underscore
-        $title = preg_replace('/\s/u', '_', $title);
-        // remove non ascii alnum_ with
-        $title = preg_replace('/[^\da-z_]/i', '', $title);
-
-        // track number underscore track title underscore short hash dot extension
-        return sprintf("%'.02d_%s_%s.%s", $this->parentTrack->getTrackNumber(),
-                       $title, $this->getShortUniqueKey(),
-                       $this->encodeFormat == 'aac' || $this->encodeFormat == 'alac' ? 'm4a' : $this->encodeFormat);
+        return $this->getEncodeConfig()->getConfigSpecificFileName();
     }
 
-    public function getEncodeLabel() {
-        return $this->encodeLabel;
-    }
-
-    public function getEncodeFormat() {
-        return $this->encodeFormat;
-    }
-
-    public function getEncodeCLIFlags() {
-        return $this->encodeCLIFlags;
-    }
-
-    public function getParentTrack() {
-        return $this->parentTrack;
-    }
-
-    public function getUniqueKey() {
-        return md5(serialize($this->getEncodeConfig(true))); // This gets config without unique key or filename to prevent infinite loop
-    }
-
-    public function getEncodeConfig($forUseInUniqueKey = false) {
-        // what is $forUseInUniqueKey:
-        // the encode config is a great determinant of whether a file is unique
-        // this function both uses a file's unique key and is used to generate it
-        // so this flag let's us skip the pieces that would cause infinite recursion
-        $authcode = get_transient('do_secret');
-        $parent = $this->parentTrack;
-        $config = [
-            'source_url'    =>
-                $forUseInUniqueKey ?
-                    // post id will not change over site url changes
-                    '' :
-                    ($parent->getTrackSourceFileObject() ? $parent->getTrackSourceFileObject()->getURL() : 'shit...'),
-            'source_md5'    => $parent->getTrackSourceFileObject() ? md5_file($parent->getTrackSourceFileObject()->getPath()) : 'shit...',
-            'encode_format' => $this->getEncodeFormat(),
-            'dest_url'      =>
-                $forUseInUniqueKey ?
-                    '' :
-                    (get_site_url() . "/api/$authcode/receiveencode/" . $this->getUniqueKey()),
-            'art_url'       =>
-                $forUseInUniqueKey ?
-                    '' :
-                    ($parent->getTrackArtObject() ? $parent->getTrackArtObject()->getURL() : 'MISSING!!!'),
-            'art_md5'       => $parent->getTrackArtObject() ? md5_file($parent->getTrackArtObject()->getPath()) : 'MISSING!!!',
-            'metadata'      => [
-                'title'        => $parent->getTrackTitle(),
-                'track'        => $parent->getTrackNumber(),
-                'album'        => $parent->getAlbum()->getAlbumTitle(),
-                'album_artist' => $parent->getAlbum()->getAlbumArtist(),
-                'artist'       => $parent->getTrackArtist(),
-                'comment'      => $parent->getTrackComment(),
-                'genre'        => $parent->getTrackGenre(),
-                'filename'     => $forUseInUniqueKey ? '' : $this->getFileAssetFileName(),
-            ],
-        ];
-        if($this->encodeCLIFlags) {
-            $config['ffmpeg_flags'] = $this->encodeCLIFlags;
-        }
-        return $config;
-    }
-
-    public function encodeIsNeeded() {
-        return !$this->fileAssetExists();
-    }
 
     public function setEncodeTransient() {
         $unique_key = $this->getUniqueKey();
@@ -152,12 +80,6 @@ class Encode extends KeyedWPAttachment {
         }
     }
 
-    public function getEncodeContext() {
-        $context = ['format' => $this->getEncodeFormat(), 'flags' => $this->getEncodeCLIFlags()];
-        $context['exists'] = $this->fileAssetExists();
-        $context['need_to_upload'] = $this->needToUpload();
-        return $context;
-    }
 
     public function getAwsKey() { // Same as getFileAssetFileName() without the short hash
         $title = $this->parentTrack->getTrackTitle();
@@ -177,6 +99,36 @@ class Encode extends KeyedWPAttachment {
         return sprintf("%s_%'.02d_%s_%s.%s", $album_title, $this->parentTrack->getTrackNumber(), $title, $this->encodeFormat,
                        $this->encodeFormat == 'aac' || $this->encodeFormat == 'alac' ? 'm4a' : $this->encodeFormat);
     }
+
+
+    static function recoverFromTransient($transient_key) {
+        $encode_details = get_transient($transient_key);
+        if(!$encode_details) {
+            return false;
+        }
+        $track_post_id = $encode_details[0];
+        $encode_format = $encode_details[1];
+        $encode_flags = $encode_details[2];
+        $encode_label = $encode_details[3];
+        $track_post = get_post($track_post_id);
+        $track = new Track($track_post);
+        return new Encode($track, $encode_format, $encode_flags, $encode_label);
+    }
+
+    /**
+     * @param $uniqueKey
+     * @return Encode|null
+     */
+    public static function findByUniqueKey($uniqueKey) {
+        return Util::get_posts_cached([
+                                          'post_type'  => self::POST_TYPE_NAME,
+                                          'meta_query' => [
+                                              'key'   => self::META_UNIQUE_KEY,
+                                              'value' => $uniqueKey,
+                                          ],
+                                      ], self::class);
+    }
+
 
 }
 

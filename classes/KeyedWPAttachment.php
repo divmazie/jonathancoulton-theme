@@ -4,16 +4,45 @@ namespace jct;
 
 abstract class KeyedWPAttachment extends WPAttachment {
 
+    const META_UNIQUE_KEY = 'attachment_unique_key';
+    const META_ATTACHMENT_META_PAYLOAD = 'attachment_meta_payload';
+    const META_PARENT_PARENT_POST_KEY = 'attachment_parent_post';
+
+
     private $awsUrl;
     private $createdTime, $uploadedTime;
-    // encode format === file extension!
-    public $encodeLabel, $encodeFormat, $encodeCLIFlags;
 
-    abstract public function getUniqueKey();
+    // encode format === file extension!
+
 
     abstract public function getFileAssetFileName();
 
     abstract public function getAwsKey();
+
+
+    public function getUniqueKey() {
+        return $this->get_field(self::META_UNIQUE_KEY);
+    }
+
+    public function setUniqueKey($uniqueKey) {
+        $this->update(self::META_UNIQUE_KEY, $uniqueKey);
+    }
+
+    public function getAttachmentMetaPayloadArray() {
+        return $this->get_field(self::META_ATTACHMENT_META_PAYLOAD);
+    }
+
+    public function setAttachmentMetaPayloadArray(array $payload) {
+        $this->update(self::META_ATTACHMENT_META_PAYLOAD, $payload);
+    }
+
+    public function getParentPost($parentPostClass = JCTPost::class) {
+        return Util::get_posts_cached($this->get_field(self::META_PARENT_PARENT_POST_KEY), $parentPostClass);
+    }
+
+    public function setParentPost(JCTPost $post) {
+        $this->update(self::META_PARENT_PARENT_POST_KEY, $post->getPostID());
+    }
 
     public function getShortUniqueKey() {
         // if 7 is good enough for git/github, it's good enough for us

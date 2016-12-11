@@ -6,6 +6,10 @@ use Timber\Timber;
 
 class Util {
 
+    public static function get_site_url() {
+        return get_site_url();
+    }
+
     public static function get_posts_cached($args, $returnClass) {
         static $res_cache = [];
         $cache_key = md5(serialize(func_get_args()));
@@ -16,7 +20,13 @@ class Util {
         if(is_array($args)) {
             $result = Timber::get_posts($args, $returnClass);
         } else {
-            $result = Timber::get_post($args, $returnClass);
+            if($args) {
+                $result = Timber::get_post($args, $returnClass);
+            } else {
+                // if we are passed nothing in our args... don't fetch because timber
+                // will try to be smart about it.
+                return null;
+            }
         }
         return $res_cache[$cache_key] = $result;
     }

@@ -7,6 +7,7 @@ use Timber\Timber;
 class Track extends ShopifyProduct {
 
     const CPT_NAME = 'track';
+    const PLAYER_ENCODE_CONFIG_NAME = 'MP3';
 
     // auto complete acf props
     public $track_album, $track_source, $track_number, $track_price, $track_artist, $track_year, $track_genre, $track_art, $track_comment, $wiki_link;
@@ -18,17 +19,14 @@ class Track extends ShopifyProduct {
         return Album::getAlbumByID($this->track_album);
     }
 
-    public function getPostID() {
-        return $this->postID;
-    }
-
     public function getTrackTitle() {
         return $this->title();
     }
 
-    public function getTitle() {
+    function getTitle() {
         return $this->getTrackTitle();
     }
+
 
     public function getTrackNumber() {
         return abs(intval($this->track_number));
@@ -54,11 +52,15 @@ class Track extends ShopifyProduct {
         return $this->track_comment ? $this->track_comment : $this->getAlbum()->getAlbumComment();
     }
 
+    /** @returns CoverArt */
     public function getTrackArtObject() {
         $trackArtObject = $this->track_art ? Util::get_posts_cached($this->track_art, CoverArt::class) : null;
         return $trackArtObject ? $trackArtObject : $this->getAlbum()->getAlbumArtObject();
     }
 
+    /**
+     * @return WPAttachment
+     */
     public function getTrackSourceFileObject() {
         return Util::get_posts_cached($this->track_source, WPAttachment::class);
     }
@@ -89,17 +91,15 @@ class Track extends ShopifyProduct {
     }
 
     public function isEncodeWorthy() {
-        $worthy = false;
-        if($this->parentAlbum->isEncodeWorthy()) {
-            //$worthy = true;
-            if($this->getTrackTitle() && $this->getTrackArtist() && $this->getTrackSourceFileObject() &&
-               $this->getTrackArtObject()
-            ) {
-                $worthy = true;
-            }
-        }
-        return $worthy;
+        return $this->getAlbum()->isEncodeWorthy() && $this->getTrackTitle() && $this->getTrackArtist() &&
+               $this->getTrackSourceFileObject() && $this->getTrackArtObject();
     }
+
+    public function getMusicLink() {
+        return EncodeConfig::getConfigForTrackByName(
+            $this, self::PLAYER_ENCODE_CONFIG_NAME)->getEncode()->getURL();
+    }
+
 
     public function getAllChildEncodes() {
         $encodes = [];
@@ -115,13 +115,6 @@ class Track extends ShopifyProduct {
     public function getChildEncode($format, $flags, $label) {
         $encode = new Encode($this, $format, $flags, $label);
         return $encode;
-    }
-
-    public function getMusicLink() {
-        $encode_label = "MP3";
-        $encode =
-            $this->getChildEncode(Util::get_encode_types()[$encode_label][0], Util::get_encode_types()[$encode_label][1], $encode_label);
-        return $encode->getURL();
     }
 
     public function deleteOldEncodes() {
@@ -168,7 +161,11 @@ class Track extends ShopifyProduct {
         });
 
         return $tracks;
+    }
 
+    /** return Track|null */
+    public static function getTrackByID($id) {
+        return Util::get_posts_cached($id, self::class);
     }
 
 }

@@ -46,9 +46,12 @@ switch($class) {
         /** @var $post Track */
         new_section('track art');
         var_dump($post->getTrackArtObject());
-die();
+
         new_section('track src');
         var_dump($post->getTrackSourceFileObject());
+
+        new_section('track configs');
+        var_dump(EncodeConfig::getConfigsForTrack($post));
 
         break;
 

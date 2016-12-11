@@ -11,6 +11,8 @@ namespace jct;
 
 class WPAttachment extends JCTPost {
 
+    const POST_TYPE_NAME = 'attachment';
+
     public function __construct($id) {
         parent::__construct($id);
     }
