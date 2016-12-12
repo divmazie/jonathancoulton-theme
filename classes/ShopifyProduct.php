@@ -49,7 +49,7 @@ abstract class ShopifyProduct extends JCTPost {
     public function getWikiLink() {
         $wiki_link = $this->get_field(self::META_WIKI_LINK);
         if(!$wiki_link) {
-            $wiki_link = Util::get_user_option('joco_wiki_base_url') .
+            $wiki_link = Util::get_theme_option('joco_wiki_base_url') .
                          urlencode(preg_replace('/\s+/', '_', $this->getTitle()));
         }
         return $wiki_link;

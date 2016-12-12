@@ -20,7 +20,20 @@ if(!(isset($json['encodes']) &&
     die('no encodes listed');
 }
 
+// from http://stackoverflow.com/questions/15273570/continue-processing-php-after-sending-http-response
+
+ignore_user_abort(true);
+set_time_limit(0);
+
+ob_start();
+// do initial processing here
 print_r($json);
+header('Connection: close');
+header('Content-Length: '.ob_get_length());
+ob_end_flush();
+ob_flush();
+flush();
+
 
 define('CODE_DIR', __DIR__ . '/../src');
 // get our objects
@@ -32,7 +45,6 @@ $chains = [];
 $jsonMandatoryFormat = include(CODE_DIR . '/json_mandatory_fields.php');
 $mandatoryKeys = array_keys($jsonMandatoryFormat);
 chdir('/var/www/dest');
-
 
 
 

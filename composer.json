@@ -4,7 +4,8 @@
     "ricardoper/twitteroauth": "2.*",
     "cosenary/instagram": "^2.4@dev",
     "fetchapp/fetchapp": "dev-master",
-    "aws/aws-sdk-php": "^3.18"
+    "aws/aws-sdk-php": "^3.18",
+    "guzzlehttp/guzzle": "~6.0"
   },
   "autoload": {
     "psr-4": {

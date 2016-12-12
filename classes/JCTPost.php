@@ -11,7 +11,7 @@ class JCTPost extends Post {
         return $this->ID;
     }
 
-    public function getPublicFilename() {
+    public function getFilenameFriendlyTitle() {
         //return "something.zip";
         $title = $this->title();
         $title = iconv('UTF-8', 'ASCII//TRANSLIT', $title);

@@ -3,7 +3,10 @@
 namespace jct;
 
 class EncodeConfig extends EncodedAssetConfig {
-
+    const RECEIVE_ENCODE_ROOT_REL_PATH = 'receive_encode';
+    const ENCODE_AUTH_CODE_TRANSIENT_NAME = 'jct_encode_secret';
+    // 1 day duration for transient
+    const ENCODE_AUTH_CODE_TRANSIENT_DURATION_SECONDS = 60 * 60 * 24;
 
     public function __construct(Track $parentTrack, $encodeFormat, $ffmpegFlags, $configName) {
         parent::__construct($parentTrack, $encodeFormat, $ffmpegFlags, $configName);
@@ -29,14 +32,14 @@ class EncodeConfig extends EncodedAssetConfig {
         // track number underscore track title underscore short hash dot extension
         return sprintf("%'.02d_%s_%s.%s",
                        $this->getParentTrack()->getTrackNumber(),
-                       $this->getParentTrack()->getPublicFilename(),
+                       $this->getParentTrack()->getFilenameFriendlyTitle(),
                        $this->getShortUniqueKey(),
                        $this->getFileExtension());
     }
 
     public function getUploadRelativeStorageDirectory() {
         return sprintf('%s/%s', static::BASE_UPLOADS_FOLDER,
-                       $this->getParentTrack()->getAlbum()->getPublicFilename());
+                       $this->getParentTrack()->getAlbum()->getFilenameFriendlyTitle());
     }
 
     /**
@@ -62,7 +65,8 @@ class EncodeConfig extends EncodedAssetConfig {
             'dest_url'      =>
                 $forUseInUniqueKey ?
                     '' :
-                    (Util::get_site_url() . "/api/$remoteAuthCode/receiveencode/" . $this->getUniqueKey()),
+                    (Util::get_site_url() . '/' . self::RECEIVE_ENCODE_ROOT_REL_PATH . '/' .
+                     $remoteAuthCode . '/' . $this->getUniqueKey()),
             'art_url'       =>
                 $forUseInUniqueKey ?
                     '' :
@@ -76,7 +80,7 @@ class EncodeConfig extends EncodedAssetConfig {
                 'artist'       => $parent->getTrackArtist(),
                 'comment'      => $parent->getTrackComment(),
                 'genre'        => $parent->getTrackGenre(),
-                'filename'     => $forUseInUniqueKey ? '' : $this->getConfigSpecificFileName(),
+                'filename'     => $forUseInUniqueKey ? '' : $this->getConfigUniqueFilename(),
             ],
         ];
         if($this->getFfmpegFlags()) {
@@ -98,13 +102,7 @@ class EncodeConfig extends EncodedAssetConfig {
     }
 
     public function createEncodeFromTempFile($tempFile) {
-        return Encode::createFromTempFile(
-            $tempFile, $this->getUniqueKey(),
-            sprintf('%s/%s', static::BASE_UPLOADS_FOLDER,
-                    $this->getParentTrack()->getAlbum()->getPublicFilename()),
-            $this->getConfigUniqueFilename(),
-            $this->getParentTrack()
-        );
+        return Encode::createFromTempFile($tempFile, $this);
     }
 
     public function getEncodeStatusContext() {
@@ -117,7 +115,7 @@ class EncodeConfig extends EncodedAssetConfig {
     }
 
     /** @return EncodeConfig[] keyed by unique key */
-    public static function getAllEncodeConfigs() {
+    public static function getAll() {
         $allEncodeConfigs =
             // get a flat array of all the EncodeConfigs
             Util::array_merge_flatten_1L(array_map(function (Track $track) {
@@ -132,6 +130,13 @@ class EncodeConfig extends EncodedAssetConfig {
         return array_combine(array_map(function (EncodeConfig $encodeConfig) {
             return $encodeConfig->getUniqueKey();
         }, $allEncodeConfigs), $allEncodeConfigs);
+    }
+
+    public static function getPending() {
+        $allEncodeConfigs = self::getAll();
+        $allEncodes = Encode::getAllOfClass();
+
+        return array_diff_key($allEncodeConfigs, $allEncodes);
     }
 
 
@@ -166,5 +171,19 @@ class EncodeConfig extends EncodedAssetConfig {
         return $outputFormats[$encodeFormat]['file_ext'];
     }
 
+    public static function getEncodeAuthCode() {
+        /** @noinspection PhpUndefinedFunctionInspection */
+        if(!$trans = \get_transient(self::ENCODE_AUTH_CODE_TRANSIENT_NAME)) {
+            /** @noinspection PhpUndefinedFunctionInspection */
+            \set_transient(self::ENCODE_AUTH_CODE_TRANSIENT_NAME, $trans =
+                Util::rand_str(40), self::ENCODE_AUTH_CODE_TRANSIENT_DURATION_SECONDS);
+        }
+
+        return $trans;
+    }
+
+    public static function isValidAuthCode($authCode) {
+        return self::getEncodeAuthCode() == $authCode;
+    }
 
 }

@@ -73,12 +73,6 @@ add_action('init', function(){
 	\jct\Util::register_generic_cpt('Track');
 });
 
-add_action('admin_init', function(){
-	// make sure that any categories we need are registered
-	\jct\EncodedAsset::wpRegisterCategory();
-	\jct\Encode::wpRegisterCategory();
-	\jct\AlbumZip::wpRegisterCategory();
-});
 
 include __DIR__.'/include/routes.php';
 include __DIR__.'/include/prepopulate.php';
@@ -88,7 +82,4 @@ function base64_url_encode($input) {
 	return strtr(base64_encode($input), '+/=', '-_~');
 }
 
-function randstr($len) {
-	return substr(base64_url_encode(openssl_random_pseudo_bytes($len + 5, $did)), 0, $len);
-}
 

@@ -15,7 +15,7 @@ abstract class EncodedAsset extends WPAttachment {
     abstract public function getAwsKey();
 
     public function getUniqueKey() {
-        return $this->name();
+        return $this->slug;
     }
 
     public function getShortUniqueKey() {
@@ -106,38 +106,6 @@ abstract class EncodedAsset extends WPAttachment {
     }
 
 
-    /**
-     * @param $uniqueKey
-     * @return Encode|null
-     */
-    public static function findByUniqueKey($uniqueKey, $prepop = null) {
-        return Util::get_posts_cached([
-                                          'post_type' => static::POST_TYPE_NAME,
-                                          'name'      => $uniqueKey,
-                                      ], static::class);
-    }
-
-    public static function getAll() {
-        /** @var EncodedAsset[] $all */
-        $all = Util::get_posts_cached([
-                                          'post_type'      => static::POST_TYPE_NAME,
-                                          'category_name'  => static::getWPCategoryName(),
-                                          'posts_per_page' => -1,
-                                      ], static::class);
-
-        foreach($all as $encodedAsset) {
-            // cache on the two class levels that we easily can
-            // for the two key types we'll likely get asked about in the future
-            static::getByID($encodedAsset->getPostID(), $encodedAsset);
-            self::getByID($encodedAsset->getPostID(), $encodedAsset);
-
-            static::findByUniqueKey($encodedAsset->getUniqueKey(), $encodedAsset);
-            self::findByUniqueKey($encodedAsset->getUniqueKey(), $encodedAsset);
-        }
-
-        return $all;
-    }
-
 
     public static function createFromTempFile($tempFilePath, EncodedAssetConfig $encodedAssetConfig) {
         /** @noinspection PhpUndefinedFunctionInspection */
@@ -148,14 +116,16 @@ abstract class EncodedAsset extends WPAttachment {
             $encodedAssetConfig->getConfigUniqueFilename();
 
         /** @noinspection PhpUndefinedFunctionInspection */
-        if(!wp_mkdir_p(dirname($fullStoragePath))) {
-            throw new JCTException("Could not create file storage path");
+        if(!wp_mkdir_p($mkdirTarget = dirname($fullStoragePath))) {
+            throw new JCTException("Could not create file storage path [$mkdirTarget]");
         }
 
         // move the temp file in
         if(!rename($tempFilePath, $fullStoragePath)) {
             throw new JCTException('Could not rename file');
         }
+
+        @chmod($fullStoragePath, 644);
 
         /** @noinspection PhpUndefinedFunctionInspection */
         $wpFileType = wp_check_filetype(basename($tempFilePath), null);
@@ -166,10 +136,8 @@ abstract class EncodedAsset extends WPAttachment {
             'post_name'      => $encodedAssetConfig->getUniqueKey(),
             'post_mime_type' => $wpFileType['type'],
             'post_title'     => $encodedAssetConfig->getConfigUniqueFilename(),
-            'post_content'   => json_encode($encodedAssetConfig->toPersistableArray(), JSON_PRETTY_PRINT),
+            'post_content'   => '',
             'post_status'    => 'inherit',
-            // want to be able to find by this class and by the child class...
-            'post_category'  => array_unique([self::getWPCategoryName(), static::getWPCategoryName()]),
         ];
 
         /** @noinspection PhpUndefinedFunctionInspection */
@@ -178,19 +146,10 @@ abstract class EncodedAsset extends WPAttachment {
 
         $attachment = static::getByID($attach_id);
         $attachment->setCanonicalContentHash();
+        $attachment->setAttachmentClassMetaVariables();
 
         return $attachment;
     }
-
-    public static function getWPCategoryName() {
-        return static::class;
-    }
-
-    public static function wpRegisterCategory() {
-        /** @noinspection PhpUndefinedFunctionInspection */
-        \wp_create_category(static::getWPCategoryName());
-    }
-
 
 }
 

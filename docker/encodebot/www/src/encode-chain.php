@@ -34,7 +34,7 @@ class EncodeChain {
             $this->sourceExtension = $extFromURL($this->sourceURL);
             $this->sourceLocalRawName = $this->sourceMD5 . '_source.' . $this->sourceExtension;
             $this->sourceLocalWavName = $this->sourceMD5 . '.wav';
-            $this->errorFile = $this->sourceMD5 . '.errors';
+            $this->errorFile = $this->sourceMD5 . '.errors.txt';
 
             $this->albumArtURL = $config ['art_url'];
             $this->albumArtMD5 = $config ['art_md5'];

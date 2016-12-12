@@ -22,14 +22,14 @@ class EncodeTarget {
 
         $this->fromWavFile = $fromWav;
         $rowJSON = json_encode($config, JSON_PRETTY_PRINT);
-        $this->nameBase = $fromNameBase . date('y-m-d') . md5($rowJSON);
+        $this->nameBase = $fromNameBase . md5($rowJSON);
         // for debugging & tracking
         $this->configFile = $this->nameBase . '.txt';
         if(file_exists($this->configFile)) {
             throw new Exception('config exists');
         }
         file_put_contents($this->nameBase . '.txt', $rowJSON);
-        $this->errorsFile = $this->nameBase . '.errors';
+        $this->errorsFile = $this->nameBase . '.errors.txt';
 
         $this->fromArtFile = $fromArtFile;
 
@@ -76,7 +76,7 @@ class EncodeTarget {
         exec($cmd, $output, $rv);
 
         if($rv != 0) {
-            file_put_contents($this->errorsFile, implode("\n", $output));
+            $this->putError(implode("\n", $output));
             return false;
         }
 
@@ -85,12 +85,16 @@ class EncodeTarget {
         //error_log($rv);
         //error_log(implode("\n", $output));
         if($rv != 0) {
-            file_put_contents($this->errorsFile, implode("\n", $output));
+            $this->putError(implode("\n", $output));
             return false;
         }
 
         $this->postEncodeFile();
         return true;
+    }
+
+    private function putError($error) {
+        file_put_contents($this->errorsFile, $error, FILE_APPEND);
     }
 
     private function postEncodeFile() {
@@ -109,7 +113,7 @@ class EncodeTarget {
 
 // output the response
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-        echo(curl_exec($ch));
+        $this->putError(curl_exec($ch));
 
 // close the session
         curl_close($ch);

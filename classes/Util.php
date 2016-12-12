@@ -56,8 +56,13 @@ class Util {
         return $encodeTypes = include(dirname(__DIR__) . '/config/encode_types.php');
     }
 
-    public static function get_user_option($option_name) {
+    public static function get_theme_option($option_name) {
+        /** @noinspection PhpUndefinedFunctionInspection */
         return get_field($option_name, 'options');
+    }
+
+    public static function rand_str($len) {
+        return substr(base64_url_encode(openssl_random_pseudo_bytes($len + 5, $did)), 0, $len);
     }
 
     public static function array_merge_flatten_1L(array $arrayOfArrays) {
