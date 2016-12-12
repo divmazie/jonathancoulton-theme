@@ -4,9 +4,6 @@ namespace jct;
 
 abstract class EncodedAsset extends WPAttachment {
 
-    const META_ATTACHMENT_META_PAYLOAD = 'attachment_meta_payload';
-
-
     private $awsUrl;
     private $createdTime, $uploadedTime;
 
@@ -25,12 +22,12 @@ abstract class EncodedAsset extends WPAttachment {
         return substr($this->getUniqueKey(), 0, 7);
     }
 
-    public function getAttachmentMetaPayloadArray() {
-        return $this->get_field(self::META_ATTACHMENT_META_PAYLOAD);
+    public function getCanonicalContentHash() {
+        return $this->guid;
     }
 
-    public function setAttachmentMetaPayloadArray(array $payload) {
-        $this->update(self::META_ATTACHMENT_META_PAYLOAD, $payload);
+    public function getAttachmentMetaPayloadArray() {
+        return json_decode($this->post_content);
     }
 
     public function getParentPost($parentPostClass = JCTPost::class) {
@@ -163,7 +160,7 @@ abstract class EncodedAsset extends WPAttachment {
         $wpFileType = wp_check_filetype(basename($tempFilePath), null);
 
         $attachment = [
-            'guid'           => $encodedAssetConfig->getUniqueKey(),
+            'guid'           => md5($tempFilePath),
             'post_name'      => $encodedAssetConfig->getUniqueKey(),
             'post_mime_type' => $wpFileType['type'],
             'post_title'     => $encodedAssetConfig->getConfigUniqueFilename(),
