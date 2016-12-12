@@ -9,7 +9,7 @@
 namespace jct;
 
 
-class AlbumZip extends KeyedWPAttachment {
+class AlbumZip extends EncodedAsset {
 
     public function getParentAlbum() {
         return $this->getParentPost(Album::class);

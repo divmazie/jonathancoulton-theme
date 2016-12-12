@@ -24,4 +24,10 @@ class JCTPost extends Post {
     }
 
 
+    /** @return static */
+    public static function getByID($id, $prepop = null) {
+        return Util::get_posts_cached($id, static::class, $prepop);
+    }
+
+
 }

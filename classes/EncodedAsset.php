@@ -2,7 +2,7 @@
 
 namespace jct;
 
-abstract class KeyedWPAttachment extends WPAttachment {
+abstract class EncodedAsset extends WPAttachment {
 
     const META_ATTACHMENT_META_PAYLOAD = 'attachment_meta_payload';
 
@@ -17,7 +17,7 @@ abstract class KeyedWPAttachment extends WPAttachment {
 
 
     public function getUniqueKey() {
-        return $this->guid;
+        return $this->name();
     }
 
     public function getShortUniqueKey() {
@@ -36,7 +36,6 @@ abstract class KeyedWPAttachment extends WPAttachment {
     public function getParentPost($parentPostClass = JCTPost::class) {
         return Util::get_posts_cached($this->post_parent, $parentPostClass);
     }
-
 
 
     public function uploadToAws($s3) {
@@ -113,15 +112,84 @@ abstract class KeyedWPAttachment extends WPAttachment {
      * @param $uniqueKey
      * @return Encode|null
      */
-    public static function findByUniqueKey($uniqueKey) {
+    public static function findByUniqueKey($uniqueKey, $prepop = null) {
         return Util::get_posts_cached([
-                                          'post_type'  => self::POST_TYPE_NAME,
-                                          'meta_query' => [
-                                              'key'   => self::META_UNIQUE_KEY,
-                                              'value' => $uniqueKey,
-                                          ],
+                                          'post_type' => static::POST_TYPE_NAME,
+                                          'name'      => $uniqueKey,
                                       ], static::class);
     }
+
+    public static function getAll() {
+        /** @var EncodedAsset[] $all */
+        $all = Util::get_posts_cached([
+                                          'post_type'      => static::POST_TYPE_NAME,
+                                          'category_name'  => static::getWPCategoryName(),
+                                          'posts_per_page' => -1,
+                                      ], static::class);
+
+        foreach($all as $encodedAsset) {
+            // cache on the two class levels that we easily can
+            // for the two key types we'll likely get asked about in the future
+            static::getByID($encodedAsset->getPostID(), $encodedAsset);
+            self::getByID($encodedAsset->getPostID(), $encodedAsset);
+
+            static::findByUniqueKey($encodedAsset->getUniqueKey(), $encodedAsset);
+            self::findByUniqueKey($encodedAsset->getUniqueKey(), $encodedAsset);
+        }
+
+        return $all;
+    }
+
+
+    public static function createFromTempFile($tempFilePath, EncodedAssetConfig $encodedAssetConfig) {
+        /** @noinspection PhpUndefinedFunctionInspection */
+        $wpUploadDir = wp_upload_dir();
+        $fullStoragePath =
+            $wpUploadDir['basedir'] . '/' .
+            $encodedAssetConfig->getUploadRelativeStorageDirectory() . '/' .
+            $encodedAssetConfig->getConfigUniqueFilename();
+
+        /** @noinspection PhpUndefinedFunctionInspection */
+        if(!wp_mkdir_p(dirname($fullStoragePath))) {
+            throw new JCTException("Could not create file storage path");
+        }
+
+        // move the temp file in
+        if(!rename($tempFilePath, $fullStoragePath)) {
+            throw new JCTException('Could not rename file');
+        }
+
+        /** @noinspection PhpUndefinedFunctionInspection */
+        $wpFileType = wp_check_filetype(basename($tempFilePath), null);
+
+        $attachment = [
+            'guid'           => $encodedAssetConfig->getUniqueKey(),
+            'post_name'      => $encodedAssetConfig->getUniqueKey(),
+            'post_mime_type' => $wpFileType['type'],
+            'post_title'     => $encodedAssetConfig->getConfigUniqueFilename(),
+            'post_content'   => json_encode($encodedAssetConfig->toPersistableArray(), JSON_PRETTY_PRINT),
+            'post_status'    => 'inherit',
+            // want to be able to find by this class and by the child class...
+            'post_category'  => array_unique([self::getWPCategoryName(), static::getWPCategoryName()]),
+        ];
+
+        /** @noinspection PhpUndefinedFunctionInspection */
+        $attach_id =
+            wp_insert_attachment($attachment, $fullStoragePath, $encodedAssetConfig->getParentPost()->getPostID());
+
+        return static::getWPAttachmentByID($attach_id);
+    }
+
+    public static function getWPCategoryName() {
+        return static::class;
+    }
+
+    public static function wpRegisterCategory() {
+        /** @noinspection PhpUndefinedFunctionInspection */
+        wp_create_category(static::getWPCategoryName());
+    }
+
+
 }
 
 

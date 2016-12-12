@@ -47,9 +47,12 @@ abstract class EncodedAssetConfig {
 
     abstract public function getConfigUniqueFilename();
 
+    abstract public function getUploadRelativeStorageDirectory();
+
     abstract public function getFileExtension();
 
-    /** @return KeyedWPAttachment */
+
+    /** @return EncodedAsset */
     abstract public function getAsset();
 
     public function assetExists() {

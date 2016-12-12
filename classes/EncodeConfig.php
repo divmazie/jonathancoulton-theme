@@ -34,6 +34,11 @@ class EncodeConfig extends EncodedAssetConfig {
                        $this->getFileExtension());
     }
 
+    public function getUploadRelativeStorageDirectory() {
+        return sprintf('%s/%s', static::BASE_UPLOADS_FOLDER,
+                       $this->getParentTrack()->getAlbum()->getPublicFilename());
+    }
+
     /**
      * @param null $remoteAuthCode
      * @return array
@@ -109,6 +114,21 @@ class EncodeConfig extends EncodedAssetConfig {
             'exists'         => $this->getEncode() && $this->getEncode()->fileAssetExists(),
             'need_to_upload' => $this->getEncode() && $this->getEncode()->needToUpload(),
         ];
+    }
+
+
+    public static function getAllEncodeConfigs() {
+        /** @var EncodeConfig[] $encodeConfigs */
+        $encodeConfigs =
+            // get a flat array of all the EncodeConfigs
+            call_user_func('array_merge', array_map(function (Track $track) {
+                $track->getTrackEncodeConfigs();
+            },
+                // get a flat array of all the album tracks
+                call_user_func('array_merge', array_map(function (Album $album) {
+                    return $album->getAlbumTracks();
+                }, Album::getAllAlbums()))));
+
     }
 
 

@@ -8,7 +8,7 @@ $context = Timber::get_context();
 $post_id = $_REQUEST['album_post_id'];
 
 if($post_id) {
-    $album = Album::getAlbumByID($post_id);
+    $album = Album::getByID($post_id);
     $context['albums'] = [$album->getAlbumContext()];
     $context['post_id_get_string'] = "?album_post_id=$post_id";
     Timber::render("music_admin.twig", $context);

@@ -2,7 +2,7 @@
 
 namespace jct;
 
-class Encode extends KeyedWPAttachment {
+class Encode extends EncodedAsset {
 
     /**
      * @return Track

@@ -259,12 +259,15 @@ class Album extends ShopifyProduct {
 
     /** @return Album[] */
     public static function getAllAlbums() {
-        return Util::get_posts_cached(['post_type' => self::CPT_NAME, 'numberposts' => -1], Album::class);
-    }
-
-    /** @return Album */
-    public static function getAlbumByID($id) {
-        return Util::get_posts_cached($id, self::class);
+        /** @var Album[] $all */
+        $all = Util::get_posts_cached([
+                                          'post_type'      => self::CPT_NAME,
+                                          'posts_per_page' => -1,
+                                      ], Album::class);
+        foreach($all as $prepop) {
+            static::getByID($prepop->getPostID(), $prepop);
+        }
+        return $all;
     }
 
 

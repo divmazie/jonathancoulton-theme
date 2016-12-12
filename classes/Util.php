@@ -10,25 +10,39 @@ class Util {
         return get_site_url();
     }
 
-    public static function get_posts_cached($args, $returnClass) {
+    public static function get_posts_cached($args, $returnClass, $prepopValue = null, $prepopNull = false) {
         static $res_cache = [];
-        $cache_key = md5(serialize(func_get_args()));
+
+        // if someone passes us an ID as a string... convert it here,
+        // treat as the same
+        if(!is_array($args)) {
+            $args = intval($args);
+        }
+
+        // cache_key is just exactly how we were asked for the valuepre
+        $cache_key = md5(serialize([$args, $returnClass]));
+
+        // if we are actually just prepopulating the cache, do so and return
+        if($prepopValue || $prepopNull) {
+            return $res_cache[$cache_key] = $prepopValue;
+        }
+
+        // if we have a cached value, return with it
         if(isset($res_cache[$cache_key])) {
             return $res_cache[$cache_key];
         }
 
-        if(is_array($args)) {
-            $result = Timber::get_posts($args, $returnClass);
-        } else {
-            if($args) {
-                $result = Timber::get_post($args, $returnClass);
+        if($args) {
+            if(is_array($args)) {
+                $result = Timber::get_posts($args, $returnClass);
             } else {
-                // if we are passed nothing in our args... don't fetch because timber
-                // will try to be smart about it.
-                return null;
+                $result = Timber::get_post($args, $returnClass);
             }
+
+            return $res_cache[$cache_key] = $result;
         }
-        return $res_cache[$cache_key] = $result;
+
+        throw new JCTException('attempt to get_posts_cached with null $args');
     }
 
     /**

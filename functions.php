@@ -71,6 +71,11 @@ add_action('init', function(){
 	\jct\Util::register_generic_cpt("FAQ");
 	\jct\Util::register_generic_cpt('Album');
 	\jct\Util::register_generic_cpt('Track');
+
+	// make sure that any categories we need are registered
+	\jct\EncodedAsset::wpRegisterCategory();
+	\jct\Encode::wpRegisterCategory();
+	\jct\AlbumZip::wpRegisterCategory();
 });
 
 include __DIR__.'/include/routes.php';

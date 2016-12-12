@@ -16,7 +16,7 @@ class Track extends ShopifyProduct {
      * @return Album
      */
     public function getAlbum() {
-        return Album::getAlbumByID($this->track_album);
+        return Album::getByID($this->track_album);
     }
 
     public function getTrackTitle() {
@@ -112,48 +112,12 @@ class Track extends ShopifyProduct {
                '.' . $withExtension ? $withExtension : '';
     }
 
-    public function getAllChildEncodes() {
-        $encodes = [];
-        foreach(Util::get_encode_types() as $key => $encode_type) {
-            $label = $key;
-            $format = $encode_type[0];
-            $flags = $encode_type[1];
-            $encodes[$label] = $this->getChildEncode($format, $flags, $label);
-        }
-        return $encodes;
-    }
-
-    public function getChildEncode($format, $flags, $label) {
-        $encode = new Encode($this, $format, $flags, $label);
-        return $encode;
-    }
-
-    public function deleteOldEncodes() {
-        $goodKeys = [];
-        foreach($this->getAllChildEncodes() as $encode) {
-            $goodKeys[] = $encode->getUniqueKey();
-        }
-        return Encode::deleteOldAttachments($this->postID, $goodKeys);
-    }
-
-    public function getNeededEncodes() {
-        if(!$this->isEncodeWorthy()) {
-            return false;
-        }
-        $needed_encodes = [];
-        foreach($this->getAllChildEncodes() as $encode) {
-            if($encode->encodeIsNeeded()) {
-                $needed_encodes[] = $encode;
-            }
-        }
-        return $needed_encodes;
-    }
-
     public function syncToStore($shopify) {
         return $shopify->syncProduct($this);
     }
 
     public static function getTracksForAlbum(Album $album) {
+        /** @var Track[] $tracks */
         $tracks = Util::get_posts_cached([
                                              'post_type'      => self::CPT_NAME,
                                              'posts_per_page' => -1,
@@ -171,13 +135,13 @@ class Track extends ShopifyProduct {
             return $ltn === $rtn ? 0 : ($ltn < $rtn ? -1 : 1);
         });
 
+        foreach($tracks as $prepop) {
+            static::getByID($prepop->getPostID(), $prepop);
+        }
+
         return $tracks;
     }
 
-    /** return Track|null */
-    public static function getTrackByID($id) {
-        return Util::get_posts_cached($id, self::class);
-    }
 
 }
 
