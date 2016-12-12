@@ -100,6 +100,16 @@ class Track extends ShopifyProduct {
             $this, self::PLAYER_ENCODE_CONFIG_NAME)->getEncode()->getURL();
     }
 
+    public function getTrackEncodeConfigs($forFormat = null) {
+        if($forFormat) {
+            return EncodeConfig::getConfigForTrackByName($this, $forFormat);
+        }
+        return EncodeConfig::getConfigsForTrack($this);
+    }
+
+    public function getPublicFilename($withExtension) {
+        return sprintf('0.2%d %s.%s', $this->getTrackNumber(), $this->getTrackTitle(), $withExtension);
+    }
 
     public function getAllChildEncodes() {
         $encodes = [];

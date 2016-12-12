@@ -115,19 +115,6 @@ class Encode extends KeyedWPAttachment {
         return new Encode($track, $encode_format, $encode_flags, $encode_label);
     }
 
-    /**
-     * @param $uniqueKey
-     * @return Encode|null
-     */
-    public static function findByUniqueKey($uniqueKey) {
-        return Util::get_posts_cached([
-                                          'post_type'  => self::POST_TYPE_NAME,
-                                          'meta_query' => [
-                                              'key'   => self::META_UNIQUE_KEY,
-                                              'value' => $uniqueKey,
-                                          ],
-                                      ], self::class);
-    }
 
 
 }

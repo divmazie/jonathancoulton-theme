@@ -12,8 +12,6 @@ abstract class KeyedWPAttachment extends WPAttachment {
     private $awsUrl;
     private $createdTime, $uploadedTime;
 
-    // encode format === file extension!
-
 
     abstract public function getFileAssetFileName();
 
@@ -43,6 +41,7 @@ abstract class KeyedWPAttachment extends WPAttachment {
     public function setParentPost(JCTPost $post) {
         $this->update(self::META_PARENT_PARENT_POST_KEY, $post->getPostID());
     }
+
 
     public function getShortUniqueKey() {
         // if 7 is good enough for git/github, it's good enough for us
@@ -174,6 +173,20 @@ abstract class KeyedWPAttachment extends WPAttachment {
         return $this->getUploadedTime() < $this->getCreatedTime();
     }
 
+
+    /**
+     * @param $uniqueKey
+     * @return Encode|null
+     */
+    public static function findByUniqueKey($uniqueKey) {
+        return Util::get_posts_cached([
+                                          'post_type'  => self::POST_TYPE_NAME,
+                                          'meta_query' => [
+                                              'key'   => self::META_UNIQUE_KEY,
+                                              'value' => $uniqueKey,
+                                          ],
+                                      ], static::class);
+    }
 }
 
 

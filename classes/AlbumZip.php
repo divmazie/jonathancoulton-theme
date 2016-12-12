@@ -11,93 +11,6 @@ namespace jct;
 
 class AlbumZip extends KeyedWPAttachment {
 
-    private $parentAlbum, $encodeCLIFlags, $encodeFormat, $encodeLabel;
-
-    public function __construct(Album $parentAlbum, $encodeFormat, $encodeCLIFlags, $encodeLabel = "") {
-        if(!$encodeLabel) {
-            $encodeLabel = $encodeFormat;
-        }
-        $this->parentAlbum = $parentAlbum;
-        $this->parent_post_id = $parentAlbum->getPostID();
-        $this->encodeCLIFlags = $encodeCLIFlags;
-        $this->encodeFormat = $encodeFormat;
-        $this->encodeLabel = $encodeLabel;
-    }
-
-
-    public function getParentAlbum() {
-        return $this->parentAlbum;
-    }
-
-    public function getEncodeFormat() {
-        return $this->encodeFormat;
-    }
-
-    public function getEncodeCLIFlags() {
-        return $this->encodeCLIFlags;
-    }
-
-    public function getEncodeLabel() {
-        return $this->encodeLabel;
-    }
-
-
-    public function getUniqueKey() {
-        $album_info = [
-            $this->getParentAlbum()->getAlbumTitle(),
-        ];
-        foreach($this->getParentAlbum()->getAlbumBonusAssetObjects() as $bonus_asset) {
-            $album_info[] = md5_file($bonus_asset->getPath());
-        }
-        foreach($this->getEncodesToZip() as $encode) {
-            $album_info[] = $encode->getUniqueKey();
-        }
-        return md5(serialize($album_info));
-    }
-
-    public function getFileAssetFileName() {
-        //return "something.zip";
-        $title = $this->parentAlbum->getAlbumTitle();
-        $title = iconv('UTF-8', 'ASCII//TRANSLIT', $title);
-        // replace spaces with underscore
-        $title = preg_replace('/\s/u', '_', $title);
-        // remove non ascii alnum_ with
-        $title = preg_replace('/[^\da-z_]/i', '', $title);
-
-        // album title underscore format underscore short hash dot extension
-        return sprintf('%s_%s_%s.%s', $title, $this->encodeFormat, $this->getShortUniqueKey(), "zip");
-    }
-
-    /**
-     * @return Encode[]
-     */
-    public function getEncodesToZip() {
-        $parent_album = $this->getParentAlbum();
-        $tracks = $parent_album->getAlbumTracks();
-        $encodes = [];
-        foreach($tracks as $track) {
-            $encodes[] = $track->getChildEncode($this->encodeFormat, $this->encodeCLIFlags, $this->encodeLabel);
-        }
-        return $encodes;
-    }
-
-    public function isMissingEncodes() {
-        foreach($this->getEncodesToZip() as $encode) {
-            if(!$encode->fileAssetExists()) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    public function isZipWorthy() {
-        if(!$this->parentAlbum->isEncodeWorthy()) {
-            return false;
-        } else if($this->isMissingEncodes()) {
-            return false;
-        }
-        return true;
-    }
 
     public function createZip() {
         if(!$this->isZipWorthy()) {
@@ -164,16 +77,6 @@ class AlbumZip extends KeyedWPAttachment {
             $this->setCreatedTime();
             return [true, "Zip created successfully!\n"];
         }
-    }
-
-    public function getZipContext() {
-        $context = ['format' => $this->getEncodeFormat(), 'flags' => $this->getEncodeCLIFlags()];
-        $context['zip_worthy'] = !!$this->isZipWorthy();
-        $context['missing_encodes'] = !!$this->isMissingEncodes();
-        $context['exists'] = !!$this->fileAssetExists();
-        $context['need_to_upload'] = !!$this->needToUpload();
-        $context['path'] = $this->getPath();
-        return $context;
     }
 
     public function getAwsKey() { // Same as getFileAssetFileName() without the short hash

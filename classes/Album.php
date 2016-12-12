@@ -92,6 +92,15 @@ class Album extends ShopifyProduct {
                                       ], BonusAsset::class);
     }
 
+    /** @return EncodeConfig[] */
+    public function getAlbumEncodeConfigs($forFormat = null) {
+        // array map returns array of arrays, we provide each returned array
+        // as an arg to array merge
+        return call_user_func_array('array_merge', array_map(function (Track $track) use ($forFormat) {
+            return $track->getTrackEncodeConfigs($forFormat);
+        }, $this->getAlbumTracks()));
+    }
+
     public function getAllChildZips() {
         $encode_types = Util::get_encode_types();
 
