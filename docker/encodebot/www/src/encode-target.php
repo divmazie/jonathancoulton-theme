@@ -10,6 +10,7 @@ class EncodeTarget {
     protected $destMetadata;
     protected $fromArtFile;
     protected $errorsFile;
+    protected $configFile;
     protected $destPostURL;
 
     public function __construct($config, $fromWav, $fromNameBase, $fromArtFile) {
@@ -21,8 +22,12 @@ class EncodeTarget {
 
         $this->fromWavFile = $fromWav;
         $rowJSON = json_encode($config, JSON_PRETTY_PRINT);
-        $this->nameBase = $fromNameBase . md5($rowJSON);
+        $this->nameBase = $fromNameBase . date('y-m-d') . md5($rowJSON);
         // for debugging & tracking
+        $this->configFile = $this->nameBase . '.txt';
+        if(file_exists($this->configFile)) {
+            throw new Exception('config exists');
+        }
         file_put_contents($this->nameBase . '.txt', $rowJSON);
         $this->errorsFile = $this->nameBase . '.errors';
 

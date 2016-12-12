@@ -41,9 +41,14 @@ class EncodeChain {
             $this->albumArtDestFile = $this->sourceMD5 . '_art.' . $extFromURL($this->albumArtURL);
         }
 
-        $this->children[] =
-            new EncodeTarget($config, $this->sourceLocalWavName,
-                             $this->sourceMD5, $this->albumArtDestFile);
+
+        try {
+            $target = new EncodeTarget($config, $this->sourceLocalWavName,
+                                       $this->sourceMD5, $this->albumArtDestFile);
+            $this->children[] = $target;
+        } catch(Exception $ex) {
+            // just carry on
+        }
     }
 
     public function addError($singleLineError) {
@@ -96,7 +101,7 @@ class EncodeChain {
                 shell_exec(sprintf("ffprobe -show_streams -select_streams 0 -i %s 2>&1 | grep codec_name", escapeshellarg($this->sourceLocalRawName)));
             $acodecLine = '';
             if(($codec = str_replace('codec_name=', '', trim($codec))) &&
-                        in_array($codec, $allowedPCMTypes)
+               in_array($codec, $allowedPCMTypes)
             ) {
                 $acodecLine = '-acodec ' . $codec;
             }
