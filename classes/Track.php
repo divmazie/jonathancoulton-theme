@@ -107,8 +107,9 @@ class Track extends ShopifyProduct {
         return EncodeConfig::getConfigsForTrack($this);
     }
 
-    public function getPublicFilename($withExtension) {
-        return sprintf('0.2%d %s.%s', $this->getTrackNumber(), $this->getTrackTitle(), $withExtension);
+    public function getPublicFilename($withExtension = null) {
+        return sprintf('0.2%d %s', $this->getTrackNumber(), $this->getTrackTitle(), $withExtension) .
+               '.' . $withExtension ? $withExtension : '';
     }
 
     public function getAllChildEncodes() {

@@ -25,7 +25,7 @@ class EncodeConfig extends EncodedAssetConfig {
     }
 
 
-    public function getFilename() {
+    public function getConfigUniqueFilename() {
         // track number underscore track title underscore short hash dot extension
         return sprintf("%'.02d_%s_%s.%s",
                        $this->getParentTrack()->getTrackNumber(),
@@ -92,12 +92,22 @@ class EncodeConfig extends EncodedAssetConfig {
         return $this->getEncode();
     }
 
+    public function createEncodeFromTempFile($tempFile) {
+        return Encode::createFromTempFile(
+            $tempFile, $this->getUniqueKey(),
+            sprintf('%s/%s', static::BASE_UPLOADS_FOLDER,
+                    $this->getParentTrack()->getAlbum()->getPublicFilename()),
+            $this->getConfigUniqueFilename(),
+            $this->getParentTrack()
+        );
+    }
+
     public function getEncodeStatusContext() {
         return [
             'format'         => $this->getEncodeFormat(),
             'flags'          => $this->getFfmpegFlags(),
-            'exists'         => $this->encodeExists() && $this->getEncode()->fileAssetExists(),
-            'need_to_upload' => $this->encodeExists() && $this->getEncode()->needToUpload(),
+            'exists'         => $this->getEncode() && $this->getEncode()->fileAssetExists(),
+            'need_to_upload' => $this->getEncode() && $this->getEncode()->needToUpload(),
         ];
     }
 

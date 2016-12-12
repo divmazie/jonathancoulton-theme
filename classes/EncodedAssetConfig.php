@@ -9,6 +9,8 @@ abstract class EncodedAssetConfig {
     const STORAGE_KEY_RECONSTITUTE_AS = 'targetClass';
     const PARENT_POST_CLASS = JCTPost::class;
 
+    const BASE_UPLOADS_FOLDER = 'encodes';
+
     private $parentPost, $encodeFormat, $ffmpegFlags, $configName;
 
     public function __construct(JCTPost $parentPost, $encodeFormat, $ffmpegFlags, $configName) {
@@ -43,7 +45,7 @@ abstract class EncodedAssetConfig {
         return substr($this->getUniqueKey(), 0, 7);
     }
 
-    abstract public function getFilename();
+    abstract public function getConfigUniqueFilename();
 
     abstract public function getFileExtension();
 

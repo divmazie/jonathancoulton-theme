@@ -14,22 +14,22 @@ class AlbumZipConfig extends EncodedAssetConfig {
         return $this->getParentPost();
     }
 
+    public function getPrerequisiteEncodeConfigs() {
+        return $this->getParentAlbum()->getAlbumEncodeConfigs($this->getEncodeFormat());
+    }
+
     public function getUniqueKey() {
         $album_info = [$this->getParentAlbum()->getAlbumTitle()];
         foreach($this->getParentAlbum()->getAlbumBonusAssetObjects() as $bonus_asset) {
             $album_info[] = md5_file($bonus_asset->getPath());
         }
-        foreach($this->getEncodeConfigs() as $encodeConfig) {
+        foreach($this->getPrerequisiteEncodeConfigs() as $encodeConfig) {
             $album_info[] = $encodeConfig->getUniqueKey();
         }
         return md5(serialize($album_info));
     }
 
-    public function getEncodeConfigs() {
-        return $this->getParentAlbum()->getAlbumEncodeConfigs($this->getEncodeFormat());
-    }
-
-    public function getFilename() {
+    public function getConfigUniqueFilename() {
         // album title underscore format underscore short hash dot extension
         return sprintf('%s_%s_%s.%s',
                        $this->getParentAlbum()->getPublicFilename(),
@@ -52,7 +52,7 @@ class AlbumZipConfig extends EncodedAssetConfig {
 
     public function getPendingEncodes() {
         $waiting = [];
-        foreach($this->getEncodeConfigs() as $encodeConfig) {
+        foreach($this->getPrerequisiteEncodeConfigs() as $encodeConfig) {
             if(!$encodeConfig->assetExists()) {
                 $waiting[] = $encodeConfig;
             }
@@ -78,7 +78,7 @@ class AlbumZipConfig extends EncodedAssetConfig {
         }
 
         $zipArchive = new \ZipArchive();
-        $zipFileName = tempnam(sys_get_temp_dir(), $this->getFilename());
+        $zipFileName = tempnam(sys_get_temp_dir(), $this->getConfigUniqueFilename());
         if($zipArchive->open($zipFileName, \ZipArchive::CREATE) !== true) {
             throw new JCTException("Cannot open zip file: <$zipFileName>!");
         }
@@ -86,7 +86,7 @@ class AlbumZipConfig extends EncodedAssetConfig {
 
         // populate targetFiles with $filePath=>$zipPath
         $targetFiles = [];
-        foreach($this->getEncodeConfigs() as $encodeConfig) {
+        foreach($this->getPrerequisiteEncodeConfigs() as $encodeConfig) {
             $targetFiles[$encodeConfig->getEncode()->getPath()] =
                 $zipInnerDirectoryPath . '/' . $encodeConfig->getParentTrack()->getPublicFilename(
                     $encodeConfig->getFileExtension());
