@@ -168,44 +168,6 @@ class Album extends ShopifyProduct {
         return $response;
     }
 
-    public function getAlbumContext() {
-        $context = ['title' => $this->getAlbumTitle(), 'artist' => $this->getAlbumArtist()];
-        $context['show_album'] = $this->getAlbumShow() ? true : false;
-        $context['encode_worthy'] = $this->isEncodeWorthy() ? true : false;
-        //$context['year'] = $this->getAlbumYear();
-        //$context['price'] = $this->getAlbumPrice();
-        $context['sort_order'] = $this->getAlbumSortOrder();
-        $context['sort_order_conflict'] = false;
-        $context['art'] = $this->getAlbumArtObject() ?
-            [
-                'filename' => basename($this->getAlbumArtObject()->getPath()),
-                'url'      => $this->getAlbumArtObject()->getURL(),
-                'exists'   => file_exists($this->getAlbumArtObject()->getPath()),
-            ]
-            : ['filename' => 'MISSING!!!', 'url' => 'MISSING!!!', 'exists' => false];
-        $context['album_zips'] = [];
-        foreach($this->getAllChildZips() as $zip) {
-            $zip_context = $zip->getZipContext();
-            if(!is_array($zip_context)) {
-                $zip_context = ['exists' => false];
-            }
-            $context['album_zips'][] = $zip_context;
-        }
-        $context['tracks'] = [];
-        foreach($this->getAlbumTracks() as $key => $track) {
-            $context['tracks'][$key] = $track->getTrackContext();
-            if($key > 1000) {
-                $context['tracks'][$key]['track_num_conflict'] = true;
-            }
-        }
-        $context['bonus_assets'] = [];
-        foreach($this->getAlbumBonusAssetObjects() as $bonus_asset) {
-            $context['bonus_assets'][] =
-                ['filename' => basename($bonus_asset->getPath()), 'exists' => file_exists($bonus_asset->getPath())];
-        }
-        return $context;
-    }
-
     public function isEncodeWorthy() {
         return ($this->getAlbumShow() && $this->getAlbumTitle() && $this->getAlbumArtist() &&
                 $this->getAlbumArtObject());

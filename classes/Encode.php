@@ -15,11 +15,11 @@ class Encode extends EncodedAsset {
      * @return EncodeConfig
      */
     public function getEncodeConfig() {
-        return EncodeConfig::fromPersistableArray($this->getAttachmentMetaPayloadArray());
+        return EncodeConfig::fromPersistableArray($this->getConfigPayloadArray());
     }
 
     public function setEncodeConfig(EncodeConfig $encodeConfig) {
-        $this->setAttachmentMetaPayloadArray($encodeConfig->toPersistableArray());
+        $this->setConfigPayloadArray($encodeConfig->toPersistableArray());
     }
 
     public function getFileAssetFileName() {

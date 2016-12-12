@@ -13,6 +13,9 @@ class WPAttachment extends JCTPost {
 
     const POST_TYPE_NAME = 'attachment';
 
+    const META_CONTENT_HASH = 'jct_content_hash';
+
+
     public function __construct($id) {
         parent::__construct($id);
     }
@@ -23,6 +26,19 @@ class WPAttachment extends JCTPost {
 
     public function getFilename() {
         return basename($this->getPath());
+    }
+
+    public function getCanonicalContentHash() {
+        $hash = $this->get_field(self::META_CONTENT_HASH);
+        if(!$hash) {
+            return $this->setCanonicalContentHash();
+        }
+        return $hash;
+    }
+
+    protected function setCanonicalContentHash() {
+        $this->update(self::META_CONTENT_HASH, $hash = md5_file($this->getPath()));
+        return $hash;
     }
 
     public function getPath() {
@@ -42,10 +58,6 @@ class WPAttachment extends JCTPost {
     public function deleteAttachment($skipTrash = false) {
         /** @noinspection PhpUndefinedFunctionInspection */
         wp_delete_attachment($this->getPostID(), $skipTrash);
-    }
-
-    public static function getWPAttachmentByID(integer $id) {
-        return Util::get_posts_cached($id, static::class);
     }
 
 

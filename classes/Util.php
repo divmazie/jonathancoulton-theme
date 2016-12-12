@@ -60,6 +60,10 @@ class Util {
         return get_field($option_name, 'options');
     }
 
+    public static function array_merge_flatten_1L(array $arrayOfArrays) {
+        return call_user_func_array('array_merge', $arrayOfArrays);
+    }
+
     public static function register_generic_cpt($name, $plural_name = "") {
         if(!isset($plural_name) || $plural_name == "") {
             $plural_name = $name . "s";

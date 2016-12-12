@@ -3,6 +3,8 @@
 namespace jct;
 
 abstract class EncodedAsset extends WPAttachment {
+    const META_CONFIG_PAYLOAD = 'jct_asset_config_payload';
+
 
     private $awsUrl;
     private $createdTime, $uploadedTime;
@@ -11,7 +13,6 @@ abstract class EncodedAsset extends WPAttachment {
     abstract public function getFileAssetFileName();
 
     abstract public function getAwsKey();
-
 
     public function getUniqueKey() {
         return $this->name();
@@ -22,12 +23,12 @@ abstract class EncodedAsset extends WPAttachment {
         return substr($this->getUniqueKey(), 0, 7);
     }
 
-    public function getCanonicalContentHash() {
-        return $this->guid;
+    public function getConfigPayloadArray() {
+        return $this->get_field(self::META_CONFIG_PAYLOAD);
     }
 
-    public function getAttachmentMetaPayloadArray() {
-        return json_decode($this->post_content);
+    public function setConfigPayloadArray(array $payload) {
+        $this->update(self::META_CONFIG_PAYLOAD, $payload);
     }
 
     public function getParentPost($parentPostClass = JCTPost::class) {
@@ -160,7 +161,8 @@ abstract class EncodedAsset extends WPAttachment {
         $wpFileType = wp_check_filetype(basename($tempFilePath), null);
 
         $attachment = [
-            'guid'           => md5($tempFilePath),
+            // guid must be the filepath!
+            'guid'           => $fullStoragePath,
             'post_name'      => $encodedAssetConfig->getUniqueKey(),
             'post_mime_type' => $wpFileType['type'],
             'post_title'     => $encodedAssetConfig->getConfigUniqueFilename(),
@@ -174,7 +176,10 @@ abstract class EncodedAsset extends WPAttachment {
         $attach_id =
             wp_insert_attachment($attachment, $fullStoragePath, $encodedAssetConfig->getParentPost()->getPostID());
 
-        return static::getWPAttachmentByID($attach_id);
+        $attachment = static::getByID($attach_id);
+        $attachment->setCanonicalContentHash();
+
+        return $attachment;
     }
 
     public static function getWPCategoryName() {
@@ -183,7 +188,7 @@ abstract class EncodedAsset extends WPAttachment {
 
     public static function wpRegisterCategory() {
         /** @noinspection PhpUndefinedFunctionInspection */
-        wp_create_category(static::getWPCategoryName());
+        \wp_create_category(static::getWPCategoryName());
     }
 
 

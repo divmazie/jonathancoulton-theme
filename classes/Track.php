@@ -62,32 +62,7 @@ class Track extends ShopifyProduct {
      * @return WPAttachment
      */
     public function getTrackSourceFileObject() {
-        return Util::get_posts_cached($this->track_source, WPAttachment::class);
-    }
-
-    public function getTrackContext() {
-        $context = ['title' => $this->getTrackTitle(), 'artist' => $this->getTrackArtist()];
-        $context['number'] = $this->getTrackNumber();
-        //$context['price'] = $this->getTrackPrice();
-        $context['encode_worthy'] = $this->isEncodeWorthy();
-        $context['art'] = $this->getTrackArtObject() ?
-            [
-                'filename' => basename($this->getTrackArtObject()->getPath()),
-                'exists'   => file_exists($this->getTrackArtObject()->getPath()),
-            ]
-            : ['filename' => 'MISSING!!!', 'exists' => false];
-        $context['source'] = $this->getTrackSourceFileObject() ?
-            [
-                'filename' => basename($this->getTrackSourceFileObject()->getPath()),
-                'exists'   => file_exists($this->getTrackSourceFileObject()->getPath()),
-            ]
-            : ['filename' => 'MISSING', 'exists' => false];
-        $context['encodes'] = [];
-        $context['track_num_conflict'] = false;
-        foreach($this->getAllChildEncodes() as $encode) {
-            $context['encodes'][] = $encode->getEncodeContext();
-        }
-        return $context;
+        return Util::get_posts_cached($this->track_source, SourceTrack::class);
     }
 
     public function isEncodeWorthy() {

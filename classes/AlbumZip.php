@@ -16,7 +16,7 @@ class AlbumZip extends EncodedAsset {
     }
 
     public function getAlbumZipConfig() {
-        return AlbumZipConfig::fromPersistableArray($this->getAttachmentMetaPayloadArray());
+        return AlbumZipConfig::fromPersistableArray($this->getConfigPayloadArray());
     }
 
     public function getFileAssetFileName() {

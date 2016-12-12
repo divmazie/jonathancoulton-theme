@@ -78,7 +78,7 @@ abstract class EncodedAssetConfig {
         /** @noinspection PhpParamsInspection
          * The parent post class should be correct here, crazily
          */
-        return new EncodeConfig(
+        return new static(
             Util::get_posts_cached($array[static::STORAGE_KEY_PARENT_ID], static::PARENT_POST_CLASS),
             $array[static::STORAGE_KEY_ENCODE_FORMAT],
             $array[static::STORAGE_KEY_FFMPEG_FLAGS],
