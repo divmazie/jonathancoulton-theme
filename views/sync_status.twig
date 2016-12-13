@@ -1,3 +1,17 @@
+{% macro pipeline_button(stage, copy, enable) %}
+    <button name="pipeline_stage"
+            value="{{ stage }}"
+            {% if not enable %}
+                disabled="disabled"
+            {% endif %}
+    >
+        {{ copy }}
+    </button>
+{% endmacro %}
+
+{% import _self as m %}
+
+
 <html>
 <head>
     <style>
@@ -5,6 +19,12 @@
 
             padding: 30px;
             background-color: lightgoldenrodyellow;
+        }
+
+        pre {
+            background-color: lightsalmon;
+            font-size: 130%;
+            padding:11px;
         }
 
         #pipeline ol {
@@ -16,11 +36,20 @@
             margin-top: 3px;
             margin-bottom: 7px;
         }
+
+        li button {
+            margin-bottom: 15px;
+        }
     </style>
 </head>
 
 <body>
-<div id="pipeline">
+<form id="pipeline">
+
+    {% if status %}
+        <pre>{{ status }}</pre>
+    {% endif %}
+
     <h1>Pipeline Status</h1>
     <ol>
         <li>Song Encodes ({{ pending_encodes|length }} pending of {{ all_encodes|length }})
@@ -30,19 +59,26 @@
 
             <p> Once songs are submitted to be encoded they will start coming in. You don't need to resubmit them a
                 bunch of times. You can refresh this page to check status.</p>
+
+            {{ m.pipeline_button('encodes', "Submit Remaining Encodes for Processing", can_encode ) }}
         </li>
         <li>Album Zips ({{ pending_zips|length }} pending of {{ all_zips|length }})
-            <p>Once an album has all its songs encoded, it can be pending for zip-up.</p>
+            <p>Once all the songs are encoded we can zip up the albums.</p>
+
+            {{ m.pipeline_button('zips', "Zip Up Albums", can_zip ) }}
         </li>
         <li>S3 Uploads ({{ uploaded_assets|length }} uploaded, {{ un_uploaded_assets|length }} ready to upload out
             of {{ total_asset_count }})
             <p>Once all tracks and albums are created, they need to be uploaded to s3</p>
+
+            {{ m.pipeline_button('s3', "Upload all the stuff we got", can_upload ) }}
+
         </li>
         <li>Shopify Product Sync
             <p>Once everything is on s3, then we make sure our records with our store are all good</p>
         </li>
     </ol>
-</div>
+</form>
 <p></p>
 
 

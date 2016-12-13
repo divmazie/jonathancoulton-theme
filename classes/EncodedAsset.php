@@ -2,6 +2,7 @@
 
 namespace jct;
 
+use Aws\Credentials\Credentials;
 use Aws\S3\S3Client;
 
 abstract class EncodedAsset extends WPAttachment {
@@ -66,13 +67,13 @@ abstract class EncodedAsset extends WPAttachment {
         $result = self::getS3Client()
             ->putObject([
                             'Bucket'              => Util::get_theme_option('aws_bucket_name'),
-                            'Key'                 => $this->getEncodedAsset()->getAwsName(),
-                            'SourceFile'          => $this->getEncodedAsset()->getPath(),
+                            'Key'                 => $this->getAwsName(),
+                            'SourceFile'          => $this->getPath(),
                             'Content-Disposition' => 'attachment'
                             //'ACL'   =>  'public-read' // Set permissions through bucket policy for referrals from joco.fetchapp.com
                         ]);
 
-        $this->s3Url = $result->toArray()['ObjectURL'];
+        $this->setS3Url($result->toArray()['ObjectURL']);
         $this->setS3Hash($this->getCanonicalContentHash());
         return $result;
     }
@@ -86,9 +87,20 @@ abstract class EncodedAsset extends WPAttachment {
             $encodedAssetConfig->getUploadRelativeStorageDirectory() . '/' .
             $encodedAssetConfig->getConfigUniqueFilename();
 
+
+        // possible we could find garbage from testing... just delete it.
+        $copyCat = WPAttachment::findByUniqueKey($encodedAssetConfig->getUniqueKey());
+        if($copyCat) {
+            $copyCat->deleteAttachment(true);
+        }
+
         /** @noinspection PhpUndefinedFunctionInspection */
         if(!wp_mkdir_p($mkdirTarget = dirname($fullStoragePath))) {
             throw new JCTException("Could not create file storage path [$mkdirTarget]");
+        }
+
+        if(file_exists($fullStoragePath) && !unlink($fullStoragePath)) {
+            throw new JCTException('Could not unlink pre-existing file of same name');
         }
 
         // move the temp file in
@@ -97,6 +109,7 @@ abstract class EncodedAsset extends WPAttachment {
         }
 
         @chmod($fullStoragePath, 644);
+
 
         /** @noinspection PhpUndefinedFunctionInspection */
         $wpFileType = wp_check_filetype(basename($tempFilePath), null);
@@ -118,6 +131,7 @@ abstract class EncodedAsset extends WPAttachment {
         $attachment = static::getByID($attach_id);
         $attachment->setCanonicalContentHash();
         $attachment->setAttachmentClassMetaVariables();
+        $attachment->setConfigPayloadArray($encodedAssetConfig->toPersistableArray());
 
         return $attachment;
     }
@@ -130,8 +144,10 @@ abstract class EncodedAsset extends WPAttachment {
         if(!$client) {
             $client = new S3Client(
                 [
-                    'key'    => Util::get_theme_option('aws_access_key_id'),
-                    'secret' => Util::get_theme_option('aws_secret_access_key'),
+                    'credentials' => new Credentials(Util::get_theme_option('aws_access_key_id'),
+                                                     Util::get_theme_option('aws_secret_access_key')),
+                    'region'      => 'us-east-1',
+                    'version'     => '2006-03-01',
                 ]);
         }
         return $client;

@@ -10,6 +10,7 @@ class EncodeTarget {
     protected $destMetadata;
     protected $fromArtFile;
     protected $errorsFile;
+    protected $successFile;
     protected $configFile;
     protected $destPostURL;
 
@@ -25,12 +26,11 @@ class EncodeTarget {
         $this->nameBase = $fromNameBase . md5($rowJSON);
         // for debugging & tracking
         $this->configFile = $this->nameBase . '.txt';
-        if(file_exists($this->configFile)) {
-            throw new Exception('config exists');
-        }
+        $preexistingConfig = file_exists($this->configFile);
         file_put_contents($this->nameBase . '.txt', $rowJSON);
         $this->errorsFile = $this->nameBase . '.errors.txt';
-
+        $this->successFile = $this->nameBase . '.success.txt';
+        $preexistingSuccess = file_exists($this->successFile);
         $this->fromArtFile = $fromArtFile;
 
         // default to first format if illegal format given
@@ -53,6 +53,16 @@ class EncodeTarget {
         // just need only legal metadata keys
         $this->destMetadata = array_intersect_key(
             $this->destMetadata, array_combine($metadataKeys, $metadataKeys));
+
+        if($preexistingConfig && $preexistingSuccess) {
+            $this->postEncodeFile();
+            throw new Exception('Already processed');
+        }
+
+        if($preexistingConfig) {
+            throw new Exception('In midst of processing, cannot act');
+        }
+
     }
 
     public function getFFMpegMetadataFlags() {
@@ -97,6 +107,10 @@ class EncodeTarget {
         file_put_contents($this->errorsFile, $error, FILE_APPEND);
     }
 
+    private function putSuccess($success) {
+        file_put_contents($this->successFile, $success, FILE_APPEND);
+    }
+
     private function postEncodeFile() {
         // initialise the curl request
         $ch = curl_init($this->destPostURL);
@@ -113,7 +127,7 @@ class EncodeTarget {
 
 // output the response
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-        $this->putError(curl_exec($ch));
+        $this->putSuccess(curl_exec($ch));
 
 // close the session
         curl_close($ch);

@@ -27,6 +27,7 @@ abstract class EncodedAssetConfig {
         return $this->parentPost;
     }
 
+
     public function getEncodeFormat() {
         return $this->encodeFormat;
     }

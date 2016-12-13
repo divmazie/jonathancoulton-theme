@@ -73,6 +73,11 @@ class Util {
         return isset($all_options[$option_name]) ? $all_options[$option_name] : null;
     }
 
+
+    public static function redirect($location, $status = 302) {
+        header("Location: $location", true, $status);
+    }
+
     public static function rand_str($len) {
         return substr(base64_url_encode(openssl_random_pseudo_bytes($len + 5, $did)), 0, $len);
     }

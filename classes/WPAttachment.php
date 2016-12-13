@@ -140,7 +140,10 @@ class WPAttachment extends JCTPost {
             static::findByUniqueKey($encodedAsset->getUniqueKey(), $encodedAsset);
             self::findByUniqueKey($encodedAsset->getUniqueKey(), $encodedAsset);
 
-            $byUniqueKey[$encodedAsset->getUniqueKey()] = $encodedAsset;
+            // if there is no file it is garbage
+            if($encodedAsset->fileAssetExists()) {
+                $byUniqueKey[$encodedAsset->getUniqueKey()] = $encodedAsset;
+            }
         }
 
         return $byUniqueKey;

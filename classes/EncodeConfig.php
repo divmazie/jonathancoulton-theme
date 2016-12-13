@@ -2,11 +2,14 @@
 
 namespace jct;
 
+use GuzzleHttp\Client;
+
 class EncodeConfig extends EncodedAssetConfig {
     const RECEIVE_ENCODE_ROOT_REL_PATH = 'receive_encode';
     const ENCODE_AUTH_CODE_TRANSIENT_NAME = 'jct_encode_secret';
     // 1 day duration for transient
     const ENCODE_AUTH_CODE_TRANSIENT_DURATION_SECONDS = 60 * 60 * 24;
+    const PARENT_POST_CLASS = Track::class;
 
     public function __construct(Track $parentTrack, $encodeFormat, $ffmpegFlags, $configName) {
         parent::__construct($parentTrack, $encodeFormat, $ffmpegFlags, $configName);
@@ -185,6 +188,27 @@ class EncodeConfig extends EncodedAssetConfig {
 
     public static function isValidAuthCode($authCode) {
         return self::getEncodeAuthCode() == $authCode;
+    }
+
+    public static function postEncodeConfigsToEncodeBot($encodeConfigs) {
+        $postArray = [];
+        $postArray['encodes'] = array_map(function (EncodeConfig $encodeConfig) {
+            return $encodeConfig->toEncodeBotArray(EncodeConfig::getEncodeAuthCode());
+        }, $encodeConfigs);
+
+        $client = new Client();
+
+        $r = $client->request('POST', Util::get_theme_option('post_encodes_link'), [
+            'json' => $postArray,
+        ]);
+
+        if($r->getStatusCode() === 200) {
+            return true;
+        }
+
+        echo "<pre>";
+        print_r($r);
+        die();
     }
 
 }

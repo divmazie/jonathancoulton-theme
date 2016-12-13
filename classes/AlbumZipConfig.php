@@ -3,6 +3,8 @@ namespace jct;
 
 class AlbumZipConfig extends EncodedAssetConfig {
 
+    const PARENT_POST_CLASS = Album::class;
+
     public function __construct(Album $parentAlbum, $encodeFormat, $ffmpegFlags, $configName) {
         parent::__construct($parentAlbum, $encodeFormat, $ffmpegFlags, $configName);
     }
@@ -125,7 +127,7 @@ class AlbumZipConfig extends EncodedAssetConfig {
 
         $zipArchive->close();
 
-        return $zipFileName;
+        AlbumZip::createFromTempFile($zipFileName, $this);
     }
 
     /**
@@ -155,6 +157,9 @@ class AlbumZipConfig extends EncodedAssetConfig {
 
     }
 
+    /**
+     * @return AlbumZipConfig[]
+     */
     public static function getPending() {
         $allZipConfigs = self::getAll();
         $allZips = AlbumZip::getAllOfClass();

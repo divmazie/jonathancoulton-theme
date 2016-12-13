@@ -20,6 +20,10 @@ class AlbumZip extends EncodedAsset {
         return AlbumZipConfig::fromPersistableArray($this->getConfigPayloadArray());
     }
 
+    public function setAlbumZipConfig(AlbumZipConfig $zipConfig) {
+        $this->setConfigPayloadArray($zipConfig->toPersistableArray());
+    }
+
     public function getAwsName() {
         return $this->getAlbumZipConfig()->getUploadRelativeStorageDirectory() . '/' .
                $this->getParentAlbum()->getPublicFilename($this->getAlbumZipConfig()->getFileExtension());
