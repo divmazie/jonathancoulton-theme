@@ -34,6 +34,8 @@ $uploadedAssets = $context['uploaded_assets'] =
 $canUpload = $context['can_upload'] = count($unUploadedAssets);
 
 
+$garbage = $context['garbage_attachments'] = array_diff_key($uploadableAssets, array_merge($allZips, $allEncodes));
+
 function status_redirect($statusMessage) {
     Util::redirect('./?status=' . urlencode($statusMessage));
     exit();
@@ -79,6 +81,19 @@ switch(@$_GET['pipeline_stage']) {
             loopForX(function (EncodedAsset $encodedAsset) {
                 $encodedAsset->uploadToS3();
             }, $unUploadedAssets);
+            maintenance_redirect();
+
+        } else {
+            status_redirect("Think we uploaded it all!");
+        }
+
+        break;
+
+    case 'garbage':
+        if($garbage) {
+            loopForX(function (EncodedAsset $encodedAsset) {
+                $encodedAsset->deleteAttachment(true);
+            }, $garbage);
             maintenance_redirect();
 
         } else {

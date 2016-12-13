@@ -154,7 +154,6 @@ class AlbumZipConfig extends EncodedAssetConfig {
         return array_combine(array_map(function (AlbumZipConfig $zipConfig) {
             return $zipConfig->getUniqueKey();
         }, $allZipConfigs), $allZipConfigs);
-
     }
 
     /**

@@ -48,6 +48,7 @@
 
     {% if status %}
         <pre>{{ status }}</pre>
+        {{ m.pipeline_button('status_x', 'Dismiss This Update', true) }}
     {% endif %}
 
     <h1>Pipeline Status</h1>
@@ -76,6 +77,17 @@
         </li>
         <li>Shopify Product Sync
             <p>Once everything is on s3, then we make sure our records with our store are all good</p>
+        </li>
+        <li>Shopify Product Resync
+            <p>Once everything is on s3, then we make sure our records with our store are all good</p>
+        </li>
+        <li>Garbage Collection
+            <p>If your store all is nice and updated, why leave files from a previous iteration around?
+                They're big and unseemly and useless. Wait til everything is updated to delete them, though.
+                Till then, parts of the site may still use them.</p>
+
+            {{ m.pipeline_button('garbage', "Take Out The Trash Baby!", garbage_attachments ) }}
+
         </li>
     </ol>
 </form>

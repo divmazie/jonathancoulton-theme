@@ -104,17 +104,9 @@ class EncodeConfig extends EncodedAssetConfig {
         return $this->getEncode();
     }
 
+    /** @return Encode */
     public function createEncodeFromTempFile($tempFile) {
         return Encode::createFromTempFile($tempFile, $this);
-    }
-
-    public function getEncodeStatusContext() {
-        return [
-            'format'         => $this->getEncodeFormat(),
-            'flags'          => $this->getFfmpegFlags(),
-            'exists'         => $this->getEncode() && $this->getEncode()->fileAssetExists(),
-            'need_to_upload' => $this->getEncode() && $this->getEncode()->needToUpload(),
-        ];
     }
 
     /** @return EncodeConfig[] keyed by unique key */
@@ -175,21 +167,6 @@ class EncodeConfig extends EncodedAssetConfig {
         return $outputFormats[$encodeFormat]['file_ext'];
     }
 
-    public static function getEncodeAuthCode() {
-        /** @noinspection PhpUndefinedFunctionInspection */
-        if(!$trans = \get_transient(self::ENCODE_AUTH_CODE_TRANSIENT_NAME)) {
-            /** @noinspection PhpUndefinedFunctionInspection */
-            \set_transient(self::ENCODE_AUTH_CODE_TRANSIENT_NAME, $trans =
-                Util::rand_str(40), self::ENCODE_AUTH_CODE_TRANSIENT_DURATION_SECONDS);
-        }
-
-        return $trans;
-    }
-
-    public static function isValidAuthCode($authCode) {
-        return self::getEncodeAuthCode() == $authCode;
-    }
-
     public static function postEncodeConfigsToEncodeBot($encodeConfigs) {
         $postArray = [];
         $postArray['encodes'] = array_map(function (EncodeConfig $encodeConfig) {
@@ -209,6 +186,21 @@ class EncodeConfig extends EncodedAssetConfig {
         echo "<pre>";
         print_r($r);
         die();
+    }
+
+    public static function getEncodeAuthCode() {
+        /** @noinspection PhpUndefinedFunctionInspection */
+        if(!$trans = \get_transient(self::ENCODE_AUTH_CODE_TRANSIENT_NAME)) {
+            /** @noinspection PhpUndefinedFunctionInspection */
+            \set_transient(self::ENCODE_AUTH_CODE_TRANSIENT_NAME, $trans =
+                Util::rand_str(40), self::ENCODE_AUTH_CODE_TRANSIENT_DURATION_SECONDS);
+        }
+
+        return $trans;
+    }
+
+    public static function isValidAuthCode($authCode) {
+        return self::getEncodeAuthCode() == $authCode;
     }
 
 }

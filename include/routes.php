@@ -50,6 +50,5 @@ Routes::map(EncodeConfig::RECEIVE_ENCODE_ROOT_REL_PATH . '/:auth_code/:encode_co
     }
 
     $encode = $targetConfig->createEncodeFromTempFile($tempFilePath);
-
 });
 

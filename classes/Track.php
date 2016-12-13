@@ -83,8 +83,8 @@ class Track extends ShopifyProduct {
         return EncodeConfig::getConfigsForTrack($this);
     }
 
-    public function getEncodeConfigByName($format) {
-        return EncodeConfig::getConfigForTrackByName($this, $format);
+    public function getEncodeConfigByName($configName) {
+        return EncodeConfig::getConfigForTrackByName($this, $configName);
     }
 
     public function getPublicFilename($withExtension = null) {

@@ -98,6 +98,7 @@ class Util {
             $up_plural_name = ucwords($plural_name);
         }
         $down_name = preg_replace('/\s+/', '_', strtolower($name));
+        /** @noinspection PhpUndefinedFunctionInspection */
         register_post_type($down_name, [
             'label'           => $down_name,
             'description'     => '',

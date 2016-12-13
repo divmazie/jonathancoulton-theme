@@ -78,6 +78,11 @@ class Album extends ShopifyProduct {
         return count($this->getAlbumTracks());
     }
 
+    public function isFilledOut() {
+        return ($this->getAlbumShow() && $this->getAlbumTitle() && $this->getAlbumArtist() &&
+                $this->getAlbumArtObject() && $this->getAlbumArtObject()->fileAssetExists());
+    }
+
     /**
      * @return BonusAsset[]
      */
@@ -100,10 +105,9 @@ class Album extends ShopifyProduct {
         return AlbumZipConfig::getConfigsForAlbum($this);
     }
 
-    public function getAlbumZipConfigByName($format) {
-        return AlbumZipConfig::getConfigsForAlbumByName($this, $format);
+    public function getAlbumZipConfigByName($configName) {
+        return AlbumZipConfig::getConfigsForAlbumByName($this, $configName);
     }
-
 
     public function syncToStore($shopify, $step = 0) {
         if($step == 0) {
@@ -149,29 +153,6 @@ class Album extends ShopifyProduct {
         delete_transient('track_product_ids');
         return $response;
     }
-
-    public function isFilledOut() {
-        return ($this->getAlbumShow() && $this->getAlbumTitle() && $this->getAlbumArtist() &&
-                $this->getAlbumArtObject() && $this->getAlbumArtObject()->fileAssetExists());
-    }
-
-
-    public function cleanAttachments() {
-        $deleted = $this->deleteOldZips();
-        foreach($this->getAlbumTracks() as $track) {
-            $deleted = array_merge($deleted, $track->deleteOldEncodes());
-        }
-        return $deleted;
-    }
-
-    public function deleteOldZips() {
-        $goodKeys = [];
-        foreach($this->getAllChildZips() as $zip) {
-            $goodKeys[] = $zip->getUniqueKey();
-        }
-        return AlbumZip::deleteOldAttachments($this->postID, $goodKeys);
-    }
-
 
     /** @return Album[] */
     public static function getAllAlbums() {
