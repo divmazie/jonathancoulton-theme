@@ -2,17 +2,20 @@
 
 namespace jct;
 
+use Aws\S3\S3Client;
+
 abstract class EncodedAsset extends WPAttachment {
     const META_CONFIG_PAYLOAD = 'jct_asset_config_payload';
+    const META_S3_URL = 'jct_s3_url';
+    const META_S3_HASH = 'jct_s3_hash';
 
 
     private $awsUrl;
     private $createdTime, $uploadedTime;
 
 
-    abstract public function getFileAssetFileName();
+    abstract public function getAwsName();
 
-    abstract public function getAwsKey();
 
     public function getUniqueKey() {
         return $this->slug;
@@ -31,80 +34,44 @@ abstract class EncodedAsset extends WPAttachment {
         $this->update(self::META_CONFIG_PAYLOAD, $payload);
     }
 
+    public function getS3Url() {
+        return $this->get_field(self::META_S3_URL);
+    }
+
+    public function setS3Url($url) {
+        $this->update(self::META_S3_URL, $url);
+    }
+
+    public function getS3Hash() {
+        return $this->get_field(self::META_S3_HASH);
+    }
+
+    public function setS3Hash($hash) {
+        $this->update(self::META_S3_HASH, $hash);
+    }
+
     public function getParentPost($parentPostClass = JCTPost::class) {
         return Util::get_posts_cached($this->post_parent, $parentPostClass);
     }
 
+    public function shouldUploadToS3() {
+        return $this->getCanonicalContentHash() !== $this->getS3Hash();
+    }
 
-    public function uploadToAws($s3) {
-        $bucket = get_field('aws_bucket_name', 'options');
-        $result = $s3->putObject([
-                                     'Bucket'              => $bucket,
-                                     'Key'                 => $this->getAwsKey(),
-                                     'SourceFile'          => $this->getPath(),
-                                     'Content-Disposition' => 'attachment'
-                                     //'ACL'   =>  'public-read' // Set permissions through bucket policy for referrals from joco.fetchapp.com
-                                 ]);
-        $url = $result->toArray()['ObjectURL'];
-        $this->setAwsUrl($url);
-        $this->setUploadedTime();
+    public function uploadToS3() {
+        $result = self::getS3Client()
+            ->putObject([
+                            'Bucket'              => Util::get_theme_option('aws_bucket_name'),
+                            'Key'                 => $this->getEncodedAsset()->getAwsName(),
+                            'SourceFile'          => $this->getEncodedAsset()->getPath(),
+                            'Content-Disposition' => 'attachment'
+                            //'ACL'   =>  'public-read' // Set permissions through bucket policy for referrals from joco.fetchapp.com
+                        ]);
+
+        $this->s3Url = $result->toArray()['ObjectURL'];
+        $this->setS3Hash($this->getCanonicalContentHash());
         return $result;
     }
-
-    public function setAwsUrl($url) {
-        $this->awsUrl = $url;
-        return update_post_meta($this->parent_post_id, strtolower('aws_url_' . $this->encodeLabel), $url);
-    }
-
-    public function getAwsUrl() {
-        if($this->awsUrl) {
-            return $this->awsUrl;
-        }
-        $key = strtolower('aws_url_' . $this->encodeLabel);
-        $url = get_post_meta($this->parent_post_id, $key, false)[0];
-        $this->awsUrl = $url;
-        return $url ? $url : false;
-    }
-
-    public function setCreatedTime() {
-        $time = $this->createdTime = time();
-        return update_post_meta($this->parent_post_id, strtolower('encode_created_time_' . $this->encodeLabel), $time);
-    }
-
-    public function getCreatedTime() {
-        if($this->createdTime) {
-            return $this->createdTime;
-        }
-        $time = get_post_meta($this->parent_post_id, strtolower('encode_created_time_' . $this->encodeLabel), false)[0];
-        if(!$time) {
-            $time = 1;
-        }
-        $this->createdTime = $time;
-        return $this->createdTime;
-    }
-
-    public function setUploadedTime() {
-        $time = $this->uploadedTime = time();
-        return update_post_meta($this->parent_post_id, strtolower('encode_uploaded_time_' . $this->encodeLabel), $time);
-    }
-
-    public function getUploadedTime() {
-        if($this->uploadedTime) {
-            return $this->uploadedTime;
-        }
-        $time =
-            get_post_meta($this->parent_post_id, strtolower('encode_uploaded_time_' . $this->encodeLabel), false)[0];
-        if(!$time) {
-            $time = 0;
-        }
-        $this->uploadedTime = $time;
-        return $this->uploadedTime;
-    }
-
-    public function needToUpload() {
-        return $this->getUploadedTime() < $this->getCreatedTime();
-    }
-
 
 
     public static function createFromTempFile($tempFilePath, EncodedAssetConfig $encodedAssetConfig) {
@@ -150,6 +117,22 @@ abstract class EncodedAsset extends WPAttachment {
 
         return $attachment;
     }
+
+    /**
+     * @return S3Client
+     */
+    public static function getS3Client() {
+        static $client = null;
+        if(!$client) {
+            $client = new S3Client(
+                [
+                    'key'    => Util::get_theme_option('aws_access_key_id'),
+                    'secret' => Util::get_theme_option('aws_secret_access_key'),
+                ]);
+        }
+        return $client;
+    }
+
 
 }
 

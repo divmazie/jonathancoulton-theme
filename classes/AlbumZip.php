@@ -11,6 +11,7 @@ namespace jct;
 
 class AlbumZip extends EncodedAsset {
 
+    /** @return Album */
     public function getParentAlbum() {
         return $this->getParentPost(Album::class);
     }
@@ -19,12 +20,8 @@ class AlbumZip extends EncodedAsset {
         return AlbumZipConfig::fromPersistableArray($this->getConfigPayloadArray());
     }
 
-    public function getFileAssetFileName() {
-        // TODO: Implement getFileAssetFileName() method.
+    public function getAwsName() {
+        return $this->getAlbumZipConfig()->getUploadRelativeStorageDirectory() . '/' .
+               $this->getParentAlbum()->getPublicFilename($this->getAlbumZipConfig()->getFileExtension());
     }
-
-    public function getAwsKey() {
-        // TODO: Implement getAwsKey() method.
-    }
-
 }

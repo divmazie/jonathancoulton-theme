@@ -88,8 +88,8 @@ class Track extends ShopifyProduct {
     }
 
     public function getPublicFilename($withExtension = null) {
-        return sprintf('0.2%d %s', $this->getTrackNumber(), $this->getTrackTitle(), $withExtension) .
-               '.' . $withExtension ? $withExtension : '';
+        return sprintf('%02d %s', $this->getTrackNumber(), $this->getTrackTitle()) . '.' .
+               ($withExtension ? $withExtension : '');
     }
 
     public function syncToStore($shopify) {

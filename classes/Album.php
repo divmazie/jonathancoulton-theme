@@ -78,6 +78,10 @@ class Album extends ShopifyProduct {
         return count($this->getAlbumTracks());
     }
 
+    public function getPublicFilename($withExtension = null) {
+        return $this->title() . ($withExtension ? $withExtension : '');
+    }
+
 
     /**
      * @return BonusAsset[]

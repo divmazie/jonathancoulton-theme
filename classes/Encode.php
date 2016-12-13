@@ -22,12 +22,9 @@ class Encode extends EncodedAsset {
         $this->setConfigPayloadArray($encodeConfig->toPersistableArray());
     }
 
-    public function getFileAssetFileName() {
-        return $this->getEncodeConfig()->getConfigUniqueFilename();
-    }
-
-    public function getAwsKey() {
-        return $this->getEncodeConfig()->getConfigUniqueFilename();
+    public function getAwsName() {
+        return $this->getEncodeConfig()->getUploadRelativeStorageDirectory() . '/' .
+               $this->getParentTrack()->getPublicFilename($this->getEncodeConfig()->getFileExtension());
     }
 
 }

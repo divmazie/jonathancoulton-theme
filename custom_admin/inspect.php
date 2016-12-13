@@ -53,6 +53,9 @@ switch($class) {
         new_section('track configs');
         var_dump(EncodeConfig::getConfigsForTrack($post));
 
+        new_section('track methods');
+        var_dump($post->getPublicFilename('mp3'));
+
         break;
 
 
