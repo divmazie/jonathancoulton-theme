@@ -12,51 +12,85 @@ use FetchApp\API\Currency;
 use FetchApp\API\FetchApp;
 use FetchApp\API\Product;
 
-
-class Shopify {
+/**
+ * DW Notes:
+ * Shopify API pages everything... generic paged retrieval?
+ * You can pull all metafields down at once as well... consider doing that and correlating on my own?
+ * https://help.shopify.com/api/reference/metafield#index
+ *
+ * Everything seems to be in an array... way to unify with object model?
+ *
+ * Logic between collections and products seems to be duplicated
+ *
+ * Perhaps some kind of ShopifyObject class that has an id tied to their database and?
+ *
+ * Is there an API time limit... I see that there is some usleep logic in make call
+ *
+ * Consider splitting GET/POST make call logic, bring in guzzle
+ *
+ * Sync product logic can move out into Shopify Product
+ *
+ * So when we do the sync, we also make a note of fetch products that are missing... we'll want to keep tracking that
+ *
+ * If we have a clearer object model can we sync to shopify first THEN fetch?
+ *
+ * At the very least I should be able to have track and album emit a ShopifyAPIObject, which I can use to perform
+ * the basic insert and update
+ *
+ * Update based on field equality rather than time
+ *
+ * Get product args needs to go into the sub functions... I'll need to mock up this object model hard before going forit
+ *
+ * Let's try not to do sub-fetches in our methods... like build the full picture of what is at shopify in a series of
+ * batch calls, then we'll do the comparison in memory... we shouldn't be doing any calls inside of loops since
+ * speed is such an issue with these people.
+ *
+ * Pruning code... delete all the cleanup code and then build something on top of the new system
+ *
+ * Try to use that for the refresh shopify stuff too... hopefully there are some synergies in here
+ *
+ *
+ */
+class ShopifyAPIClient {
     private $apiKey, $apiPassword, $handle;
     private $allProducts, $allCollections;
     private $fetch, $allFetchProducts, $allFetchFiles;
     private $last_api_call_time;
 
-    public function __construct($apiKey, $apiPassword, $handle) {
+    const SHOPIFY_MAX_PAGE_LENGTH = 250;
+
+    public function __construct($apiKey, $apiPassword, $handle, $fetchKey, $fetchToken) {
         $this->apiKey = $apiKey;
         $this->apiPassword = $apiPassword;
         $this->handle = $handle;
         $this->fetch = new FetchApp();
-        $this->fetch->setAuthenticationKey(get_field('fetch_key', 'options'));
-        $this->fetch->setAuthenticationToken(get_field('fetch_token', 'options'));
+        $this->fetch->setAuthenticationKey($fetchKey);
+        $this->fetch->setAuthenticationToken($fetchToken);
     }
 
-    static function sku($album, $track, $format) {
-        // replace spaces with underscore
-        $album = preg_replace('/\s/u', '_', $album);
-        $track = preg_replace('/\s/u', '_', $track);
-        $format = preg_replace('/\s/u', '_', $format);
-        // remove non ascii alnum_ with
-        $album = preg_replace('/[^\da-z_]/i', '', $album);
-        $track = preg_replace('/[^\da-z_]/i', '', $track);
-        $format = preg_replace('/[^\da-z_]/i', '', $format);
+    static function sku($albumTitleString, $trackTitleString, $formatNameString) {
+        list($albumTitleString, $trackTitleString, $formatNameString) = array_map(function ($string) {
+            return Util::filename_friendly_string($string);
+        }, func_get_args());
 
         // track number underscore track title underscore short hash dot extension
-        return strtolower(sprintf('%s-%s:%s', $album, $track, $format));
+        return strtolower(sprintf('%s-%s:%s', $albumTitleString, $trackTitleString, $formatNameString));
     }
 
     public function getAllProducts() {
-        if(isset($this->allProducts)) {
-            return $this->allProducts;
-        } else {
-            return $this->forceGetAllProducts();
-        }
+        return $this->allProducts ?
+            $this->allProducts :
+            $this->allProducts = $this->forceGetAllProducts();
     }
 
     public function forceGetAllProducts() {
         $response = $this->makeCall('admin/products/count', 'GET', ['product_type' => 'Music download']);
         $num_products = $response->count;
         $products = [];
-        for($i = 0; $i < $num_products / 250; $i++) {
+        // 250 products per page
+        for($i = 0; $i < ceil($num_products / self::SHOPIFY_MAX_PAGE_LENGTH); $i++) {
             $response = $this->makeCall("admin/products", 'GET', [
-                'product_type' => 'Music download', 'limit' => 250, 'page' => $i + 1,
+                'product_type' => 'Music download', 'limit' => self::SHOPIFY_MAX_PAGE_LENGTH, 'page' => $i + 1,
             ]);
             $products = array_merge($products, $response->products);
         }
@@ -65,17 +99,17 @@ class Shopify {
     }
 
     public function getAllCollections() {
-        if(isset($this->allCollections)) {
-            return $this->allCollections;
-        } else {
-            return $this->forceGetAllCollections();
-        }
+        $this->allCollections ?
+            $this->allCollections :
+            $this->allCollections = $this->forceGetAllCollections();
     }
 
     public function forceGetAllCollections() {
         $collections = [];
         $response =
-            $this->makeCall('admin/custom_collections', 'GET', ['limit' => 250]); // This will cause problems if we have >250 albums
+            $this->makeCall('admin/custom_collections', 'GET', ['limit' => self::SHOPIFY_MAX_PAGE_LENGTH]);
+        // This will cause problems if we have >SHOPIFY_MAX_PAGE_LENGTH albums
+
         foreach($response->custom_collections as $collection) {
             $album_collection = false;
             $metafields = $this->makeCall("admin/custom_collections/$collection->id/metafields");
@@ -494,11 +528,13 @@ class Shopify {
             $args['custom_collection']['image'] = ['attachment' => $image];
             $args['custom_collection']['metafields'] = [
                 ['key' => 'album_collection', 'value_type' => 'string', 'namespace' => 'global', 'value' => 'true'],
-                ['key'   => 'album_sort_order', 'value_type' => 'integer', 'namespace' => 'global',
-                 'value' => $album->getAlbumSortOrder(),
+                [
+                    'key'   => 'album_sort_order', 'value_type' => 'integer', 'namespace' => 'global',
+                    'value' => $album->getAlbumSortOrder(),
                 ],
-                ['key'   => 'album_description', 'value_type' => 'string', 'namespace' => 'global',
-                 'value' => $album->getAlbumDescription(),
+                [
+                    'key'   => 'album_description', 'value_type' => 'string', 'namespace' => 'global',
+                    'value' => $album->getAlbumDescription(),
                 ],
             ];
             $response = $this->makeCall('admin/custom_collections', 'POST', $args);

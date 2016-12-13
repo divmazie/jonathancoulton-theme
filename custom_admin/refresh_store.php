@@ -9,7 +9,7 @@
 $apiKey = get_field('shopify_api_key','options');
 $apiPassword = get_field('shopify_api_password','options');
 $handle = get_field('shopify_handle','options');
-$shopify = new jct\Shopify($apiKey,$apiPassword,$handle);
+$shopify = new jct\ShopifyAPIClient($apiKey, $apiPassword, $handle);
 $albums_to_go = $shopify->getAlbumsFromShopify();
 if ($albums_to_go>0) {
     reload($albums_to_go);

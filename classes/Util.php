@@ -73,6 +73,16 @@ class Util {
         return isset($all_options[$option_name]) ? $all_options[$option_name] : null;
     }
 
+    public static function filename_friendly_string($string) {
+        // try to transliterate ascii...
+        $string = iconv('UTF-8', 'ASCII//TRANSLIT', $string);
+        // replace spaces with underscore
+        $string = preg_replace('/\s/u', '_', $string);
+        // remove non ascii alnum_ with
+        $string = preg_replace('/[^\da-z_]/i', '', $string);
+
+        return $string;
+    }
 
     public static function redirect($location, $status = 302) {
         header("Location: $location", true, $status);

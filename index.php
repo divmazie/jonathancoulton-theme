@@ -29,7 +29,7 @@ $context['facebook_link'] = get_field('facebook_link','options');
 $apiKey = get_field('shopify_api_key','options');
 $apiPassword = get_field('shopify_api_password','options');
 $handle = get_field('shopify_handle','options');
-$shopify = new jct\Shopify($apiKey,$apiPassword,$handle);
+$shopify = new jct\ShopifyAPIClient($apiKey, $apiPassword, $handle);
 $store = $shopify->getStoreContext();
 if (is_array($store)) {
     foreach ($store as $category) {

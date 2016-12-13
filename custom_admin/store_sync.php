@@ -9,7 +9,7 @@
 $apiKey = get_field('shopify_api_key','options');
 $apiPassword = get_field('shopify_api_password','options');
 $handle = get_field('shopify_handle','options');
-$shopify = new jct\Shopify($apiKey,$apiPassword,$handle);
+$shopify = new jct\ShopifyAPIClient($apiKey, $apiPassword, $handle);
 
 $album_num = $_GET['album'];
 $step_num = $_GET['step'];
