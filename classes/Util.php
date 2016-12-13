@@ -88,8 +88,12 @@ class Util {
         header("Location: $location", true, $status);
     }
 
+    function base64_url_encode($input) {
+        return strtr(base64_encode($input), '+/=', '-_~');
+    }
+
     public static function rand_str($len) {
-        return substr(base64_url_encode(openssl_random_pseudo_bytes($len + 5, $did)), 0, $len);
+        return substr(Util::base64_url_encode(openssl_random_pseudo_bytes($len + 5, $did)), 0, $len);
     }
 
     public static function array_merge_flatten_1L(array $arrayOfArrays) {

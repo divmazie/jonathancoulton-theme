@@ -22,7 +22,7 @@ them to to 777
 You may need to run this a few times... it sucks but whatever.
 
 ##  Logs
-Getting bash in db
+Getting bash in db, then seeing the full query logs
 
     docker exec -it docker_db_1 bash
     echo "SET GLOBAL general_log_file = '/var/lib/mysql/dev.log'; SET GLOBAL general_log = 'ON';" | mysql -uroot -p1234; tail -f /var/log/mysql.log

@@ -19,7 +19,7 @@ class AlbumZipConfig extends EncodedAssetConfig {
     /**
      * @return EncodeConfig[]
      */
-    public function getAlbumEncodeConfigs() {
+    public function getParticipatingEncodeConfigs() {
         return array_map(function (Track $track) {
             return $track->getEncodeConfigByName($this->getConfigName());
         }, $this->getParentAlbum()->getAlbumTracks());
@@ -30,7 +30,7 @@ class AlbumZipConfig extends EncodedAssetConfig {
         foreach($this->getParentAlbum()->getAlbumBonusAssetObjects() as $bonus_asset) {
             $album_info[] = $bonus_asset->getCanonicalContentHash();
         }
-        foreach($this->getAlbumEncodeConfigs() as $encodeConfig) {
+        foreach($this->getParticipatingEncodeConfigs() as $encodeConfig) {
             $album_info[] = $encodeConfig->getUniqueKey();
         }
         return md5(serialize($album_info));
@@ -58,13 +58,9 @@ class AlbumZipConfig extends EncodedAssetConfig {
     }
 
     public function getPendingEncodes() {
-        $waiting = [];
-        foreach($this->getAlbumEncodeConfigs() as $encodeConfig) {
-            if(!$encodeConfig->assetExists()) {
-                $waiting[] = $encodeConfig;
-            }
-        }
-        return false;
+        return array_filter($this->getParticipatingEncodeConfigs(), function (EncodeConfig $encodeConfig) {
+            return !$encodeConfig->assetExists();
+        });
     }
 
     public function hasPendingEncodes() {
@@ -98,7 +94,7 @@ class AlbumZipConfig extends EncodedAssetConfig {
 
         // populate targetFiles with $filePath=>$zipPath
         $targetFiles = [];
-        foreach($this->getAlbumEncodeConfigs() as $encodeConfig) {
+        foreach($this->getParticipatingEncodeConfigs() as $encodeConfig) {
             $targetFiles[$encodeConfig->getEncode()->getPath()] =
                 $zipInnerDirectoryPath . '/' . $encodeConfig->getParentTrack()->getPublicFilename(
                     $encodeConfig->getFileExtension());

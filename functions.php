@@ -78,8 +78,5 @@ include __DIR__.'/include/routes.php';
 include __DIR__.'/include/prepopulate.php';
 include __DIR__.'/include/filters.php';
 
-function base64_url_encode($input) {
-	return strtr(base64_encode($input), '+/=', '-_~');
-}
 
 
