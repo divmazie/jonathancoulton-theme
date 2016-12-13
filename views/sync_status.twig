@@ -34,8 +34,12 @@
         <li>Album Zips ({{ pending_zips|length }} pending of {{ all_zips|length }})
             <p>Once an album has all its songs encoded, it can be pending for zip-up.</p>
         </li>
-        <li>S3 Uploads ({{ pending_zips|length }} pending of {{ all_zips|length }})
+        <li>S3 Uploads ({{ uploaded_assets|length }} uploaded, {{ un_uploaded_assets|length }} ready to upload out
+            of {{ total_asset_count }})
             <p>Once all tracks and albums are created, they need to be uploaded to s3</p>
+        </li>
+        <li>Shopify Product Sync
+            <p>Once everything is on s3, then we make sure our records with our store are all good</p>
         </li>
     </ol>
 </div>

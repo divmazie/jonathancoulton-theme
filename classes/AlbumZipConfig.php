@@ -18,9 +18,9 @@ class AlbumZipConfig extends EncodedAssetConfig {
      * @return EncodeConfig[]
      */
     public function getAlbumEncodeConfigs() {
-        return Util::array_merge_flatten_1L(array_map(function (Track $track) {
-            return $track->getTrackEncodeConfigs();
-        }, $this->getParentAlbum()->getAlbumTracks()));
+        return array_map(function (Track $track) {
+            return $track->getEncodeConfigByName($this->getConfigName());
+        }, $this->getParentAlbum()->getAlbumTracks());
     }
 
     public function getUniqueKey() {

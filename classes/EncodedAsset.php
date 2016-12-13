@@ -58,6 +58,10 @@ abstract class EncodedAsset extends WPAttachment {
         return $this->getCanonicalContentHash() !== $this->getS3Hash();
     }
 
+    public function isUploadedToS3() {
+        return !$this->shouldUploadToS3();
+    }
+
     public function uploadToS3() {
         $result = self::getS3Client()
             ->putObject([
