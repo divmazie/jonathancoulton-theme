@@ -23,7 +23,8 @@ class Encode extends EncodedAsset {
     }
 
     public function getAwsName() {
-        return $this->getEncodeConfig()->getUploadRelativeStorageDirectory() . '/' .
+        return $this->getParentTrack()->getAlbum()->getFilenameFriendlyTitle() . '/' .
+               $this->getEncodeConfig()->getEncodeFormat() . '/' .
                $this->getParentTrack()->getPublicFilename($this->getEncodeConfig()->getFileExtension());
     }
 

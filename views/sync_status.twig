@@ -24,7 +24,7 @@
         pre {
             background-color: lightsalmon;
             font-size: 130%;
-            padding:11px;
+            padding: 11px;
         }
 
         #pipeline ol {
@@ -108,6 +108,11 @@
                     {% for zipconf in album.albumZipConfigs %}
                         <span style="color:{{ zipconf.assetExists?'green':'red' }}">{{ zipconf.configName }}</span>&nbsp;
                     {% endfor %}
+                </span><br/>
+                <span>S3 Status:
+                    {% for zipconf in album.albumZipConfigs %}
+                        <span style="color:{{ zipconf.asset.isUploadedToS3?'green':'red' }}">{{ zipconf.configName }}</span>&nbsp;
+                    {% endfor %}
                 </span>
             </div>
         </li>
@@ -125,7 +130,13 @@
                             {% for encodeConf in track.getTrackEncodeConfigs %}
                                 <span style="color:{{ encodeConf.assetExists?'green':'red' }}">{{ encodeConf.configName }}</span>&nbsp;
                             {% endfor %}
+                        </span><br/>
+                        <span>S3 Status:
+                            {% for encodeConf in track.getTrackEncodeConfigs %}
+                                <span style="color:{{ encodeConf.asset.isUploadedToS3?'green':'red' }}">{{ encodeConf.configName }}</span>&nbsp;
+                            {% endfor %}
                         </span>
+
                     </div>
 
                 </li>

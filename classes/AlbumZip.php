@@ -25,7 +25,10 @@ class AlbumZip extends EncodedAsset {
     }
 
     public function getAwsName() {
-        return $this->getAlbumZipConfig()->getUploadRelativeStorageDirectory() . '/' .
-               $this->getParentAlbum()->getPublicFilename($this->getAlbumZipConfig()->getFileExtension());
+        return $this->getParentAlbum()->getFilenameFriendlyTitle() . '/' .
+               sprintf('%s (%s).%s',
+                       $this->getParentAlbum()->getTitle(),
+                       $this->getAlbumZipConfig()->getEncodeFormat(),
+                       $this->getAlbumZipConfig()->getFileExtension());
     }
 }
