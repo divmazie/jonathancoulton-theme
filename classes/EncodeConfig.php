@@ -136,22 +136,23 @@ class EncodeConfig extends EncodedAssetConfig {
         $allEncodeConfigs = self::getAll();
         $allEncodes = Encode::getAllOfClass();
 
-        return array_diff_key($allEncodeConfigs, $allEncodes);
+        /** @var EncodeConfig[] $pendingEncodeConfigs */
+        $pendingEncodeConfigs = array_diff_key($allEncodeConfigs, $allEncodes);
+
+        foreach($pendingEncodeConfigs as $config) {
+            // prepop null here
+            Encode::findByUniqueKey($config->getUniqueKey(), null, true);
+        }
+
+        return $pendingEncodeConfigs;
     }
 
 
     /**
-     * @param Track $track
      * @return EncodeConfig[]
      */
     public static function getConfigsForTrack(Track $track, $keyByName = false) {
-        $encTypes = Util::get_encode_types();
-        $configs = [];
-
-        foreach($encTypes as $configName => $configArgs) {
-            $configs[$configName] = new self($track, $configArgs[0], $configArgs[1], $configName);
-        }
-        return $keyByName ? $configs : array_values($configs);
+        return static::getConfigsForPost($track, $keyByName);
     }
 
     /**
@@ -160,7 +161,7 @@ class EncodeConfig extends EncodedAssetConfig {
      * @return EncodeConfig
      */
     public static function getConfigForTrackByName(Track $track, $configName) {
-        return self::getConfigsForTrack($track, true)[$configName];
+        return static::getConfigForPostByConfigName($track, $configName);
     }
 
     public static function getFileExtensionForEncodeFormat($encodeFormat) {

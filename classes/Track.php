@@ -65,9 +65,10 @@ class Track extends ShopifyProduct {
         return Util::get_posts_cached($this->track_source, SourceTrack::class);
     }
 
-    public function isEncodeWorthy() {
-        return $this->getAlbum()->isEncodeWorthy() && $this->getTrackTitle() && $this->getTrackArtist() &&
-               $this->getTrackSourceFileObject() && $this->getTrackArtObject();
+    public function isFilledOut() {
+        return $this->getAlbum()->isFilledOut() && $this->getTrackTitle() && $this->getTrackArtist() &&
+               $this->getTrackSourceFileObject() && $this->getTrackSourceFileObject()->fileAssetExists() &&
+               $this->getTrackArtObject() && $this->getTrackArtObject()->fileAssetExists();
     }
 
     public function getMusicLink() {
@@ -75,11 +76,15 @@ class Track extends ShopifyProduct {
             $this, self::PLAYER_ENCODE_CONFIG_NAME)->getEncode()->getURL();
     }
 
-    public function getTrackEncodeConfigs($forFormat = null) {
-        if($forFormat) {
-            return EncodeConfig::getConfigForTrackByName($this, $forFormat);
+    public function getTrackEncodeConfigs() {
+        if(!$this->isFilledOut()) {
+            return [];
         }
         return EncodeConfig::getConfigsForTrack($this);
+    }
+
+    public function getEncodeConfigByName($format) {
+        return EncodeConfig::getConfigForTrackByName($this, $format);
     }
 
     public function getPublicFilename($withExtension = null) {
@@ -116,8 +121,6 @@ class Track extends ShopifyProduct {
 
         return $tracks;
     }
-
-
 }
 
 

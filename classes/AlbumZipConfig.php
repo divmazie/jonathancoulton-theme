@@ -14,16 +14,21 @@ class AlbumZipConfig extends EncodedAssetConfig {
         return $this->getParentPost();
     }
 
-    public function getPrerequisiteEncodeConfigs() {
-        return $this->getParentAlbum()->getAlbumEncodeConfigs($this->getEncodeFormat());
+    /**
+     * @return EncodeConfig[]
+     */
+    public function getAlbumEncodeConfigs() {
+        return Util::array_merge_flatten_1L(array_map(function (Track $track) {
+            return $track->getTrackEncodeConfigs();
+        }, $this->getParentAlbum()->getAlbumTracks()));
     }
 
     public function getUniqueKey() {
         $album_info = [$this->getParentAlbum()->getAlbumTitle()];
         foreach($this->getParentAlbum()->getAlbumBonusAssetObjects() as $bonus_asset) {
-            $album_info[] = md5_file($bonus_asset->getPath());
+            $album_info[] = $bonus_asset->getCanonicalContentHash();
         }
-        foreach($this->getPrerequisiteEncodeConfigs() as $encodeConfig) {
+        foreach($this->getAlbumEncodeConfigs() as $encodeConfig) {
             $album_info[] = $encodeConfig->getUniqueKey();
         }
         return md5(serialize($album_info));
@@ -32,7 +37,7 @@ class AlbumZipConfig extends EncodedAssetConfig {
     public function getConfigUniqueFilename() {
         // album title underscore format underscore short hash dot extension
         return sprintf('%s_%s_%s.%s',
-                       $this->getParentAlbum()->getPublicFilename(),
+                       $this->getParentAlbum()->getFilenameFriendlyTitle(),
                        $this->getEncodeFormat(),
                        $this->getShortUniqueKey(),
                        $this->getFileExtension());
@@ -52,7 +57,7 @@ class AlbumZipConfig extends EncodedAssetConfig {
 
     public function getPendingEncodes() {
         $waiting = [];
-        foreach($this->getPrerequisiteEncodeConfigs() as $encodeConfig) {
+        foreach($this->getAlbumEncodeConfigs() as $encodeConfig) {
             if(!$encodeConfig->assetExists()) {
                 $waiting[] = $encodeConfig;
             }
@@ -65,8 +70,13 @@ class AlbumZipConfig extends EncodedAssetConfig {
     }
 
     public function isZipWorthy() {
-        return $this->getParentAlbum()->isEncodeWorthy() && !$this->hasPendingEncodes();
+        return $this->getParentAlbum()->isFilledOut() && !$this->hasPendingEncodes();
     }
+
+    public function getUploadRelativeStorageDirectory() {
+        return self::BASE_UPLOADS_FOLDER . '/' . $this->getParentAlbum()->getFilenameFriendlyTitle();
+    }
+
 
     public function createZip() {
         if(!$this->isZipWorthy()) {
@@ -86,7 +96,7 @@ class AlbumZipConfig extends EncodedAssetConfig {
 
         // populate targetFiles with $filePath=>$zipPath
         $targetFiles = [];
-        foreach($this->getPrerequisiteEncodeConfigs() as $encodeConfig) {
+        foreach($this->getAlbumEncodeConfigs() as $encodeConfig) {
             $targetFiles[$encodeConfig->getEncode()->getPath()] =
                 $zipInnerDirectoryPath . '/' . $encodeConfig->getParentTrack()->getPublicFilename(
                     $encodeConfig->getFileExtension());
@@ -118,16 +128,45 @@ class AlbumZipConfig extends EncodedAssetConfig {
         return $zipFileName;
     }
 
-    public function getZipStatusContext() {
-        return [
-            'format'          => $this->getEncodeFormat(),
-            'flags'           => $this->getFfmpegFlags(),
-            'zip_worthy'      => $this->isZipWorthy(),
-            'missing_encodes' => $this->hasPendingEncodes(),
-            'exists'          => $this->assetExists(),
-            'need_to_upload'  => $this->getAlbumZip()->needToUpload(),
-            'path'            => $this->getAlbumZip()->getPath(),
-        ];
+    /**
+     * @return AlbumZipConfig
+     */
+    public static function getConfigsForAlbum(Album $album, $keyByName = false) {
+        /** @var AlbumZipConfig[] $allZipConfigs */
+        return static::getConfigsForPost($album, $keyByName);
+    }
+
+    /**
+     * @return AlbumZipConfig
+     */
+    public static function getConfigsForAlbumByName(Album $album, $configName) {
+        return static::getConfigForPostByConfigName($album, $configName);
+    }
+
+    public static function getAll() {
+        /** @var AlbumZipConfig[] $allZipConfigs */
+        $allZipConfigs = Util::array_merge_flatten_1L(array_map(function (Album $album) {
+            return $album->getAlbumZipConfigs();
+        }, Album::getAllAlbums()));
+
+        return array_combine(array_map(function (AlbumZipConfig $zipConfig) {
+            return $zipConfig->getUniqueKey();
+        }, $allZipConfigs), $allZipConfigs);
+
+    }
+
+    public static function getPending() {
+        $allZipConfigs = self::getAll();
+        $allZips = AlbumZip::getAllOfClass();
+
+        /** @var AlbumZipConfig[] $pendingZipConfigs */
+        $pendingZipConfigs = array_diff_key($allZipConfigs, $allZips);
+        foreach($pendingZipConfigs as $config) {
+            // prepop null here
+            AlbumZip::findByUniqueKey($config->getUniqueKey(), null, true);
+        }
+
+        return $pendingZipConfigs;
     }
 
 }

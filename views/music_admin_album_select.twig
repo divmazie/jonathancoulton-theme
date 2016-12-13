@@ -3,29 +3,33 @@
     {% endblock %}
 </head>
 
-<body class="{{body_class}}">
-    <div class="container">
-        <h1>Select an album to administer encodes for</h1>
+<body class="{{ body_class }}">
+<div class="container">
+    <h1>Select an album to administer encodes for</h1>
 
-        {% for album in albums %}
-            {{ album.sort_order }}: {{ album.title }} -
-            {% if album.zips_needed %}<span style="color: red">ZIPS NEEDED!</span>{% endif %}
-            {% if album.encodes_needed > 0 %}<span style="color: red">ENCODES NEEDED!</span>{% endif %}
-            <a href="{{ site.url }}/custom_admin/music_admin/?album_post_id={{ album.post_id }}">Manage encodes and zips</a><br />
-            {% if album.sort_order_conflict %}
-                <span style="color: red">{{ album.sort_order }}: {{ album.sort_order_conflict_album }} - DUPLICATE SORT ORDER VALUE!!!</span><br />
-            {% endif %}
-        {% endfor %}
-        <br /><br /><br />
-        {% if safe_to_shopify_sync %}
-            <h3 style="color: red;">IMPORTANT: Please inspect any album above that you may have made changes to since the last albums were synced to shopify!</h3>
-            <br />
-            After you have clicked the button below once, it will create all the products in the store.
-            You may then need to upload some files to fetch and then run the sync again.<br /><br />
-            <button onclick="window.location.href='{{ site.url }}/custom_admin/store_sync?album=0&step=0'">Sync to store</button> <br />
-            (This is a slow process, on the order of 20 minutes.)
-        {% else %}
-            Please create encodes and zips for the albums with red warnings above.
+    {% for album in albums %}
+        {{ album.albumSortOrder }}: {{ album.albumTitle }} -
+        {% if album.zips_needed %}<span style="color: red">ZIPS NEEDED!</span>{% endif %}
+        {% if album.encodes_needed > 0 %}<span style="color: red">ENCODES NEEDED!</span>{% endif %}
+        <a href="{{ site.url }}/custom_admin/music_admin/?album_post_id={{ album.post_id }}">Manage encodes and zips</a>
+        <br/>
+        {% if album.sort_order_conflict %}
+            <span style="color: red">{{ album.sort_order }}: {{ album.sort_order_conflict_album }} - DUPLICATE SORT ORDER VALUE!!!</span>
+            <br/>
         {% endif %}
-    </div>
+    {% endfor %}
+    <br/><br/><br/>
+    {% if safe_to_shopify_sync %}
+        <h3 style="color: red;">IMPORTANT: Please inspect any album above that you may have made changes to since the
+            last albums were synced to shopify!</h3>
+        <br/>
+        After you have clicked the button below once, it will create all the products in the store.
+        You may then need to upload some files to fetch and then run the sync again.<br/><br/>
+        <button onclick="window.location.href='{{ site.url }}/custom_admin/store_sync?album=0&step=0'">Sync to store
+        </button> <br/>
+        (This is a slow process, on the order of 20 minutes.)
+    {% else %}
+        Please create encodes and zips for the albums with red warnings above.
+    {% endif %}
+</div>
 </body>

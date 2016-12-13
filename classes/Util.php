@@ -22,14 +22,21 @@ class Util {
         // cache_key is just exactly how we were asked for the valuepre
         $cache_key = md5(serialize([$args, $returnClass]));
 
+        $pretendNull = 'GAyrrhQyFm1C7Q7CD7Yl89IuLNDWlY4eGXoPrBcf3wRVnGLdW3VB8RVQGCjw';
+
         // if we are actually just prepopulating the cache, do so and return
         if($prepopValue || $prepopNull) {
-            return $res_cache[$cache_key] = $prepopValue;
+            $res_cache[$cache_key] = $prepopValue ? $prepopValue : $pretendNull;
+            return $prepopValue;
         }
 
         // if we have a cached value, return with it
         if(isset($res_cache[$cache_key])) {
-            return $res_cache[$cache_key];
+            $result = $res_cache[$cache_key];
+            if($result === $pretendNull) {
+                return null;
+            }
+            return $result;
         }
 
         if($args) {
@@ -58,7 +65,12 @@ class Util {
 
     public static function get_theme_option($option_name) {
         /** @noinspection PhpUndefinedFunctionInspection */
-        return get_field($option_name, 'options');
+        static $all_options = null;
+        if(!$all_options) {
+            $all_options = get_fields('options');
+        }
+
+        return isset($all_options[$option_name]) ? $all_options[$option_name] : null;
     }
 
     public static function rand_str($len) {

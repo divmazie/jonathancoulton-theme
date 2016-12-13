@@ -1,0 +1,100 @@
+<html>
+<head>
+    <style>
+        body {
+
+            padding: 30px;
+            background-color: lightgoldenrodyellow;
+        }
+
+        #pipeline ol {
+            font-size: 120%;
+        }
+
+        li p {
+            font-size: 80%;
+            margin-top: 3px;
+            margin-bottom: 7px;
+        }
+    </style>
+</head>
+
+<body>
+<div id="pipeline">
+    <h1>Pipeline Status</h1>
+    <ol>
+        <li>Song Encodes ({{ pending_encodes|length }} pending of {{ all_encodes|length }})
+
+            <p>This is the first step in the process. Songs can only be pending once
+                they and their parent albums are filled out.</p>
+
+            <p> Once songs are submitted to be encoded they will start coming in. You don't need to resubmit them a
+                bunch of times. You can refresh this page to check status.</p>
+        </li>
+        <li>Album Zips ({{ pending_zips|length }} pending of {{ all_zips|length }})
+            <p>Once an album has all its songs encoded, it can be pending for zip-up.</p>
+        </li>
+        <li>S3 Uploads ({{ pending_zips|length }} pending of {{ all_zips|length }})
+            <p>Once all tracks and albums are created, they need to be uploaded to s3</p>
+        </li>
+    </ol>
+</div>
+<p></p>
+
+
+<h1>Albums ({{ albums|length }} total)</h1>
+
+<p>Albums are displayed, sorted by their sort key (which is in parentheses after the name). If two
+    albums sort keys are identical, they may display in a different order in the store. </p>
+
+<p>The number in parentheses is the track number in the backend. The other number is
+    simply a result of it being an HTML list.</p>
+
+<p style="margin-left:15px;">
+    <strong style="color:green">green</strong> stuff is done <br/>
+    <strong style="color:red">red</strong> stuff is pending<br/>
+</p>
+
+
+<ol>
+    {% for album in albums if album.isFilledOut %}
+        <li>
+            <span style="color:{{ album.isFilledOut?'green':'red' }}">{{ album.title }}</span>
+            ({{ album.numTracks }} tracks)
+            <a href="{{ album.edit_link }}">EDIT</a><br/>
+
+            <div style="font-size: 80%">
+                <span>Zip Status:
+                    {% for zipconf in album.albumZipConfigs %}
+                        <span style="color:{{ zipconf.assetExists?'green':'red' }}">{{ zipconf.configName }}</span>&nbsp;
+                    {% endfor %}
+                </span>
+            </div>
+        </li>
+
+        <ol>
+            {% for track in album.albumTracks %}
+
+                <li>
+                    <span style="color:{{ track.isFilledOut?'green':'red' }}">
+                    ({{ track.trackNumber }}) {{ track.trackTitle }}</span>
+                    <a href="{{ track.edit_link }}">edit</a>
+
+                    <div style="font-size: 80%">
+                        <span>Encode Status:
+                            {% for encodeConf in track.getTrackEncodeConfigs %}
+                                <span style="color:{{ encodeConf.assetExists?'green':'red' }}">{{ encodeConf.configName }}</span>&nbsp;
+                            {% endfor %}
+                        </span>
+                    </div>
+
+                </li>
+            {% endfor %}
+        </ol>
+    {% endfor %}
+</ol>
+
+
+</body>
+
+</html>

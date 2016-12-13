@@ -74,6 +74,11 @@ class Album extends ShopifyProduct {
         return Track::getTracksForAlbum($this);
     }
 
+    public function numTracks() {
+        return count($this->getAlbumTracks());
+    }
+
+
     /**
      * @return BonusAsset[]
      */
@@ -92,34 +97,12 @@ class Album extends ShopifyProduct {
                                       ], BonusAsset::class);
     }
 
-    /** @return EncodeConfig[] */
-    public function getAlbumEncodeConfigs($forFormat = null) {
-        // array map returns array of arrays, we provide each returned array
-        // as an arg to array merge
-        return call_user_func_array('array_merge', array_map(function (Track $track) use ($forFormat) {
-            return $track->getTrackEncodeConfigs($forFormat);
-        }, $this->getAlbumTracks()));
+    public function getAlbumZipConfigs() {
+        return AlbumZipConfig::getConfigsForAlbum($this);
     }
 
-    public function getAllChildZips() {
-        $encode_types = Util::get_encode_types();
-
-        $zips = [];
-        foreach($encode_types as $key => $encode_type) {
-            $label = $key;
-            $format = $encode_type[0];
-            $flags = $encode_type[1];
-            $zips[$label] = $this->getChildZip($format, $flags, $label);
-        }
-        return $zips;
-    }
-
-    public function getChildZip($format, $flags, $label = '') {
-        if(!$label) {
-            $label = $format;
-        }
-        $zip = new AlbumZip($this, $format, $flags, $label);
-        return $zip;
+    public function getAlbumZipConfigByName($format) {
+        return AlbumZipConfig::getConfigsForAlbumByName($this, $format);
     }
 
 
@@ -168,35 +151,11 @@ class Album extends ShopifyProduct {
         return $response;
     }
 
-    public function isEncodeWorthy() {
+    public function isFilledOut() {
         return ($this->getAlbumShow() && $this->getAlbumTitle() && $this->getAlbumArtist() &&
-                $this->getAlbumArtObject());
+                $this->getAlbumArtObject() && $this->getAlbumArtObject()->fileAssetExists());
     }
 
-    public function getNeededEncodes() {
-        if(!$this->isEncodeWorthy()) {
-            return false;
-        }
-
-        $zips = $this->getAllChildZips();
-        $all_zips_exist = true;
-        foreach($zips as $zip) {
-            if(!$zip->fileAssetExists()) {
-                $all_zips_exist = false;
-            }
-        }
-        if($all_zips_exist) {
-            return false;
-        }
-        $encodes = [];
-        foreach($this->getAlbumTracks() as $track) {
-            $track_encodes = $track->getNeededEncodes();
-            if($track_encodes) {
-                $encodes = array_merge($encodes, $track_encodes);
-            }
-        }
-        return $encodes;
-    }
 
     public function cleanAttachments() {
         $deleted = $this->deleteOldZips();
@@ -214,13 +173,11 @@ class Album extends ShopifyProduct {
         return AlbumZip::deleteOldAttachments($this->postID, $goodKeys);
     }
 
-    public function getNumberOfAlbumTracks() {
-        return count($this->getAlbumTracks());
-    }
-
 
     /** @return Album[] */
     public static function getAllAlbums() {
+        $bySortOrder = [];
+
         /** @var Album[] $all */
         $all = Util::get_posts_cached([
                                           'post_type'      => self::CPT_NAME,
@@ -229,8 +186,15 @@ class Album extends ShopifyProduct {
         foreach($all as $prepop) {
             static::getByID($prepop->getPostID(), $prepop);
         }
+
+        usort($all, function (Album $left, Album $right) {
+            $leftSortOrder = $left->getAlbumSortOrder();
+            $rightSortOrder = $right->getAlbumSortOrder();
+
+            return $leftSortOrder == $rightSortOrder ? 0 : ($leftSortOrder < $rightSortOrder ? -1 : 1);
+        });
+
         return $all;
     }
-
 
 }

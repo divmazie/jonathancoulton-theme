@@ -84,17 +84,28 @@ class WPAttachment extends JCTPost {
      * @param $uniqueKey
      * @return Encode|null
      */
-    public static function findByUniqueKey($uniqueKey, $prepop = null) {
+    public static function findByUniqueKey($uniqueKey, $prepop = null, $prepopNull = false) {
         $rv = Util::get_posts_cached([
                                          'post_type' => static::POST_TYPE_NAME,
                                          'name'      => $uniqueKey,
-                                     ], static::class, $prepop);
+                                     ], static::class, $prepop, $prepopNull);
         if($rv && is_array($rv)) {
             return $rv[0];
+        }
+        if(!$rv) {
+            return null;
         }
         return $rv;
     }
 
+    public static function limitAttachmentQueries() {
+        self::getAllOfClass();
+    }
+
+    /**
+     * @return static[]
+     * @throws JCTException
+     */
     public static function getAllOfClass() {
 
         $getRootClass = self::class === static::class;

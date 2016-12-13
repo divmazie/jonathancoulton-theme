@@ -56,9 +56,26 @@ abstract class EncodedAssetConfig {
     abstract public function getAsset();
 
     public function assetExists() {
-        return $this->getAsset()->fileAssetExists();
+        return $this->getAsset() && $this->getAsset()->fileAssetExists();
     }
 
+
+    public function getConfigsForPost(JCTPost $JCTPost, $keyByName = false) {
+        $encTypes = Util::get_encode_types();
+        $configs = [];
+
+        foreach($encTypes as $configName => $configArgs) {
+            $configs[$configName] = new static($JCTPost, $configArgs[0], $configArgs[1], $configName);
+        }
+        return $keyByName ? $configs : array_values($configs);
+    }
+
+    /**
+     * @return static
+     */
+    public function getConfigForPostByConfigName(JCTPost $JCTPost, $configName) {
+        return static::getConfigsForPost($JCTPost, true)[$configName];
+    }
 
     public function toPersistableArray() {
         return [
