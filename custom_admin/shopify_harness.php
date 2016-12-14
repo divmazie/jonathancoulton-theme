@@ -35,6 +35,7 @@ use jct\Shopify\Product;
  * Do fetch later... use the trick from github to actually upload the s3 urls... that one
  * should be relatively quick (I hope)
  */
+echo "<pre>";
 
 $apiClient = new SynchronousAPIClient(Util::get_theme_option('shopify_api_key'),
                                       Util::get_theme_option('shopify_api_password'),
@@ -42,11 +43,17 @@ $apiClient = new SynchronousAPIClient(Util::get_theme_option('shopify_api_key'),
 
 
 //var_dump($otherClient->makeCall('admin/custom_collections'));
-$response = $apiClient->shopifyPagedGet('admin/products.json');
+//$response = $apiClient->shopifyPagedGet('admin/products.json');
 
-var_dump($response);
+//$this->shopifyPagedGet('admin/products.json')
+//var_dump($response);
+//var_dump($apiClient->getAllProducts());
+$products = $apiClient->getAllProducts();
 
-echo "<pre>";
+$prod0 = $products[0];
+
+var_dump($prod0->postArray());
+die();
 
 $prod0 = Product::instancesFromArray($response->getResponseArray()['products']);
 var_dump($prod0);

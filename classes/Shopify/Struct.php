@@ -8,9 +8,10 @@ abstract class Struct {
 
     private static $id_map;
 
+    private $parent;
+
     // everything in the shopify system has an id... store it here
     public $id;
-
 
     abstract protected function postProperties();
 
@@ -36,6 +37,18 @@ abstract class Struct {
         return $topLevelArray;
     }
 
+    public function getParent() {
+        return $this->parent;
+    }
+
+    public function hasParent() {
+        return (bool)$this->getParent();
+    }
+
+    public function setParent(Struct $parent = null) {
+        $this->parent = $parent;
+    }
+
     public function postArray() {
         return $this->arrayForVerb('POST');
     }
@@ -56,7 +69,7 @@ abstract class Struct {
         $this->{$propertyName} = $property;
     }
 
-    protected function setProperties($propertyArray) {
+    protected function setProperties(array $propertyArray) {
         foreach($propertyArray as $propertyName => $property) {
             if(property_exists(get_class($this), $propertyName)) {
                 $this->setProperty($propertyName, $property);
@@ -67,10 +80,15 @@ abstract class Struct {
     }
 
     /** @return static */
-    public static function instanceFromArray($array) {
-        $obj = new static();
+    protected static function instanceFromArray($array, Struct $parent = null) {
+        if(is_null($array)) {
+            return null;
+        }
 
-        $obj->id = @$array['id'];
+        $obj = new static();
+        $obj->setProperties($array);
+        $obj->setParent($parent);
+
         if(!$obj->id) {
             throw new Exception('no id for resource');
         }
@@ -78,15 +96,20 @@ abstract class Struct {
         // cache all our shit in this here map
         self::$id_map[$obj->id] = $obj;
 
-        $obj->setProperties($array);
         return $obj;
     }
 
     /** @return static[] */
-    public static function instancesFromArray($array) {
-        return array_map(function ($array) {
-            return self::instanceFromArray($array);
+    public static function instancesFromArray($array, Struct $parent = null) {
+        return array_map(function ($childArray) use ($parent) {
+            return self::instanceFromArray($childArray, $parent);
         }, $array);
     }
+
+    public static function getObjectByID($id) {
+        return static::$id_map[$id];
+    }
+
+
 }
 

@@ -4,7 +4,7 @@ namespace jct\Shopify;
 
 use jct\Shopify\Provider\MetafieldProvider;
 
-class Metafield extends ChildStruct {
+class Metafield extends Struct {
     public
         $namespace,
         $key,

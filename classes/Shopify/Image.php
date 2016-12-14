@@ -3,7 +3,7 @@ namespace jct\Shopify;
 
 use jct\Shopify\Provider\ImageProvider;
 
-class Image extends ChildStruct {
+class Image extends Struct {
 
 
     public

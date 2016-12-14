@@ -7,7 +7,6 @@ use jct\Shopify\Provider\MetafieldProvider;
 use jct\Shopify\Provider\ProductOptionProvider;
 use jct\Shopify\Provider\ProductProvider;
 use jct\Shopify\Provider\ProductVariantProvider;
-use jct\Track;
 
 class Product extends Struct {
     //https://help.shopify.com/api/reference/product
@@ -56,16 +55,16 @@ class Product extends Struct {
     protected function setProperty($propertyName, $property) {
         switch($propertyName) {
             case 'variants':
-                $property = Variant::instancesFromArray($property);
+                $property = ProductVariant::instancesFromArray($property, $this);
                 break;
             case 'options':
-                $property = Option::instancesFromArray($property);
+                $property = ProductOption::instancesFromArray($property, $this);
                 break;
             case 'image':
-                $property = Image::instanceFromArray($property);
+                $property = Image::instanceFromArray($property, $this);
                 break;
             case 'images':
-                $property = Image::instancesFromArray($property);
+                $property = Image::instancesFromArray($property, $this);
                 break;
         }
 

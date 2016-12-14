@@ -4,7 +4,7 @@ namespace jct\Shopify;
 
 use jct\Shopify\Provider\ProductOptionProvider;
 
-class Option extends ChildStruct {
+class ProductOption extends Struct {
 
     public
         // int

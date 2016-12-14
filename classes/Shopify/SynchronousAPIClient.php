@@ -16,6 +16,7 @@ class SynchronousAPIClient extends Client {
 
     const DEFAULT_PAGE_SIZE = 250;
     const DEFAULT_TIMEOUT = 5.0;
+    const MAX_TRIES_REQUEST = 8;
 
     private $apiKey, $apiPassword, $storeHandle;
 
@@ -45,6 +46,13 @@ class SynchronousAPIClient extends Client {
         );
     }
 
+
+    /** @return Product[] */
+    public function getAllProducts() {
+        $allProducts = $this->shopifyPagedGet('admin/products.json');
+        //var_dump($allProducts);
+        return Product::instancesFromArray($allProducts);
+    }
 
     /**
      * @param $endPoint
@@ -88,13 +96,19 @@ class SynchronousAPIClient extends Client {
      * @return SynchronousAPIResponse
      */
     private function shopifyRequest($method, $uri = [], $options = []) {
+        $tries = 0;
         while(true) {
             SynchronousAPIResponse::preemptiveSleep();
             try {
                 return new SynchronousAPIResponse($this->request($method, $uri, $options));
             } catch(RateLimitException $ex) {
-                SynchronousAPIResponse::rateLimitSleep();
+                if($tries < self::MAX_TRIES_REQUEST) {
+                    SynchronousAPIResponse::rateLimitSleep();
+                } else {
+                    throw $ex;
+                }
             }
+            $tries++;
         }
         // should throw exception or return a response--should never reach here
         return null;

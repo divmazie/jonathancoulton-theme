@@ -4,7 +4,7 @@ namespace jct\Shopify;
 
 use jct\Shopify\Provider\ProductVariantProvider;
 
-class Variant extends ChildStruct {
+class ProductVariant extends Struct {
     public
         // POST and PUT
         $product_id,
