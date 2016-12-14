@@ -2,6 +2,8 @@
 
 namespace jct\Shopify;
 
+use jct\Shopify\Provider\ProductVariantProvider;
+
 class ProductVariant extends Struct {
     public
         // POST and PUT
@@ -33,6 +35,19 @@ class ProductVariant extends Struct {
         $created_at,
         $updated_at;
 
+
+    public static function fromProductVariantProvider(ProductVariantProvider $variantProvider) {
+        $variant = new self();
+
+        $variant->title = $variantProvider->getProductVariantTitle();
+        $variant->price = $variantProvider->getProductVariantPrice();
+        $variant->sku = $variantProvider->getProductVariantSKU();
+        $variant->option1 = $variantProvider->getProductVariantOption1();
+        $variant->option2 = $variantProvider->getProductVariantOption2();
+        $variant->option3 = $variantProvider->getProductVariantOption3();
+
+        return $variant;
+    }
 
 }
 

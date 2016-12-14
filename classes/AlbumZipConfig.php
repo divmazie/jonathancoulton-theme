@@ -126,6 +126,11 @@ class AlbumZipConfig extends EncodedAssetConfig {
         AlbumZip::createFromTempFile($zipFileName, $this);
     }
 
+    public function getProductVariantPrice() {
+        return $this->getParentAlbum()->getAlbumPrice();
+    }
+
+
     /**
      * @return AlbumZipConfig
      */

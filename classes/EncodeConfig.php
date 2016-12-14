@@ -109,6 +109,11 @@ class EncodeConfig extends EncodedAssetConfig {
         return Encode::createFromTempFile($tempFile, $this);
     }
 
+    public function getProductVariantPrice() {
+        return $this->getParentTrack()->getTrackPrice();
+    }
+
+
     /** @return EncodeConfig[] keyed by unique key */
     public static function getAll() {
         $allEncodeConfigs =

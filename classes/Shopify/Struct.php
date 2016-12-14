@@ -28,6 +28,8 @@ class Struct {
         foreach($propertyArray as $propertyName => $property) {
             if(property_exists(get_class($this), $propertyName)) {
                 $this->propertySet($propertyName, $property);
+            } else {
+                throw new Exception('unanticipated property in response');
             }
         }
     }

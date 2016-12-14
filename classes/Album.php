@@ -2,9 +2,13 @@
 
 namespace jct;
 
+use jct\Shopify\Provider\ProductImageProvider;
+use jct\Shopify\Provider\ProductOptionProvider;
+use jct\Shopify\Provider\ProductProvider;
+use jct\Shopify\Provider\ProductVariantProvider;
 use Timber\Timber;
 
-class Album extends ShopifyProduct {
+class Album extends ShopifyProduct implements ProductProvider, ProductImageProvider {
 
     const CPT_NAME = 'album';
 
@@ -153,6 +157,50 @@ class Album extends ShopifyProduct {
         delete_transient('track_product_ids');
         return $response;
     }
+
+    public function getProductImageSourceUrl() {
+        return $this->getAlbumArtObject()->getURL();
+    }
+
+    public function getShopifyTitle() {
+        return $this->getAlbumTitle() . '(Full Album)';
+    }
+
+    public function getShopifyBodyHtml() {
+        return sprintf('%s by %s. Released in %s.',
+                       $this->getShopifyTitle(),
+                       $this->getAlbumArtist(),
+                       $this->getAlbumYear());
+    }
+
+    public function getShopifyProductType() {
+        return static::DEFAULT_SHOPIFY_PRODUCT_TYPE;
+    }
+
+    public function getShopifyVendor() {
+        return 'Jonathan Coulton';
+    }
+
+    public function getShopifyTags() {
+        return $this->getFilenameFriendlyTitle();
+    }
+
+    public function getProductVariantProviders() {
+        return $this->getAlbumZipConfigs();
+    }
+
+    public function getProductOptionProviders() {
+        return [$this->getAlbumZipConfigs()[0]];
+    }
+
+    public function getProductImageProviders() {
+        return [$this];
+    }
+
+    public function getProductMetafieldProviders() {
+        return [];
+    }
+
 
     /** @return Album[] */
     public static function getAllAlbums() {

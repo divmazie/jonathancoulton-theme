@@ -2,9 +2,13 @@
 
 namespace jct;
 
+use jct\Shopify\Provider\ProductImageProvider;
+use jct\Shopify\Provider\ProductOptionProvider;
+use jct\Shopify\Provider\ProductProvider;
+use jct\Shopify\Provider\ProductVariantProvider;
 use Timber\Timber;
 
-class Track extends ShopifyProduct {
+class Track extends ShopifyProduct implements ProductProvider, ProductImageProvider {
 
     const CPT_NAME = 'track';
     const PLAYER_ENCODE_CONFIG_NAME = 'MP3';
@@ -95,6 +99,51 @@ class Track extends ShopifyProduct {
     public function syncToStore($shopify) {
         return $shopify->syncProduct($this);
     }
+
+    public function getProductImageSourceUrl() {
+        return $this->getTrackArtObject()->getURL();
+    }
+
+    public function getShopifyTitle() {
+        return $this->getPublicFilename();
+    }
+
+    public function getShopifyBodyHtml() {
+        return sprintf('%s by %s. From the album %s. Released in %d.',
+                       $this->getShopifyTitle(),
+                       $this->getTrackArtist(),
+                       $this->getAlbum()->getAlbumTitle(),
+                       $this->getTrackYear());
+    }
+
+    public function getShopifyProductType() {
+        return static::DEFAULT_SHOPIFY_PRODUCT_TYPE;
+    }
+
+    public function getShopifyVendor() {
+        return 'Jonathan Coulton';
+    }
+
+    public function getShopifyTags() {
+        return $this->getAlbum()->getFilenameFriendlyTitle();
+    }
+
+    public function getProductVariantProviders() {
+        return $this->getTrackEncodeConfigs();
+    }
+
+    public function getProductOptionProviders() {
+        return [$this->getTrackEncodeConfigs()[0]];
+    }
+
+    public function getProductImageProviders() {
+        return [$this];
+    }
+
+    public function getProductMetafieldProviders() {
+        return [];
+    }
+
 
     public static function getTracksForAlbum(Album $album) {
         /** @var Track[] $tracks */

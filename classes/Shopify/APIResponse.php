@@ -56,8 +56,18 @@ class APIResponse {
         }
     }
 
-    public function getResponseArray() {
-        return \json_decode($this->baseResponse->getBody(), JSON_OBJECT_AS_ARRAY);
+    public function getResponseArray($unwrap = true) {
+        $array = \json_decode($this->baseResponse->getBody(), JSON_OBJECT_AS_ARRAY);
+        // shopify puts everything in a wrapper... usually there is just single wrapper, then
+        // a bunch of sub elements in it
+        if($unwrap) {
+            $array = current($array);
+        }
+        return $array;
+    }
+
+    public function countResponseElements($unwrap = true) {
+        return count($this->getResponseArray($unwrap));
     }
 
     public function debugPrint() {

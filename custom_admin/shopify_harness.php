@@ -14,7 +14,9 @@ $apiClient = new APIClient(Util::get_theme_option('shopify_api_key'),
 
 
 //var_dump($otherClient->makeCall('admin/custom_collections'));
-$response = $apiClient->shopifyGet('admin/products.json');
+$response = $apiClient->shopifyPagedGet('admin/products.json');
+
+var_dump($response);
 
 echo "<pre>";
 

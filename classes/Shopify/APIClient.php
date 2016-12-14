@@ -4,11 +4,16 @@ namespace jct\Shopify;
 
 
 use GuzzleHttp\Client;
+use jct\Util;
 
 class APIClient extends Client {
+
+    const DEFAULT_PAGE_SIZE = 250;
+    const DEFAULT_TIMEOUT = 5.0;
+
     private $apiKey, $apiPassword, $storeHandle;
 
-    public function __construct($apiKey, $apiPassword, $shopifyStoreHandle, $timeout = 2.0) {
+    public function __construct($apiKey, $apiPassword, $shopifyStoreHandle, $timeout = self::DEFAULT_TIMEOUT) {
         $this->apiKey = $apiKey;
         $this->apiPassword = $apiPassword;
         $this->storeHandle = $shopifyStoreHandle;
@@ -26,6 +31,33 @@ class APIClient extends Client {
     }
 
 
+    public function shopifyPagedGet($endPoint, $queryVars = [], $pageSize = self::DEFAULT_PAGE_SIZE, $specificPageOnly = null) {
+        $queryVars['limit'] = $pageSize;
+
+        $pagedResponse = [];
+        $page = $specificPageOnly ? $specificPageOnly : 1;
+
+        /** @var APIResponse $response */
+        while(true) {
+            $queryVars['page'] = $page;
+            $response = $this->shopifyGet($endPoint, $queryVars);
+
+            $pagedResponse[] = $response->getResponseArray();
+
+            if($specificPageOnly || $response->countResponseElements() < $pageSize) {
+                break;
+            }
+
+            $page++;
+        }
+
+        return Util::array_merge_flatten_1L($pagedResponse);
+    }
+
+
+    /**
+     * @return APIResponse
+     */
     public function shopifyGet($endPoint, $queryVars = []) {
         return new APIResponse($this->request('GET', $endPoint, ['query' => $queryVars]));
     }
