@@ -5,7 +5,7 @@ namespace jct;
 
 use Timber\Timber;
 
-$context['albums'] = Album::getAllAlbums();
+$context['albums'] = Album::getAll();
 
 
 $allEncodes = $context['all_encodes'] = EncodeConfig::getAll();

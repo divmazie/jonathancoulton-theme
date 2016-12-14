@@ -397,7 +397,7 @@ class ShopifyAPIClient {
 
     public function syncEverythingProduct($allAlbums = false) {
         if(!$allAlbums) {
-            $allAlbums = \jct\Album::getAllAlbums();
+            $allAlbums = \jct\Album::getAll();
         }
         $everything_shopify_details = get_transient('everything_shopify_details');
         $update = false;
@@ -548,7 +548,7 @@ class ShopifyAPIClient {
     public function deleteUnusedProducts($allAlbums = false) {
         $this->forceGetAllProducts();
         if(!$allAlbums) {
-            $allAlbums = \jct\Album::getAllAlbums();
+            $allAlbums = \jct\Album::getAll();
         }
         $usedIds = [];
         if($everything_shopify_details = get_transient('everything_shopify_details')) {
@@ -570,7 +570,7 @@ class ShopifyAPIClient {
     public function deleteUnusedCollections($allAlbums = false) {
         $this->forceGetAllCollections();
         if(!$allAlbums) {
-            $allAlbums = \jct\Album::getAllAlbums();
+            $allAlbums = \jct\Album::getAll();
         }
         $usedIds = [];
         foreach($allAlbums as $album) {

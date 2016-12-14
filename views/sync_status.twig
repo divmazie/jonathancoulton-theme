@@ -68,8 +68,9 @@
 
             {{ m.pipeline_button('zips', "Zip Up Albums", can_zip ) }}
         </li>
-        <li>S3 Uploads ({{ uploaded_assets|length }} uploaded, {{ un_uploaded_assets|length }} ready to upload out
-            of {{ total_asset_count }})
+        <li>S3 Uploads ({{ un_uploaded_assets|length }} ready to upload,
+            {{ uploaded_assets|length }} uploaded
+            (out of {{ total_asset_count }} total))
             <p>Once all tracks and albums are created, they need to be uploaded to s3</p>
 
             {{ m.pipeline_button('s3', "Upload all the stuff we got", can_upload ) }}

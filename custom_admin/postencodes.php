@@ -19,7 +19,7 @@ if ($post_id) {
     $album = new \jct\Album($post);
     $albums = array($album);
 } else {
-    $albums = Album::getAllAlbums();
+    $albums = Album::getAll();
 }
 foreach($albums as $album) {
     $album_encodes = $album->getNeededEncodes();

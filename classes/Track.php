@@ -10,7 +10,6 @@ use Timber\Timber;
 
 class Track extends ShopifyProduct implements ProductProvider, ImageProvider {
 
-    const CPT_NAME = 'track';
     const PLAYER_ENCODE_CONFIG_NAME = 'MP3';
 
     // auto complete acf props
@@ -144,17 +143,20 @@ class Track extends ShopifyProduct implements ProductProvider, ImageProvider {
         return [];
     }
 
+    public static function getPostType() {
+        return 'track';
+    }
 
-    public static function getTracksForAlbum(Album $album) {
+    public static function getTracksForAlbum(Album $album, $prepop = null) {
         /** @var Track[] $tracks */
         $tracks = Util::get_posts_cached([
-                                             'post_type'      => self::CPT_NAME,
+                                             'post_type'      => self::getPostType(),
                                              'posts_per_page' => -1,
                                              'meta_query'     => [
                                                  'key'   => 'track_album',
                                                  'value' => $album->getPostID(),
                                              ],
-                                         ], self::class);
+                                         ], self::class, $prepop);
 
 
         usort($tracks, function (Track $left, Track $right) {
@@ -164,11 +166,26 @@ class Track extends ShopifyProduct implements ProductProvider, ImageProvider {
             return $ltn === $rtn ? 0 : ($ltn < $rtn ? -1 : 1);
         });
 
-        foreach($tracks as $prepop) {
-            static::getByID($prepop->getPostID(), $prepop);
+        return $tracks;
+    }
+
+    public static function getAll() {
+        /** @var Track[] $allTracks */
+        $allTracks = parent::getAll();
+
+        $albumsArray = [];
+        foreach($allTracks as $track) {
+            $album = $track->getAlbum();
+            $albumsArray[$album->getPostID()]['album'] = $album;
+            $albumsArray[$album->getPostID()]['tracks'][] = $track;
         }
 
-        return $tracks;
+        // prepop by album
+        foreach($albumsArray as $albumRow) {
+            self::getTracksForAlbum($albumRow['album'], $albumRow['tracks']);
+        }
+
+        return $allTracks;
     }
 }
 

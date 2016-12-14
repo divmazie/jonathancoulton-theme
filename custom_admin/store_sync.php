@@ -22,7 +22,7 @@ if (!$step_num) {
 if ($album_num==0 && $step_num==0) {
     delete_transient('missing_files');
 }
-$albums = \jct\Album::getAllAlbums();
+$albums = \jct\Album::getAll();
 $missing_files = get_transient('missing_files');
 if ($missing_files === false) {
     $missing_files = array();

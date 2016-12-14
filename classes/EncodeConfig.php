@@ -121,9 +121,7 @@ class EncodeConfig extends EncodedAssetConfig {
                 return $track->getTrackEncodeConfigs();
             },
                 // get a flat array of all the album tracks
-                $allTracks = Util::array_merge_flatten_1L(array_map(function (Album $album) {
-                    return $album->getAlbumTracks();
-                }, Album::getAllAlbums()))));
+                Track::getAll()));
 
 
         return array_combine(array_map(function (EncodeConfig $encodeConfig) {

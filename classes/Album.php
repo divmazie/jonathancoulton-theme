@@ -9,9 +9,6 @@ use jct\Shopify\Provider\ProductVariantProvider;
 use Timber\Timber;
 
 class Album extends ShopifyProduct implements ProductProvider, ImageProvider {
-
-    const CPT_NAME = 'album';
-
     // meta fields acf will load (here for autocomplete purposes)
     public $album_artist, $album_price, $album_year, $album_genre, $album_art, $album_comment, $album_sort_order, $album_description, $shopify_collection_id, $bonus_assets, $show_album_in_store;
 
@@ -202,18 +199,14 @@ class Album extends ShopifyProduct implements ProductProvider, ImageProvider {
     }
 
 
-    /** @return Album[] */
-    public static function getAllAlbums() {
-        $bySortOrder = [];
+    public static function getPostType() {
+        return 'album';
+    }
 
+    /** @return Album[] */
+    public static function getAll() {
         /** @var Album[] $all */
-        $all = Util::get_posts_cached([
-                                          'post_type'      => self::CPT_NAME,
-                                          'posts_per_page' => -1,
-                                      ], Album::class);
-        foreach($all as $prepop) {
-            static::getByID($prepop->getPostID(), $prepop);
-        }
+        $all = parent::getAll();
 
         usort($all, function (Album $left, Album $right) {
             $leftSortOrder = $left->getAlbumSortOrder();

@@ -149,7 +149,7 @@ class AlbumZipConfig extends EncodedAssetConfig {
         /** @var AlbumZipConfig[] $allZipConfigs */
         $allZipConfigs = Util::array_merge_flatten_1L(array_map(function (Album $album) {
             return $album->getAlbumZipConfigs();
-        }, Album::getAllAlbums()));
+        }, Album::getAll()));
 
         return array_combine(array_map(function (AlbumZipConfig $zipConfig) {
             return $zipConfig->getUniqueKey();
