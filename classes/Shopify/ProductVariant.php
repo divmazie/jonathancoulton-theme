@@ -11,10 +11,9 @@ class ProductVariant extends Struct {
         $title,
         $price,
         $sku,
-        $position,
         $option1,
 
-        // default values for unused
+        // default values or unused
         $grams = 0,
         $inventory_policy = 'deny',
         $compare_at_price = null,
@@ -22,7 +21,7 @@ class ProductVariant extends Struct {
         $inventory_management = null,
         $option2 = null,
         $option3 = null,
-        $taxable = false,
+        $taxable = true,
         $barcode = null,
         $image_id = null,
         $inventory_quantity = 1,
@@ -31,9 +30,20 @@ class ProductVariant extends Struct {
         $old_inventory_quantity = 1,
         $requires_shipping = false,
 
+        // it infers this
+        $position,
+
         // date time
         $created_at,
         $updated_at;
+
+    protected function postProperties() {
+        return ['product_id', 'sku', 'title', 'price', 'option1', 'option2', 'option3', 'taxable', 'require_shipping'];
+    }
+
+    protected function putProperties() {
+        // TODO: Implement putProperties() method.
+    }
 
 
     public static function fromProductVariantProvider(ProductVariantProvider $variantProvider) {

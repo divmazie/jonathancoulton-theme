@@ -31,4 +31,6 @@ class AlbumZip extends EncodedAsset {
                        $this->getAlbumZipConfig()->getEncodeFormat(),
                        $this->getAlbumZipConfig()->getFileExtension());
     }
+
+
 }

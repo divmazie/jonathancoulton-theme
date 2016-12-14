@@ -130,7 +130,6 @@ class AlbumZipConfig extends EncodedAssetConfig {
         return $this->getParentAlbum()->getAlbumPrice();
     }
 
-
     /**
      * @return AlbumZipConfig
      */

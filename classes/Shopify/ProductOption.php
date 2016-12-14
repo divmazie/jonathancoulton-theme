@@ -15,6 +15,14 @@ class ProductOption extends Struct {
         // string[]
         $values;
 
+    protected function postProperties() {
+        return ['name'];
+    }
+
+    protected function putProperties() {
+        return $this->postProperties();
+    }
+
 
     public static function fromProductOptionProvider(ProductOptionProvider $optionProvider) {
         $option = new self();

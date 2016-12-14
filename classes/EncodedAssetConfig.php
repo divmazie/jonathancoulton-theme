@@ -99,10 +99,10 @@ abstract class EncodedAssetConfig implements ProductVariantProvider, ProductOpti
         return $this->getConfigName();
     }
 
-    public abstract function getProductVariantPrice();
+    abstract public function getProductVariantPrice();
 
     public function getProductVariantSKU() {
-        return $this->getUniqueKey();
+        return $this->getParentPost()->getPostID() . ':' . $this->getConfigName();
     }
 
     public function getProductVariantOption1() {

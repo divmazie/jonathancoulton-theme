@@ -20,6 +20,13 @@ class ProductImage extends Struct {
         // default
         $variant_ids = [];
 
+    protected function postProperties() {
+        return ['src'];
+    }
+
+    protected function putProperties() {
+        return ['id', 'src'];
+    }
 
     public static function fromProductImageProvider(ProductImageProvider $imageProvider) {
         $image = new self();

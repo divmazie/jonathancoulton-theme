@@ -44,7 +44,16 @@ class Product extends Struct {
         $published_at;
 
 
-    protected function propertySet($propertyName, $property) {
+    protected function postProperties() {
+        return ['title', 'body_html', 'product_type', 'vendor', 'tags', 'variants', 'options', 'images', 'metafields'];
+    }
+
+    protected function putProperties() {
+        return array_merge(['id'], $this->postProperties());
+    }
+
+
+    protected function setProperty($propertyName, $property) {
         switch($propertyName) {
             case 'variants':
                 $property = ProductVariant::instancesFromArray($property);
@@ -60,7 +69,7 @@ class Product extends Struct {
                 break;
         }
 
-        parent::propertySet($propertyName, $property);
+        parent::setProperty($propertyName, $property);
     }
 
 
@@ -89,10 +98,6 @@ class Product extends Struct {
         $product->metafields = array_map(function (ProductMetafieldProvider $provider) {
             return Metafield::fromProductMetafieldProvider($provider);
         }, $productProvider->getProductMetafieldProviders());
-
-        $product->images = $productProvider->getProductImageProviders();
-
-
     }
 
 }

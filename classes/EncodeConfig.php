@@ -113,7 +113,6 @@ class EncodeConfig extends EncodedAssetConfig {
         return $this->getParentTrack()->getTrackPrice();
     }
 
-
     /** @return EncodeConfig[] keyed by unique key */
     public static function getAll() {
         $allEncodeConfigs =

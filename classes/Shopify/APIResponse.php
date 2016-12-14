@@ -25,7 +25,7 @@ class APIResponse {
 
     private function updateCallLimit() {
         if($this->baseResponse->hasHeader(self::CALL_LIMIT_HEADER)) {
-            self::$lastCallLimitResponse = $this->baseResponse->getHeader(self::CALL_LIMIT_HEADER);
+            self::$lastCallLimitResponse = $this->baseResponse->getHeaderLine(self::CALL_LIMIT_HEADER);
         }
     }
 
@@ -41,7 +41,7 @@ class APIResponse {
         switch($this->baseResponse->getStatusCode()) {
             case 200:
             case 201:
-                if(@$this->baseResponse->getHeader('Content-Type')[0] !== self::PROPER_CONTENT_TYPE) {
+                if(@$this->baseResponse->getHeaderLine('Content-Type') !== self::PROPER_CONTENT_TYPE) {
                     throw new APIResponseException();
                 }
                 break;

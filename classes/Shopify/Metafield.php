@@ -4,8 +4,8 @@ namespace jct\Shopify;
 
 use jct\Shopify\Provider\ProductMetafieldProvider;
 
-class Metafield {
-    public $id,
+class Metafield extends Struct {
+    public
         $namespace,
         $key,
         $value,
@@ -17,6 +17,14 @@ class Metafield {
         $created_at,
         $updated_at,
         $owner_resource;
+
+    protected function postProperties() {
+        return ['namespace', 'key', 'value', 'value_type'];
+    }
+
+    protected function putProperties() {
+        return $this->postProperties();
+    }
 
 
     public static function fromProductMetafieldProvider(ProductMetafieldProvider $metafieldProvider) {
