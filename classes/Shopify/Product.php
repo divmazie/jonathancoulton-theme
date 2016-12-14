@@ -2,8 +2,8 @@
 
 namespace jct\Shopify;
 
-use jct\Shopify\Provider\ProductImageProvider;
-use jct\Shopify\Provider\ProductMetafieldProvider;
+use jct\Shopify\Provider\ImageProvider;
+use jct\Shopify\Provider\MetafieldProvider;
 use jct\Shopify\Provider\ProductOptionProvider;
 use jct\Shopify\Provider\ProductProvider;
 use jct\Shopify\Provider\ProductVariantProvider;
@@ -56,16 +56,16 @@ class Product extends Struct {
     protected function setProperty($propertyName, $property) {
         switch($propertyName) {
             case 'variants':
-                $property = ProductVariant::instancesFromArray($property);
+                $property = Variant::instancesFromArray($property);
                 break;
             case 'options':
-                $property = ProductOption::instancesFromArray($property);
+                $property = Option::instancesFromArray($property);
                 break;
             case 'image':
-                $property = ProductImage::instanceFromArray($property);
+                $property = Image::instanceFromArray($property);
                 break;
             case 'images':
-                $property = ProductImage::instancesFromArray($property);
+                $property = Image::instancesFromArray($property);
                 break;
         }
 
@@ -74,7 +74,7 @@ class Product extends Struct {
 
 
     public static function fromProductProvider(ProductProvider $productProvider) {
-        $product = new self();
+        $product = new static();
 
         $product->title = $productProvider->getShopifyTitle();
         $product->body_html = $productProvider->getShopifyBodyHtml();
@@ -83,20 +83,20 @@ class Product extends Struct {
         $product->tags = $productProvider->getShopifyTags();
 
         // fill out the whole darn tree
-        $product->variants = array_map(function (ProductVariantProvider $variantProvider) {
-            return ProductVariant::fromProductVariantProvider($variantProvider);
+        $product->variants = array_map(function (ProductVariantProvider $variantProvider) use ($product) {
+            return Variant::fromProductVariantProvider($product, $variantProvider);
         }, $productProvider->getProductVariantProviders());
 
-        $product->options = array_map(function (ProductOptionProvider $provider) {
-            return ProductOption::fromProductOptionProvider($provider);
+        $product->options = array_map(function (ProductOptionProvider $provider) use ($product) {
+            return Option::fromProductOptionProvider($product, $provider);
         }, $productProvider->getProductOptionProviders());
 
-        $product->images = array_map(function (ProductImageProvider $provider) {
-            return ProductImage::fromProductImageProvider($provider);
+        $product->images = array_map(function (ImageProvider $provider) use ($product) {
+            return Image::fromImageProvider($product, $provider);
         }, $productProvider->getProductImageProviders());
 
-        $product->metafields = array_map(function (ProductMetafieldProvider $provider) {
-            return Metafield::fromProductMetafieldProvider($provider);
+        $product->metafields = array_map(function (MetafieldProvider $provider) use ($product) {
+            return Metafield::fromMetafieldProvider($product, $provider);
         }, $productProvider->getProductMetafieldProviders());
     }
 

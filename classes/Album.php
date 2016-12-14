@@ -2,13 +2,13 @@
 
 namespace jct;
 
-use jct\Shopify\Provider\ProductImageProvider;
+use jct\Shopify\Provider\ImageProvider;
 use jct\Shopify\Provider\ProductOptionProvider;
 use jct\Shopify\Provider\ProductProvider;
 use jct\Shopify\Provider\ProductVariantProvider;
 use Timber\Timber;
 
-class Album extends ShopifyProduct implements ProductProvider, ProductImageProvider {
+class Album extends ShopifyProduct implements ProductProvider, ImageProvider {
 
     const CPT_NAME = 'album';
 

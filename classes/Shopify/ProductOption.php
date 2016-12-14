@@ -4,7 +4,7 @@ namespace jct\Shopify;
 
 use jct\Shopify\Provider\ProductOptionProvider;
 
-class ProductOption extends Struct {
+class Option extends ChildStruct {
 
     public
         // int
@@ -15,6 +15,7 @@ class ProductOption extends Struct {
         // string[]
         $values;
 
+
     protected function postProperties() {
         return ['name'];
     }
@@ -24,8 +25,8 @@ class ProductOption extends Struct {
     }
 
 
-    public static function fromProductOptionProvider(ProductOptionProvider $optionProvider) {
-        $option = new self();
+    public static function fromProductOptionProvider(Product $parent, ProductOptionProvider $optionProvider) {
+        $option = new static($parent);
 
         $option->name = $optionProvider->getProductOptionTitle();
 

@@ -6,12 +6,13 @@ use jct\Shopify\Exception\APIResponseException;
 use jct\Shopify\Exception\RateLimitException;
 use Psr\Http\Message\ResponseInterface;
 
-class APIResponse {
+class SynchronousAPIResponse {
 
     const CALL_LIMIT_HEADER = 'X-Shopify-Shop-Api-Call-Limit';
-    const MINIMUM_CALL_LIMIT_HEAD_ROOM = 3;
+    const MINIMUM_CALL_LIMIT_HEAD_ROOM = 1;
     // from inspecting responses
     const PROPER_CONTENT_TYPE = 'application/json; charset=utf-8';
+    const RATE_LIMIT_SLEEP_MICROSECONDS = 1.1 * 1000000;
 
     static $lastCallLimitResponse;
     private $baseResponse;
@@ -76,11 +77,17 @@ class APIResponse {
         var_dump($this->baseResponse);
     }
 
-    public static function shouldCallLimit() {
+    public static function preemptiveSleep() {
         // e.g. X-Shopify-Shop-Api-Call-Limit: 32/40
         // https://help.shopify.com/api/guides/api-call-limit
         list($x, $ofY) = array_map('intval', explode('/', self::$lastCallLimitResponse));
-        return self::MINIMUM_CALL_LIMIT_HEAD_ROOM > ($ofY - $x);
+        if(self::MINIMUM_CALL_LIMIT_HEAD_ROOM > ($ofY - $x)) {
+            self::rateLimitSleep();
+        }
+    }
+
+    public static function rateLimitSleep() {
+        usleep(self::RATE_LIMIT_SLEEP_MICROSECONDS);
     }
 
 

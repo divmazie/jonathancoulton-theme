@@ -4,7 +4,7 @@ namespace jct;
 
 use GuzzleHttp\Exception\RequestException;
 use GuzzleHttp\Psr7\Uri;
-use jct\Shopify\APIClient;
+use jct\Shopify\SynchronousAPIClient;
 use jct\Shopify\Product;
 
 /**
@@ -36,9 +36,9 @@ use jct\Shopify\Product;
  * should be relatively quick (I hope)
  */
 
-$apiClient = new APIClient(Util::get_theme_option('shopify_api_key'),
-                           Util::get_theme_option('shopify_api_password'),
-                           Util::get_theme_option('shopify_handle'));
+$apiClient = new SynchronousAPIClient(Util::get_theme_option('shopify_api_key'),
+                                      Util::get_theme_option('shopify_api_password'),
+                                      Util::get_theme_option('shopify_handle'));
 
 
 //var_dump($otherClient->makeCall('admin/custom_collections'));

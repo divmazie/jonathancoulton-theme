@@ -2,9 +2,9 @@
 
 namespace jct\Shopify;
 
-use jct\Shopify\Provider\ProductMetafieldProvider;
+use jct\Shopify\Provider\MetafieldProvider;
 
-class Metafield extends Struct {
+class Metafield extends ChildStruct {
     public
         $namespace,
         $key,
@@ -27,8 +27,8 @@ class Metafield extends Struct {
     }
 
 
-    public static function fromProductMetafieldProvider(ProductMetafieldProvider $metafieldProvider) {
-        $metafield = new self();
+    public static function fromMetafieldProvider(Struct $parent, MetafieldProvider $metafieldProvider) {
+        $metafield = new static($parent);
 
         $metafield->namespace = $metafieldProvider->getProductMetafieldNamespace();
         $metafield->key = $metafieldProvider->getProductMetafieldKey();

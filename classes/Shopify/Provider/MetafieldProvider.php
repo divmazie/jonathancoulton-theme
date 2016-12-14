@@ -2,7 +2,7 @@
 
 namespace jct\Shopify\Provider;
 
-interface ProductMetafieldProvider {
+interface MetafieldProvider {
 
     public function getProductMetafieldNamespace();
 

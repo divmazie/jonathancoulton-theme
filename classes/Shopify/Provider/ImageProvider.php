@@ -2,6 +2,6 @@
 
 namespace jct\Shopify\Provider;
 
-interface ProductImageProvider {
+interface ImageProvider {
     public function getProductImageSourceUrl();
 }

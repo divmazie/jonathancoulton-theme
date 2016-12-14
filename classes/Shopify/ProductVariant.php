@@ -4,7 +4,7 @@ namespace jct\Shopify;
 
 use jct\Shopify\Provider\ProductVariantProvider;
 
-class ProductVariant extends Struct {
+class Variant extends ChildStruct {
     public
         // POST and PUT
         $product_id,
@@ -46,8 +46,8 @@ class ProductVariant extends Struct {
     }
 
 
-    public static function fromProductVariantProvider(ProductVariantProvider $variantProvider) {
-        $variant = new self();
+    public static function fromProductVariantProvider(Product $product, ProductVariantProvider $variantProvider) {
+        $variant = new self($product);
 
         $variant->title = $variantProvider->getProductVariantTitle();
         $variant->price = $variantProvider->getProductVariantPrice();

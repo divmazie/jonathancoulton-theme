@@ -1,9 +1,11 @@
 <?
 namespace jct\Shopify;
 
-use jct\Shopify\Provider\ProductImageProvider;
+use jct\Shopify\Provider\ImageProvider;
 
-class ProductImage extends Struct {
+class Image extends ChildStruct {
+
+
     public
         // int
         $product_id,
@@ -20,6 +22,7 @@ class ProductImage extends Struct {
         // default
         $variant_ids = [];
 
+
     protected function postProperties() {
         return ['src'];
     }
@@ -28,8 +31,8 @@ class ProductImage extends Struct {
         return ['id', 'src'];
     }
 
-    public static function fromProductImageProvider(ProductImageProvider $imageProvider) {
-        $image = new self();
+    public static function fromImageProvider(Struct $parent, ImageProvider $imageProvider) {
+        $image = new static($parent);
 
         $image->src = $imageProvider->getProductImageSourceUrl();
 

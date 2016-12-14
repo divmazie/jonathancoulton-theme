@@ -26,7 +26,7 @@ interface ProductProvider {
     public function getProductOptionProviders();
 
     /**
-     * @return ProductImageProvider[]
+     * @return ImageProvider[]
      */
     public function getProductImageProviders();
 
