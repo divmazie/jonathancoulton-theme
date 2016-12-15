@@ -83,11 +83,11 @@ class Product extends Struct {
 
         // fill out the whole darn tree
         $product->variants = array_map(function (ProductVariantProvider $variantProvider) use ($product) {
-            return Variant::fromProductVariantProvider($product, $variantProvider);
+            return ProductVariant::fromProductVariantProvider($product, $variantProvider);
         }, $productProvider->getProductVariantProviders());
 
         $product->options = array_map(function (ProductOptionProvider $provider) use ($product) {
-            return Option::fromProductOptionProvider($product, $provider);
+            return ProductOption::fromProductOptionProvider($product, $provider);
         }, $productProvider->getProductOptionProviders());
 
         $product->images = array_map(function (ImageProvider $provider) use ($product) {
@@ -97,6 +97,8 @@ class Product extends Struct {
         $product->metafields = array_map(function (MetafieldProvider $provider) use ($product) {
             return Metafield::fromMetafieldProvider($product, $provider);
         }, $productProvider->getProductMetafieldProviders());
+
+        return $product;
     }
 
 }

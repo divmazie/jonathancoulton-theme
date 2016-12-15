@@ -17,6 +17,10 @@ use jct\Shopify\Product;
  *  - $onLocal && $onShopify: PUT
  *      We PUT for EVERYTHING because the single query is cheaper than
  *      actually fetching the stuff we'd need to fetch
+ *
+ *      (OR we use a local approximation of syncedness
+ *      and have a force option, splitting this into two... )
+ *
  *  - !$onLocal && $onShopify: DELETE
  *
  * In order to do this we need to be able to tell shopify WTF
@@ -52,7 +56,9 @@ $products = $apiClient->getAllProducts();
 
 $prod0 = $products[0];
 
-var_dump($prod0->postArray());
+var_dump($prod0->putArray());
+var_dump(ThemeObjectRepository::getLocalShopifyProducts()[1]->putArray());
+
 die();
 
 $prod0 = Product::instancesFromArray($response->getResponseArray()['products']);

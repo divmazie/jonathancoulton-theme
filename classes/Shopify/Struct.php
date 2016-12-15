@@ -13,6 +13,10 @@ abstract class Struct {
     // everything in the shopify system has an id... store it here
     public $id;
 
+    public function __construct(Struct $parent = null) {
+        $this->setParent($parent);
+    }
+
     abstract protected function postProperties();
 
     abstract protected function putProperties();

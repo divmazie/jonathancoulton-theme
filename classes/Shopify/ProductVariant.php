@@ -42,7 +42,7 @@ class ProductVariant extends Struct {
     }
 
     protected function putProperties() {
-        // TODO: Implement putProperties() method.
+        return array_merge(['id'], $this->postProperties());
     }
 
 

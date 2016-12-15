@@ -116,7 +116,7 @@ class Track extends ShopifyProduct implements ProductProvider, ImageProvider {
     }
 
     public function getShopifyProductType() {
-        return static::DEFAULT_SHOPIFY_PRODUCT_TYPE;
+        return ThemeObjectRepository::DEFAULT_SHOPIFY_PRODUCT_TYPE;
     }
 
     public function getShopifyVendor() {
@@ -140,7 +140,7 @@ class Track extends ShopifyProduct implements ProductProvider, ImageProvider {
     }
 
     public function getProductMetafieldProviders() {
-        return [];
+        return MusicStoreMetafieldProvider::getForProduct($this);
     }
 
     public static function getPostType() {

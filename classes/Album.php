@@ -160,18 +160,18 @@ class Album extends ShopifyProduct implements ProductProvider, ImageProvider {
     }
 
     public function getShopifyTitle() {
-        return $this->getAlbumTitle() . '(Full Album)';
+        return $this->getAlbumTitle() . ' (Full Album)';
     }
 
     public function getShopifyBodyHtml() {
-        return sprintf('%s by %s. Released in %s.',
+        return sprintf('%s by %s. Released %s.',
                        $this->getShopifyTitle(),
                        $this->getAlbumArtist(),
                        $this->getAlbumYear());
     }
 
     public function getShopifyProductType() {
-        return static::DEFAULT_SHOPIFY_PRODUCT_TYPE;
+        return ThemeObjectRepository::DEFAULT_SHOPIFY_PRODUCT_TYPE;
     }
 
     public function getShopifyVendor() {
@@ -195,7 +195,7 @@ class Album extends ShopifyProduct implements ProductProvider, ImageProvider {
     }
 
     public function getProductMetafieldProviders() {
-        return [];
+        return MusicStoreMetafieldProvider::getForProduct($this);
     }
 
 
