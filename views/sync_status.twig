@@ -68,9 +68,10 @@
 
             {{ m.pipeline_button('zips', "Zip Up Albums", can_zip ) }}
         </li>
-        <li>S3 Uploads ({{ un_uploaded_assets|length }} ready to upload,
-            {{ uploaded_assets|length }} uploaded
-            (out of {{ total_asset_count }} total))
+        <li>S3 Uploads
+            ({{ uploaded_assets|length }} uploaded,
+            {{ un_uploaded_assets|length }} waiting to upload
+            ({{ total_asset_count }} total))
             <p>Once all tracks and albums are created, they need to be uploaded to s3</p>
 
             {{ m.pipeline_button('s3', "Upload all the stuff we got", can_upload ) }}
@@ -82,7 +83,7 @@
         <li>Shopify Product Resync
             <p>Once everything is on s3, then we make sure our records with our store are all good</p>
         </li>
-        <li>Garbage Collection
+        <li>Garbage Collection ({{ garbage_attachments|length }} items)
             <p>If your store all is nice and updated, why leave files from a previous iteration around?
                 They're big and unseemly and useless. Wait til everything is updated to delete them, though.
                 Till then, parts of the site may still use them.</p>

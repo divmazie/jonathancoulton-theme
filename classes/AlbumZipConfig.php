@@ -161,7 +161,7 @@ class AlbumZipConfig extends EncodedAssetConfig {
      */
     public static function getPending() {
         $allZipConfigs = self::getAll();
-        $allZips = AlbumZip::getAllOfClass();
+        $allZips = AlbumZip::getAll();
 
         /** @var AlbumZipConfig[] $pendingZipConfigs */
         $pendingZipConfigs = array_diff_key($allZipConfigs, $allZips);

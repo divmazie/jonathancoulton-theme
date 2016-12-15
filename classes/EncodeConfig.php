@@ -131,7 +131,7 @@ class EncodeConfig extends EncodedAssetConfig {
 
     public static function getPending() {
         $allEncodeConfigs = self::getAll();
-        $allEncodes = Encode::getAllOfClass();
+        $allEncodes = Encode::getAll();
 
         /** @var EncodeConfig[] $pendingEncodeConfigs */
         $pendingEncodeConfigs = array_diff_key($allEncodeConfigs, $allEncodes);

@@ -11,19 +11,19 @@ namespace jct;
 
 class WPAttachment extends JCTPost {
 
-    const POST_TYPE_NAME = 'attachment';
-
     const META_CONTENT_HASH = 'jct_content_hash';
     const META_ATTACHMENT_LEAF_CLASS = 'jct_attachment_leaf_class';
     const META_ATTACHMENT_ROOT_CLASS = 'jct_attachment_root_class';
 
 
     public function __construct($id) {
+        parent::__construct($id);
+
+        // must construct parent so these methods know what the heck they are
+        // operating on
         if(!($this->getAttachmentLeafClass() && $this->getAttachmentRootClass())) {
             $this->setAttachmentClassMetaVariables();
         }
-
-        parent::__construct($id);
     }
 
     public function getAttachmentID() { // must use this function instead of property because it gets redefined in KeyedWPAttachment
@@ -86,7 +86,7 @@ class WPAttachment extends JCTPost {
      */
     public static function findByUniqueKey($uniqueKey, $prepop = null, $prepopNull = false) {
         $rv = Util::get_posts_cached([
-                                         'post_type' => static::POST_TYPE_NAME,
+                                         'post_type' => self::getPostType(),
                                          'name'      => $uniqueKey,
                                      ], static::class, $prepop, $prepopNull);
         if($rv && is_array($rv)) {
@@ -98,21 +98,21 @@ class WPAttachment extends JCTPost {
         return $rv;
     }
 
-    public static function limitAttachmentQueries() {
-        self::getAllOfClass();
+    public static function getPostType() {
+        return 'attachment';
     }
 
     /**
      * @return static[]
      * @throws JCTException
      */
-    public static function getAllOfClass() {
+    public static function getAll() {
 
         $getRootClass = self::class === static::class;
 
         /** @var EncodedAsset[] $all */
         $all = Util::get_posts_cached([
-                                          'post_type'      => static::POST_TYPE_NAME,
+                                          'post_type'      => static::getPostType(),
                                           'post_status'    => 'inherit',
                                           'posts_per_page' => -1,
                                           'meta_query'     => [

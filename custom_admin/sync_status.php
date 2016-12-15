@@ -5,6 +5,10 @@ namespace jct;
 
 use Timber\Timber;
 
+ThemeObjectRepository::optimizeQueries();
+//die();
+
+
 $context['albums'] = Album::getAll();
 
 
@@ -19,7 +23,7 @@ $pendingZips = $context['pending_zips'] = AlbumZipConfig::getPending();
 $canZip = $context['can_zip'] = !$canEncode && $pendingZips;
 
 /** @var EncodedAsset[] $uploadableAssets */
-$uploadableAssets = array_merge(Encode::getAllOfClass(), AlbumZip::getAllOfClass());
+$uploadableAssets = array_merge(Encode::getAll(), AlbumZip::getAll());
 $assetCount = $context['total_asset_count'] = count($allEncodes) + count($allZips);
 /** @var EncodedAsset[] $unUploadedAssets */
 $unUploadedAssets = $context['un_uploaded_assets'] =
