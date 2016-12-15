@@ -52,14 +52,15 @@ $apiClient = new SynchronousAPIClient(Util::get_theme_option('shopify_api_key'),
 //$this->shopifyPagedGet('admin/products.json')
 //var_dump($response);
 //var_dump($apiClient->getAllProducts());
-$products = $apiClient->getAllProducts();
+//.$products = $apiClient->getAllProducts();
 
-$prod0 = $products[0];
-$pro1 = ThemeObjectRepository::getLocalShopifyProducts()[1];
-var_dump($products);
-var_dump($pro1->putArray());
+//$prod0 = $products[0];
+$pro1 = ThemeObjectRepository::getLocalShopifyProducts()[2];
+//var_dump($products);
+echo"beep";
+//var_dump($pro1->postArray());
 
-//$apiClient->postProduct($pro1);
+var_dump(serialize(Product::instanceFromArray($apiClient->postProduct($pro1))));
 
 die();
 

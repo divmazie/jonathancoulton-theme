@@ -58,7 +58,7 @@ class SynchronousAPIClient extends Client {
     }
 
     public function postProduct(Product $product) {
-        $this->shopifyPost(self::PRODUCTS_CREATE_ENDPOINT, ['product' => $product->postArray()]);
+        return $this->shopifyPost(self::PRODUCTS_CREATE_ENDPOINT, ['product' => $product->postArray()]);
     }
 
     /**

@@ -6,6 +6,11 @@ use jct\Shopify\Exception\Exception;
 
 abstract class Struct {
 
+    const ID_MAP_DEFAULT_NAMESPACE = 0;
+    const ID_MAP_BY_ID = 'id';
+    const ID_MAP_BY_CLASS = 'class';
+    const ID_MAP_BY_SKU = 'sku';
+
     private static $id_map;
 
     private $parent;
@@ -84,7 +89,7 @@ abstract class Struct {
     }
 
     /** @return static */
-    protected static function instanceFromArray($array, Struct $parent = null) {
+    public static function instanceFromArray($array, Struct $parent = null, $namespace = self::ID_MAP_DEFAULT_NAMESPACE) {
         if(is_null($array)) {
             return null;
         }
@@ -98,9 +103,26 @@ abstract class Struct {
         }
 
         // cache all our shit in this here map
-        self::$id_map[$obj->id] = $obj;
+        self::buildIDMap($obj);
 
         return $obj;
+    }
+
+    private static function buildIDMap(Struct $struct, $namespace = self::ID_MAP_DEFAULT_NAMESPACE) {
+        $map = &self::$id_map[$namespace];
+
+        $map[self::ID_MAP_BY_ID][$struct->id] = $struct;
+        $map[self::ID_MAP_BY_CLASS][get_class($struct)][] = $struct;
+
+
+        if(property_exists($struct, 'sku')) {
+            /** @noinspection PhpUndefinedFieldInspection */
+            if(isset($map[self::ID_MAP_BY_SKU][$struct->sku])) {
+                throw new Exception('multiple structs with same sku');
+            }
+            /** @noinspection PhpUndefinedFieldInspection */
+            $map[self::ID_MAP_BY_SKU][$struct->sku] = $struct;
+        }
     }
 
     /** @return static[] */
