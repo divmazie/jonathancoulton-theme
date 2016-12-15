@@ -37,10 +37,15 @@ class MusicStoreMetafieldProvider implements MetafieldProvider {
             $trackNumber = $product->getTrackNumber();
         }
 
-        return [
-            new MusicStoreMetafieldProvider('track_number', $trackNumber),
+        $metafields = [
+            new MusicStoreMetafieldProvider('track_number', $product instanceof Track ? $product->getTrackNumber() : 0),
             new MusicStoreMetafieldProvider('wiki_link', $product->getWikiLink()),
-            new MusicStoreMetafieldProvider('music_link', $product->getMusicLink()),
         ];
+
+        if($product instanceof Track) {
+            $metafields[] = new MusicStoreMetafieldProvider('music_link', $product->getMusicLink());
+        }
+
+        return $metafields;
     }
 }

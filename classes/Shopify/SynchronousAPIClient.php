@@ -7,6 +7,7 @@ use GuzzleHttp\Client;
 use GuzzleHttp\Exception\RequestException;
 use GuzzleHttp\HandlerStack;
 use GuzzleHttp\Middleware;
+use jct\Shopify\Exception\APIResponseException;
 use jct\Shopify\Exception\RateLimitException;
 use jct\Util;
 use Psr\Http\Message\RequestInterface;
@@ -17,8 +18,14 @@ class SynchronousAPIClient extends Client {
     const DEFAULT_PAGE_SIZE = 250;
     const DEFAULT_TIMEOUT = 5.0;
     const MAX_TRIES_REQUEST = 8;
+    const CALL_LIMIT_HEADER = 'X-Shopify-Shop-Api-Call-Limit';
+    const MINIMUM_CALL_LIMIT_HEAD_ROOM = 1;
+    const RATE_LIMIT_SLEEP_MICROSECONDS = 1.1 * 1000000;
 
-    private $apiKey, $apiPassword, $storeHandle;
+    const PRODUCTS_BULK_GET_ENDPOINT = 'admin/products.json';
+    const PRODUCTS_CREATE_ENDPOINT = self::PRODUCTS_BULK_GET_ENDPOINT;
+
+    private $apiKey, $apiPassword, $storeHandle, $lastCallLimitResponse;
 
     public function __construct($apiKey, $apiPassword, $shopifyStoreHandle, $timeout = self::DEFAULT_TIMEOUT) {
         $this->apiKey = $apiKey;
@@ -32,10 +39,6 @@ class SynchronousAPIClient extends Client {
         // *maybe* work and that I knew I couldn't really debug... so we'll just
         // NOT deal with response exceptions inside guzzle and instead deal with them
         // in our own wrapper class, capiche?
-        $stack = new HandlerStack();
-        $stack->setHandler(\GuzzleHttp\choose_handler());
-        $stack->remove('http_errors');
-
         parent::__construct(
             [    // Base URI is used with relative requests
                 'base_uri' => $base_url,
@@ -49,9 +52,13 @@ class SynchronousAPIClient extends Client {
 
     /** @return Product[] */
     public function getAllProducts() {
-        $allProducts = $this->shopifyPagedGet('admin/products.json');
+        $allProducts = $this->shopifyPagedGet(self::PRODUCTS_BULK_GET_ENDPOINT);
         //var_dump($allProducts);
         return Product::instancesFromArray($allProducts);
+    }
+
+    public function postProduct(Product $product) {
+        $this->shopifyPost(self::PRODUCTS_CREATE_ENDPOINT, ['product' => $product->postArray()]);
     }
 
     /**
@@ -72,9 +79,9 @@ class SynchronousAPIClient extends Client {
             $queryVars['page'] = $page;
             $response = $this->shopifyGet($endPoint, $queryVars);
 
-            $pagedResponse[] = $response->getResponseArray();
+            $pagedResponse[] = $response;
 
-            if($specificPageOnly || $response->countResponseElements() < $pageSize) {
+            if($specificPageOnly || count($response) < $pageSize) {
                 break;
             }
 
@@ -85,35 +92,70 @@ class SynchronousAPIClient extends Client {
     }
 
 
-    /**
-     * @return SynchronousAPIResponse
-     */
     private function shopifyGet($endPoint, $queryVars = []) {
         return $this->shopifyRequest('GET', $endPoint, ['query' => $queryVars]);
     }
 
-    /**
-     * @return SynchronousAPIResponse
-     */
+    private function shopifyPost($endPoint, $postArray) {
+        return $this->shopifyRequest('POST', $endPoint, ['json' => $postArray]);
+    }
+
     private function shopifyRequest($method, $uri = [], $options = []) {
+        $options['headers'] = ['Content-Type' => 'application/json'];
+        $options['allow_redirects'] = false;
+        $options['http_errors'] = false;
+
         $tries = 0;
         while(true) {
-            SynchronousAPIResponse::preemptiveSleep();
+            $this->preemptiveSleep();
             try {
-                return new SynchronousAPIResponse($this->request($method, $uri, $options));
+                $response = $this->request($method, $uri, $options);
+                break;
+
             } catch(RateLimitException $ex) {
                 if($tries < self::MAX_TRIES_REQUEST) {
-                    SynchronousAPIResponse::rateLimitSleep();
+                    $this->rateLimitSleep();
                 } else {
                     throw $ex;
                 }
             }
             $tries++;
         }
-        // should throw exception or return a response--should never reach here
-        return null;
+
+        /** @noinspection PhpUndefinedVariableInspection */
+        switch($response->getStatusCode()) {
+            case 200:
+            case 201:
+                break;
+
+            case 429:
+                throw new RateLimitException();
+                break;
+
+            default:
+                echo (string)$response->getBody();
+                throw new APIResponseException();
+                break;
+        }
+
+        $this->lastCallLimitResponse = $response->getHeaderLine(self::CALL_LIMIT_HEADER);
+
+        return current(\json_decode((string)$response->getBody(), JSON_OBJECT_AS_ARRAY));
     }
 
+
+    private function preemptiveSleep() {
+        // e.g. X-Shopify-Shop-Api-Call-Limit: 32/40
+        // https://help.shopify.com/api/guides/api-call-limit
+        list($x, $ofY) = array_map('intval', explode('/', $this->lastCallLimitResponse));
+        if(self::MINIMUM_CALL_LIMIT_HEAD_ROOM > ($ofY - $x)) {
+            self::rateLimitSleep();
+        }
+    }
+
+    private function rateLimitSleep() {
+        usleep(self::RATE_LIMIT_SLEEP_MICROSECONDS);
+    }
 
 }
 

@@ -44,7 +44,7 @@ class Product extends Struct {
 
 
     protected function postProperties() {
-        return ['title', 'body_html', 'product_type', 'vendor', 'tags', 'variants', 'options', 'images', 'metafields'];
+        return ['title', 'body_html', 'product_type', 'vendor', 'tags', 'variants', 'options', 'images','image', 'metafields'];
     }
 
     protected function putProperties() {
@@ -93,6 +93,10 @@ class Product extends Struct {
         $product->images = array_map(function (ImageProvider $provider) use ($product) {
             return Image::fromImageProvider($product, $provider);
         }, $productProvider->getProductImageProviders());
+
+        if(count($product->images)) {
+            $product->image = $product->images[0];
+        }
 
         $product->metafields = array_map(function (MetafieldProvider $provider) use ($product) {
             return Metafield::fromMetafieldProvider($product, $provider);
