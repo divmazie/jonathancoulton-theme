@@ -91,8 +91,8 @@ class Track extends ShopifyProduct implements ProductProvider, ImageProvider {
     }
 
     public function getPublicFilename($withExtension = null) {
-        return sprintf('%02d %s', $this->getTrackNumber(), $this->getTrackTitle()) . '.' .
-               ($withExtension ? $withExtension : '');
+        return sprintf('%02d %s', $this->getTrackNumber(), $this->getTrackTitle()) .
+               ($withExtension ? '.' . $withExtension : '');
     }
 
     public function syncToStore($shopify) {
