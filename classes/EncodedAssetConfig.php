@@ -16,7 +16,7 @@ abstract class EncodedAssetConfig implements ProductVariantProvider, ProductOpti
 
     private $parentPost, $encodeFormat, $ffmpegFlags, $configName;
 
-    public function __construct(JCTPost $parentPost, $encodeFormat, $ffmpegFlags, $configName) {
+    public function __construct(ShopifyProduct $parentPost, $encodeFormat, $ffmpegFlags, $configName) {
         $this->parentPost = $parentPost;
         $this->encodeFormat = $encodeFormat;
         $this->ffmpegFlags = $ffmpegFlags;
@@ -24,7 +24,7 @@ abstract class EncodedAssetConfig implements ProductVariantProvider, ProductOpti
     }
 
     /**
-     * @return JCTPost
+     * @return ShopifyProduct
      */
     public function getParentPost() {
         return $this->parentPost;
@@ -89,6 +89,10 @@ abstract class EncodedAssetConfig implements ProductVariantProvider, ProductOpti
             static::STORAGE_KEY_CONFIG_NAME     => $this->getConfigName(),
             static::STORAGE_KEY_RECONSTITUTE_AS => static::class,
         ];
+    }
+
+    public function getProductVariantShopifyID() {
+        return $this->getParentPost()->getVariantID($this->getProductVariantSKU());
     }
 
     public function getProductOptionTitle() {

@@ -18,7 +18,7 @@ class Product extends Struct {
         $vendor,
         $tags,
 
-        // Variant[]
+        // ProductVariant[]
         $variants,
         // ProductOption[]
         $options,
@@ -26,7 +26,7 @@ class Product extends Struct {
         $images,
 
         // Metafield[]
-        $metafields,
+        $metafields = [],
 
         // unused (default values)
         $template_suffix,
@@ -44,7 +44,10 @@ class Product extends Struct {
 
 
     protected function postProperties() {
-        return ['title', 'body_html', 'product_type', 'vendor', 'tags', 'variants', 'options', 'images','image', 'metafields'];
+        return [
+            'title', 'body_html', 'product_type', 'vendor', 'tags', 'variants', 'options', 'images', 'image',
+            'metafields',
+        ];
     }
 
     protected function putProperties() {
@@ -72,9 +75,14 @@ class Product extends Struct {
     }
 
 
+    /**
+     * @param ProductProvider $productProvider
+     * @return Product
+     */
     public static function fromProductProvider(ProductProvider $productProvider) {
         $product = new static();
 
+        $product->id = $productProvider->getShopifyID();
         $product->title = $productProvider->getShopifyTitle();
         $product->body_html = $productProvider->getShopifyBodyHtml();
         $product->product_type = $productProvider->getShopifyProductType();

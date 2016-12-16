@@ -52,15 +52,26 @@ $apiClient = new SynchronousAPIClient(Util::get_theme_option('shopify_api_key'),
 //$this->shopifyPagedGet('admin/products.json')
 //var_dump($response);
 //var_dump($apiClient->getAllProducts());
-//.$products = $apiClient->getAllProducts();
 
-//$prod0 = $products[0];
-$pro1 = ThemeObjectRepository::getLocalShopifyProducts()[2];
+//var_dump($apiClient->shopifyPagedGet('/admin/products/9133128710/metafields.json', ['metafield[owner_resource]' => 'product']));
+
+
+$remotepord = $apiClient->getAllProducts(['product_type' => ThemeObjectRepository::DEFAULT_SHOPIFY_PRODUCT_TYPE]);
+//var_dump($remotepord);
+//var_dump($remotepord);
+//die();
+//$prod0 = $products[0];11
+$lcoals = ThemeObjectRepository::getLocalProductProviders();
+
+//var_dump(Product::fromProductProvider($lcoals[1])->putArray());
+//die();
+ThemeObjectRepository::sync($apiClient, $remotepord, $lcoals);
+die();
 //var_dump($products);
-echo"beep";
+echo "beep";
 //var_dump($pro1->postArray());
 
-var_dump(serialize(Product::instanceFromArray($apiClient->postProduct($pro1))));
+$toPost->shopifyAPIResponse($apiClient->postProduct(Product::fromProductProvider($toPost)));
 
 die();
 

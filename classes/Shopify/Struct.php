@@ -6,13 +6,6 @@ use jct\Shopify\Exception\Exception;
 
 abstract class Struct {
 
-    const ID_MAP_DEFAULT_NAMESPACE = 0;
-    const ID_MAP_BY_ID = 'id';
-    const ID_MAP_BY_CLASS = 'class';
-    const ID_MAP_BY_SKU = 'sku';
-
-    private static $id_map;
-
     private $parent;
 
     // everything in the shopify system has an id... store it here
@@ -32,7 +25,10 @@ abstract class Struct {
         $topLevelArray = array_intersect_key(
         // filter out nulls
         // we get back the object vars that are not null that are in the VERB array
-            array_filter(get_object_vars($this)),
+            array_filter(get_object_vars($this), function ($v) {
+                // allow 0 value through
+                return $v || is_int($v);
+            }),
             array_combine(call_user_func($callable), call_user_func($callable))
         );
 
@@ -89,7 +85,7 @@ abstract class Struct {
     }
 
     /** @return static */
-    public static function instanceFromArray($array, Struct $parent = null, $namespace = self::ID_MAP_DEFAULT_NAMESPACE) {
+    public static function instanceFromArray($array, Struct $parent = null) {
         if(is_null($array)) {
             return null;
         }
@@ -102,27 +98,7 @@ abstract class Struct {
             throw new Exception('no id for resource');
         }
 
-        // cache all our shit in this here map
-        self::buildIDMap($obj);
-
         return $obj;
-    }
-
-    private static function buildIDMap(Struct $struct, $namespace = self::ID_MAP_DEFAULT_NAMESPACE) {
-        $map = &self::$id_map[$namespace];
-
-        $map[self::ID_MAP_BY_ID][$struct->id] = $struct;
-        $map[self::ID_MAP_BY_CLASS][get_class($struct)][] = $struct;
-
-
-        if(property_exists($struct, 'sku')) {
-            /** @noinspection PhpUndefinedFieldInspection */
-            if(isset($map[self::ID_MAP_BY_SKU][$struct->sku])) {
-                throw new Exception('multiple structs with same sku');
-            }
-            /** @noinspection PhpUndefinedFieldInspection */
-            $map[self::ID_MAP_BY_SKU][$struct->sku] = $struct;
-        }
     }
 
     /** @return static[] */
@@ -131,11 +107,5 @@ abstract class Struct {
             return self::instanceFromArray($childArray, $parent);
         }, $array);
     }
-
-    public static function getObjectByID($id) {
-        return static::$id_map[$id];
-    }
-
-
 }
 

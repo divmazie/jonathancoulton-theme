@@ -9,6 +9,7 @@ use GuzzleHttp\HandlerStack;
 use GuzzleHttp\Middleware;
 use jct\Shopify\Exception\APIResponseException;
 use jct\Shopify\Exception\RateLimitException;
+use jct\Shopify\Provider\ProductProvider;
 use jct\Util;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
@@ -17,13 +18,11 @@ class SynchronousAPIClient extends Client {
 
     const DEFAULT_PAGE_SIZE = 250;
     const DEFAULT_TIMEOUT = 5.0;
-    const MAX_TRIES_REQUEST = 8;
+    const MAX_TRIES_REQUEST = 1;
     const CALL_LIMIT_HEADER = 'X-Shopify-Shop-Api-Call-Limit';
-    const MINIMUM_CALL_LIMIT_HEAD_ROOM = 1;
-    const RATE_LIMIT_SLEEP_MICROSECONDS = 1.1 * 1000000;
-
-    const PRODUCTS_BULK_GET_ENDPOINT = 'admin/products.json';
-    const PRODUCTS_CREATE_ENDPOINT = self::PRODUCTS_BULK_GET_ENDPOINT;
+    const MINIMUM_CALL_LIMIT_HEAD_ROOM = 4;
+    // https://ecommerce.shopify.com/c/api-announcements/t/upcoming-change-in-api-limit-calculations-159710
+    const RATE_LIMIT_SLEEP_MICROSECONDS = 505 * 1000;
 
     private $apiKey, $apiPassword, $storeHandle, $lastCallLimitResponse;
 
@@ -49,16 +48,62 @@ class SynchronousAPIClient extends Client {
         );
     }
 
-
-    /** @return Product[] */
-    public function getAllProducts() {
-        $allProducts = $this->shopifyPagedGet(self::PRODUCTS_BULK_GET_ENDPOINT);
-        //var_dump($allProducts);
-        return Product::instancesFromArray($allProducts);
+    public function getMetafieldsForProduct(Product $product) {
+        return Metafield::instancesFromArray($this->shopifyPagedGet(sprintf('/admin/products/%d/metafields.json', $product->id)));
     }
 
+    public function putMetafield(Metafield $metafield) {
+        var_dump($metafield->putArray());
+
+        $putR = $this->shopifyPut(sprintf('/admin/metafields/%s.json', $metafield->id),
+                                  ['metafield' => $metafield->putArray()]);
+        var_dump($putR);
+        return Metafield::instanceFromArray($putR);
+    }
+
+    /** @return Product */
+    public function putProduct(Product $product, $updateMetafields = []) {
+        //var_dump(sprintf(self::PRODUCTS_UPDATE_ENDPOINT_ID_PATTERN, $product->id));
+        //var_dump($product->putArray());
+
+        // we can't sync these, believe me i tried
+        $product->metafields = null;
+
+        $putProduct =
+            Product::instanceFromArray($this->shopifyPut(sprintf('admin/products/%d.json', $product->id), ['product' => $product->postArray()]));
+
+
+        foreach($updateMetafields as $metafield) {
+            $putProduct->metafields[] = $this->putMetafield($metafield);
+        }
+
+        return $putProduct;
+    }
+
+    /** @return Product */
     public function postProduct(Product $product) {
-        return $this->shopifyPost(self::PRODUCTS_CREATE_ENDPOINT, ['product' => $product->postArray()]);
+        $postedProduct =
+            Product::instanceFromArray($this->shopifyPost('admin/products.json', ['product' => $product->postArray()]));
+        $postedProduct->metafields = $this->getMetafieldsForProduct($postedProduct);
+        return $postedProduct;
+    }
+
+    private function shopifyPost($endPoint, $array) {
+        return $this->shopifyRateLimitedRequest('POST', $endPoint, ['json' => $array]);
+    }
+
+    /** @return Product */
+    private function shopifyPut($endPoint, $array) {
+        return $this->shopifyRateLimitedRequest('PUT', $endPoint, ['json' => $array]);
+    }
+
+
+    /** @return Product[] */
+    public function getAllProducts($queryVars = [], $limitNumber = null) {
+        $allProducts =
+            $this->shopifyPagedGet('admin/products.json', $queryVars, $limitNumber, $limitNumber ? 1 : null);
+
+        return Product::instancesFromArray($allProducts);
     }
 
     /**
@@ -68,19 +113,20 @@ class SynchronousAPIClient extends Client {
      * @param null $specificPageOnly
      * @return Struct[]
      */
-    public function shopifyPagedGet($endPoint, $queryVars = [], $pageSize = self::DEFAULT_PAGE_SIZE, $specificPageOnly = null) {
+    public function shopifyPagedGet($endPoint, $queryVars = [], $pageSize = null, $specificPageOnly = null) {
         $queryVars['limit'] = $pageSize;
 
         $pagedResponse = [];
+        $pageSize = $pageSize ? $pageSize : self::DEFAULT_PAGE_SIZE;
         $page = $specificPageOnly ? $specificPageOnly : 1;
 
-        /** @var SynchronousAPIResponse $response */
+        var_dump(func_get_args());
+
+
         while(true) {
             $queryVars['page'] = $page;
             $response = $this->shopifyGet($endPoint, $queryVars);
-
             $pagedResponse[] = $response;
-
             if($specificPageOnly || count($response) < $pageSize) {
                 break;
             }
@@ -93,35 +139,35 @@ class SynchronousAPIClient extends Client {
 
 
     private function shopifyGet($endPoint, $queryVars = []) {
-        return $this->shopifyRequest('GET', $endPoint, ['query' => $queryVars]);
+        return $this->shopifyRateLimitedRequest('GET', $endPoint, ['query' => $queryVars]);
     }
 
-    private function shopifyPost($endPoint, $postArray) {
-        return $this->shopifyRequest('POST', $endPoint, ['json' => $postArray]);
-    }
-
-    private function shopifyRequest($method, $uri = [], $options = []) {
-        $options['headers'] = ['Content-Type' => 'application/json'];
-        $options['allow_redirects'] = false;
-        $options['http_errors'] = false;
-
+    private function shopifyRateLimitedRequest($method, $uri = [], $options = []) {
         $tries = 0;
         while(true) {
             $this->preemptiveSleep();
             try {
-                $response = $this->request($method, $uri, $options);
-                break;
-
+                return $this->shopifyRequest_impl($method, $uri, $options);
             } catch(RateLimitException $ex) {
                 if($tries < self::MAX_TRIES_REQUEST) {
                     $this->rateLimitSleep();
+                    $tries++;
                 } else {
                     throw $ex;
                 }
             }
-            $tries++;
         }
+        return null;
+    }
 
+    private function shopifyRequest_impl($method, $uri = [], $options = []) {
+        $options['headers'] = ['Content-Type' => 'application/json'];
+        $options['allow_redirects'] = false;
+        $options['http_errors'] = false;
+
+        $response = $this->request($method, $uri, $options);
+
+        var_dump($response->getStatusCode());
         /** @noinspection PhpUndefinedVariableInspection */
         switch($response->getStatusCode()) {
             case 200:
@@ -138,8 +184,8 @@ class SynchronousAPIClient extends Client {
                 break;
         }
 
-        $this->lastCallLimitResponse = $response->getHeaderLine(self::CALL_LIMIT_HEADER);
 
+        $this->lastCallLimitResponse = $response->getHeaderLine(self::CALL_LIMIT_HEADER);
         return current(\json_decode((string)$response->getBody(), JSON_OBJECT_AS_ARRAY));
     }
 
@@ -148,12 +194,18 @@ class SynchronousAPIClient extends Client {
         // e.g. X-Shopify-Shop-Api-Call-Limit: 32/40
         // https://help.shopify.com/api/guides/api-call-limit
         list($x, $ofY) = array_map('intval', explode('/', $this->lastCallLimitResponse));
-        if(self::MINIMUM_CALL_LIMIT_HEAD_ROOM > ($ofY - $x)) {
+
+        if($this->lastCallLimitResponse &&
+           self::MINIMUM_CALL_LIMIT_HEAD_ROOM >= ($ofY - $x)
+        ) {
+            var_dump(list($x, $ofY) = array_map('intval', explode('/', $this->lastCallLimitResponse)));
+            var_dump($ofY - $x);
             self::rateLimitSleep();
         }
     }
 
     private function rateLimitSleep() {
+        echo "rate limit sleep\n";
         usleep(self::RATE_LIMIT_SLEEP_MICROSECONDS);
     }
 

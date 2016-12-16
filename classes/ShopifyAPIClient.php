@@ -555,7 +555,7 @@ class ShopifyAPIClient {
             $usedIds = [$everything_shopify_details['id']];
         }
         foreach($allAlbums as $album) {
-            $usedIds[] = $album->getShopifyId();
+            $usedIds[] = $album->getShopifyIDMap();
             foreach($album->getAlbumTracks() as $track) {
                 $usedIds[] = $track->getShopifyId();
             }

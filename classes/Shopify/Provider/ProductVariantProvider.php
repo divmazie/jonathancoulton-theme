@@ -4,6 +4,8 @@ namespace jct\Shopify\Provider;
 
 interface ProductVariantProvider {
 
+    public function getProductVariantShopifyID();
+
     public function getProductVariantTitle();
 
     public function getProductVariantPrice();

@@ -2,7 +2,11 @@
 
 namespace jct\Shopify\Provider;
 
+use jct\Shopify\Product;
+
 interface ProductProvider {
+
+    public function getShopifyID();
 
     public function getShopifyTitle();
 
@@ -30,6 +34,20 @@ interface ProductProvider {
      */
     public function getProductImageProviders();
 
+    /**
+     * @return MetafieldProvider[]
+     */
     public function getProductMetafieldProviders();
+
+    /**
+     * @return MetafieldProvider[]
+     */
+    public function getProductMetafieldProvidersToUpdate();
+
+    public function shouldUpdateProduct();
+
+
+    public function remoteProductResponse(Product $product);
+
 
 }

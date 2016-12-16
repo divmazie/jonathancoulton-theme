@@ -35,6 +35,7 @@ class Image extends Struct {
         $image = new static($parent);
 
         $image->src = $imageProvider->getProductImageSourceUrl();
+        $image->id = $imageProvider->getShopifyImageID();
 
         return $image;
     }

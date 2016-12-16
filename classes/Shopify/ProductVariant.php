@@ -49,6 +49,7 @@ class ProductVariant extends Struct {
     public static function fromProductVariantProvider(Product $product, ProductVariantProvider $variantProvider) {
         $variant = new self($product);
 
+        $variant->id = $variantProvider->getProductVariantShopifyID();
         $variant->title = $variantProvider->getProductVariantTitle();
         $variant->price = $variantProvider->getProductVariantPrice();
         $variant->sku = $variantProvider->getProductVariantSKU();

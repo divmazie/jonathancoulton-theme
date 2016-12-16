@@ -8,7 +8,7 @@ use jct\Shopify\Provider\ProductProvider;
 use jct\Shopify\Provider\ProductVariantProvider;
 use Timber\Timber;
 
-class Track extends ShopifyProduct implements ProductProvider, ImageProvider {
+class Track extends ShopifyProduct {
 
     const PLAYER_ENCODE_CONFIG_NAME = 'MP3';
 
@@ -100,11 +100,12 @@ class Track extends ShopifyProduct implements ProductProvider, ImageProvider {
     }
 
     public function getProductImageSourceUrl() {
-        return $this->getTrackArtObject()->getURL();
+        //return $this->getTrackArtObject()->getURL();
+        return 'http://www.jonathancoulton.com/images/jc-face-blog-thumb.jpg';
     }
 
     public function getShopifyTitle() {
-        return $this->getPublicFilename();
+        return $this->getTrackTitle();
     }
 
     public function getShopifyBodyHtml() {

@@ -57,6 +57,18 @@ class Util {
         throw new JCTException('attempt to get_posts_cached with null $args');
     }
 
+    public static function ksort_recursive(&$array, $sort_flags = SORT_REGULAR) {
+        // from https://gist.github.com/cdzombak/601849
+        if(!is_array($array)) {
+            return false;
+        }
+        ksort($array, $sort_flags);
+        foreach($array as &$arr) {
+            Util::ksort_recursive($arr, $sort_flags);
+        }
+        return true;
+    }
+
     /**
      * @return array
      */

@@ -7,27 +7,34 @@ use jct\Shopify\Provider\MetafieldProvider;
 class MusicStoreMetafieldProvider implements MetafieldProvider {
     const DEFAULT_NAMESPACE = 'global';
 
-    private $key, $value;
+    private $key, $value, $namespace, $parentProduct;
 
-    public function __construct($key, $value) {
+    public function __construct(ShopifyProduct $parentProduct, $key, $value) {
         $this->key = $key;
         $this->value = $value;
+        $this->parentProduct = $parentProduct;
+        $this->namespace = self::DEFAULT_NAMESPACE;
+    }
+
+    public function getMetafieldID() {
+        $id = $this->parentProduct->getIDForMetafield($this->namespace, $this->key);
+        return $id;
     }
 
 
-    public function getProductMetafieldNamespace() {
+    public function getMetafieldNamespace() {
         return self::DEFAULT_NAMESPACE;
     }
 
-    public function getProductMetafieldKey() {
+    public function getMetafieldKey() {
         return $this->key;
     }
 
-    public function getProductMetafieldValue() {
+    public function getMetafieldValue() {
         return $this->value;
     }
 
-    public function getProductMetafieldValueType() {
+    public function getMetafieldValueType() {
         return is_string($this->value) ? 'string' : 'integer';
     }
 
@@ -38,12 +45,13 @@ class MusicStoreMetafieldProvider implements MetafieldProvider {
         }
 
         $metafields = [
-            new MusicStoreMetafieldProvider('track_number', $product instanceof Track ? $product->getTrackNumber() : 0),
-            new MusicStoreMetafieldProvider('wiki_link', $product->getWikiLink()),
+            new MusicStoreMetafieldProvider($product, 'track_number', $product instanceof
+                                                                      Track ? $product->getTrackNumber() : 0),
+            new MusicStoreMetafieldProvider($product, 'wiki_link', $product->getWikiLink()),
         ];
 
         if($product instanceof Track) {
-            $metafields[] = new MusicStoreMetafieldProvider('music_link', $product->getMusicLink());
+            $metafields[] = new MusicStoreMetafieldProvider($product, 'music_link', $product->getMusicLink());
         }
 
         return $metafields;

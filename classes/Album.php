@@ -2,13 +2,14 @@
 
 namespace jct;
 
+use jct\Shopify\Product;
 use jct\Shopify\Provider\ImageProvider;
 use jct\Shopify\Provider\ProductOptionProvider;
 use jct\Shopify\Provider\ProductProvider;
 use jct\Shopify\Provider\ProductVariantProvider;
 use Timber\Timber;
 
-class Album extends ShopifyProduct implements ProductProvider, ImageProvider {
+class Album extends ShopifyProduct  {
     // meta fields acf will load (here for autocomplete purposes)
     public $album_artist, $album_price, $album_year, $album_genre, $album_art, $album_comment, $album_sort_order, $album_description, $shopify_collection_id, $bonus_assets, $show_album_in_store;
 
@@ -170,13 +171,6 @@ class Album extends ShopifyProduct implements ProductProvider, ImageProvider {
                        $this->getAlbumYear());
     }
 
-    public function getShopifyProductType() {
-        return ThemeObjectRepository::DEFAULT_SHOPIFY_PRODUCT_TYPE;
-    }
-
-    public function getShopifyVendor() {
-        return 'Jonathan Coulton';
-    }
 
     public function getShopifyTags() {
         return $this->getFilenameFriendlyTitle();
@@ -192,10 +186,6 @@ class Album extends ShopifyProduct implements ProductProvider, ImageProvider {
 
     public function getProductImageProviders() {
         return [$this];
-    }
-
-    public function getProductMetafieldProviders() {
-        return MusicStoreMetafieldProvider::getForProduct($this);
     }
 
 

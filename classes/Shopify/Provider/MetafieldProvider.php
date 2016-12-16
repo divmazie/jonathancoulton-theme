@@ -4,12 +4,14 @@ namespace jct\Shopify\Provider;
 
 interface MetafieldProvider {
 
-    public function getProductMetafieldNamespace();
+    public function getMetafieldID();
 
-    public function getProductMetafieldKey();
+    public function getMetafieldNamespace();
 
-    public function getProductMetafieldValue();
+    public function getMetafieldKey();
 
-    public function getProductMetafieldValueType();
+    public function getMetafieldValue();
+
+    public function getMetafieldValueType();
 
 }
