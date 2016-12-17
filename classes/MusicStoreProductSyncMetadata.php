@@ -1,7 +1,6 @@
 <?php
 namespace jct;
 
-use GuzzleHttp\Tests\Psr7\Str;
 use jct\Shopify\Metafield;
 use jct\Shopify\Product;
 use jct\Shopify\Struct;

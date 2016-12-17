@@ -101,7 +101,7 @@ switch(@$_GET['pipeline_stage']) {
             maintenance_redirect();
 
         } else {
-            status_redirect("Think we uploaded it all!");
+            status_redirect("We deleted that garbage.");
         }
 
         break;

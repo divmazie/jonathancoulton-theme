@@ -2,8 +2,6 @@
 
 namespace jct\Shopify;
 
-use jct\Shopify\Provider\MetafieldProvider;
-use jct\Util;
 
 class Metafield extends Struct {
     public

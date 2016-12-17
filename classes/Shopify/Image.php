@@ -1,8 +1,6 @@
 <?
 namespace jct\Shopify;
 
-use jct\Shopify\Provider\ImageProvider;
-
 class Image extends Struct {
 
 

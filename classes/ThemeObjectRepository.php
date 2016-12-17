@@ -5,8 +5,6 @@ namespace jct;
 
 use jct\Shopify\Metafield;
 use jct\Shopify\Product;
-use jct\Shopify\Provider\MetafieldProvider;
-use jct\Shopify\Provider\ProductProvider;
 use jct\Shopify\SynchronousAPIClient;
 
 class ThemeObjectRepository {

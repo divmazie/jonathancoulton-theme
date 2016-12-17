@@ -2,12 +2,6 @@
 
 namespace jct\Shopify;
 
-use jct\Shopify\Provider\ImageProvider;
-use jct\Shopify\Provider\MetafieldProvider;
-use jct\Shopify\Provider\ProductOptionProvider;
-use jct\Shopify\Provider\ProductProvider;
-use jct\Shopify\Provider\ProductVariantProvider;
-
 class Product extends Struct {
     //https://help.shopify.com/api/reference/product
     public

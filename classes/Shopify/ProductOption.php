@@ -2,8 +2,6 @@
 
 namespace jct\Shopify;
 
-use jct\Shopify\Provider\ProductOptionProvider;
-
 class ProductOption extends Struct {
 
     public

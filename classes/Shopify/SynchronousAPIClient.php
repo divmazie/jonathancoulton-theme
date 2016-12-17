@@ -4,15 +4,9 @@ namespace jct\Shopify;
 
 
 use GuzzleHttp\Client;
-use GuzzleHttp\Exception\RequestException;
-use GuzzleHttp\HandlerStack;
-use GuzzleHttp\Middleware;
 use jct\Shopify\Exception\APIResponseException;
 use jct\Shopify\Exception\RateLimitException;
-use jct\Shopify\Provider\ProductProvider;
 use jct\Util;
-use Psr\Http\Message\RequestInterface;
-use Psr\Http\Message\ResponseInterface;
 
 class SynchronousAPIClient extends Client {
 
