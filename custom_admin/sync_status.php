@@ -48,6 +48,14 @@ switch(@$_GET['pipeline_stage']) {
         Util::redirect(status_message_loc("Fetch cached in $filename. Thx!"));
         break;
 
+    case 'fetch_create':
+        $syncMan->doFetchCreates(status_message_loc("We created those fetch products!"));
+        break;
+
+    case 'fetch_update':
+        $syncMan->dpFetchUpdates(status_message_loc("We updated those fetch products!"));
+        break;
+
     case 'garbage':
         $syncMan->deleteGarbage(status_message_loc("We deleted that garbage."));
         break;

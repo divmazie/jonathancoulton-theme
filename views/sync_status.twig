@@ -126,12 +126,22 @@
             ({{ sync_man.remote_fetch_delete_products|length }} to delete),
             {{ sync_man.uploadable_assets|length }} local products
             ({{ sync_man.local_fetch_create_products|length }} to create,
-            {{ sync_man.local_fetch_update_products|length }} to update)
+            {{ sync_man.local_fetch_update_products|length }} we MIGHT NEED to update)
 
             <p>You must be getting tired of reading this. Fetch takes all the individual digital assets and ties
-            them to the shopify SKU (multiple SKUs per product representing encode types), and links
-            fetch to the s3 assets we uploaded earlier.</p>
+                them to the shopify SKU (multiple SKUs per product representing encode types), and links
+                fetch to the s3 assets we uploaded earlier.</p>
 
+            <p>Because the s3 urls can change as a result of prior steps and it's difficult to compute freshness
+                of those URLS at fetch, any update will affect all products. This takes a little longer and
+                will always be available, but is only necessary if the S3 urls change.
+            </p>
+
+            <p>Updates are recommended if any new products are encoded or uploaded to s3.</p>
+
+
+            {{ m.pipeline_button('fetch_create', "Create Fetch Products", sync_man.local_fetch_create_products|length ) }}
+            {{ m.pipeline_button('fetch_update', "Update Fetch Products", sync_man.local_fetch_update_products|length ) }}
 
         </li>
 

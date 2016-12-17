@@ -6,7 +6,7 @@ use FetchApp\API\FetchApp;
 use GuzzleHttp\Client;
 use jct\Shopify\Product;
 use jct\Shopify\SynchronousAPIClient;
-use \FetchApp\API\Product as FetchProduct;
+use FetchApp\API\Product as FetchProduct;
 
 class SyncManager {
     const SHOPIFY_REMOTE_CACHE_PREFIX = 'shopify_remote_products_cache';
@@ -267,13 +267,10 @@ class SyncManager {
 
         // key by sku
         $cacheArray = [];
-        foreach($all as $product) {
-            $product = self::serializableFetchProduct($product);
-            $cacheArray[$product->getSKU()] = self::serializableFetchProduct($product);
+        foreach($all as &$product) {
+            $product = FetchProductUtil::makeSerializable($product);
+            $cacheArray[$product->getSKU()] = $product;
         }
-
-        //var_dump($cacheArray);
-        //die();
 
         $this->fetch_remote_products = &$cacheArray;
         return $this->fetch_remote_products_filename =
@@ -289,6 +286,11 @@ class SyncManager {
             $this->fetch_remote_products_mtime = self::formattedMTime($this->fetch_remote_products_filename);
         }
     }
+
+    private function updateFetchCache() {
+        static::setFileCache($this->fetch_remote_products, self::FETCH_CACHE_PREFIX);
+    }
+
 
     private function sortFetchProducts() {
         if($this->fetch_remote_products_filename) {
@@ -311,10 +313,36 @@ class SyncManager {
         }
     }
 
-    public function doFetchSync($finishedUrl) {
-        $this->loopTilDone(function (MusicStoreProduct $musicStoreProduct) {
-            $this->recordReturnedProduct($musicStoreProduct, $this->shopifyApiClient->putProduct($musicStoreProduct->getShopifyProduct()));
-        }, $this->music_store_products_to_update, $finishedUrl);
+    public function doFetchCreates($finishedUrl) {
+        $this->loopTilDone(function (EncodedAsset $encodedAsset) {
+            $fetch_product = $encodedAsset->getFetchAppProduct();
+            $rv = $fetch_product->create([]);
+            if($rv === true) {
+                $fetch_product = FetchProductUtil::makeSerializable($fetch_product);
+                $this->fetch_remote_products[$fetch_product->getSKU()] = $fetch_product;
+            } else {
+                var_dump($rv);
+                die();
+            }
+            $this->updateFetchCache();
+        }, $this->local_fetch_create_products, $finishedUrl);
+    }
+
+    public function dpFetchUpdates($finishedUrl) {
+        $this->loopTilDoneStaticArray(function (EncodedAsset $encodedAsset) {
+            $fetch_product = $encodedAsset->getFetchAppProduct();
+            //var_dump($fetch_product);
+            //var_dump($this->fetch_remote_products[$fetch_product->getSKU()]);
+            $rv = $fetch_product->update($encodedAsset->getFetchAppUrlsArray());
+            if($rv === true) {
+                $fetch_product = FetchProductUtil::makeSerializable($fetch_product);
+                $this->fetch_remote_products[$fetch_product->getSKU()] = $fetch_product;
+            } else {
+                var_dump($rv);
+                die();
+            }
+            $this->updateFetchCache();
+        }, $this->local_fetch_update_products, $finishedUrl);
     }
 
 
@@ -322,18 +350,6 @@ class SyncManager {
         return date('F d Y h:i a e', filemtime($filename));
     }
 
-    private static function serializableFetchProduct(FetchProduct $product) {
-        $reflection = new \ReflectionClass($product);
-        $props = $reflection->getProperties();
-        foreach($props as $prop) {
-            $prop->setAccessible(true);
-            if(($value = $prop->getValue($product)) instanceof \SimpleXMLElement) {
-                $prop->setValue($product, (string)$value);
-            }
-        }
-
-        return $product;
-    }
 
     private static function getFileArrayCache($uniqueFilePrefix, &$cacheFileName = '') {
         $cacheFileName = static::chooseCacheFile($uniqueFilePrefix);

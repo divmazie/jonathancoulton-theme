@@ -4,6 +4,8 @@ namespace jct;
 
 use Aws\Credentials\Credentials;
 use Aws\S3\S3Client;
+use FetchApp\API\Currency;
+use FetchApp\API\Product as FetchProduct;
 
 abstract class EncodedAsset extends WPAttachment {
     const META_CONFIG_PAYLOAD = 'jct_asset_config_payload';
@@ -16,6 +18,9 @@ abstract class EncodedAsset extends WPAttachment {
 
 
     abstract public function getAwsName();
+
+    /** @return EncodedAssetConfig */
+    abstract public function getEncodedAssetConfig();
 
 
     public function getUniqueKey() {
@@ -30,6 +35,9 @@ abstract class EncodedAsset extends WPAttachment {
     abstract public function getShopifyProductVariantSKU();
 
     abstract public function getShopifyProductVariantTitle();
+
+    /** @return MusicStoreProduct */
+    abstract public function getParentMusicStoreProduct();
 
     public function getConfigPayloadArray() {
         return $this->get_field(self::META_CONFIG_PAYLOAD);
@@ -55,6 +63,7 @@ abstract class EncodedAsset extends WPAttachment {
         $this->update(self::META_S3_HASH, $hash);
     }
 
+    /** @return MusicStoreProduct */
     public function getParentPost($parentPostClass = JCTPost::class) {
         return Util::get_posts_cached($this->post_parent, $parentPostClass);
     }
@@ -80,6 +89,24 @@ abstract class EncodedAsset extends WPAttachment {
         $this->setS3Url($result->toArray()['ObjectURL']);
         $this->setS3Hash($this->getCanonicalContentHash());
         return $result;
+    }
+
+    public function getFetchAppProduct() {
+        $fetch_product = new FetchProduct();
+        $fetch_product->setProductID($this->getShopifyProductVariantSKU());
+        $fetch_product->setSKU($this->getShopifyProductVariantSKU());
+        $fetch_product->setName(sprintf('%s (%s)', $this->getParentMusicStoreProduct()->getDownloadStoreTitle(),
+                                        $this->getEncodedAssetConfig()->getConfigName()));
+        $fetch_product->setDescription($this->getParentMusicStoreProduct()->getDownloadStoreBodyHtml());
+        $fetch_product->setPrice($this->getParentMusicStoreProduct()->getPrice());
+        $fetch_product->setCurrency(Currency::USD);
+        FetchProductUtil::setUrls($fetch_product, $this->getFetchAppUrlsArray());
+
+        return $fetch_product;
+    }
+
+    public function getFetchAppUrlsArray() {
+        return [["url" => $this->getS3Url(), "name" => "audio"]];
     }
 
 

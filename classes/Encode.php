@@ -11,6 +11,9 @@ class Encode extends EncodedAsset {
         return $this->getParentPost(Track::class);
     }
 
+    public function getParentMusicStoreProduct() {
+        return $this->getParentTrack();
+    }
 
     public function getShopifyProductVariantTitle() {
         return $this->getEncodeConfig()->getConfigName();
@@ -18,6 +21,10 @@ class Encode extends EncodedAsset {
 
     public function getShopifyProductVariantSKU() {
         return $this->getParentTrack()->getPostID() . ':' . $this->getEncodeConfig()->getConfigName();
+    }
+
+    public function getEncodedAssetConfig() {
+        return $this->getEncodeConfig();
     }
 
 
