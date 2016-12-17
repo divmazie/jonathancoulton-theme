@@ -47,29 +47,23 @@ class SynchronousAPIClient extends Client {
     }
 
     public function putMetafield(Metafield $metafield) {
-        var_dump($metafield->putArray());
-
         $putR = $this->shopifyPut(sprintf('/admin/metafields/%s.json', $metafield->id),
                                   ['metafield' => $metafield->putArray()]);
-        var_dump($putR);
+
         return Metafield::instanceFromArray($putR);
     }
 
-    /** @return Product */
-    public function putProduct(Product $product, $updateMetafields = []) {
-        //var_dump(sprintf(self::PRODUCTS_UPDATE_ENDPOINT_ID_PATTERN, $product->id));
-        var_dump($product->putArray());
-
-        // we can't sync these, believe me i tried
-        $product->metafields = null;
-
+    /**
+     * @param Product $product to update
+     * NOTE: every metafield in this product will generate a query... don't pass any
+     * if they don't need to be updated!
+     * You will not get metafields in your product response ...
+     * @return Product
+     * @throws Exception\Exception
+     */
+    public function putProduct(Product $product) {
         $putProduct =
-            Product::instanceFromArray($this->shopifyPut(sprintf('admin/products/%d.json', $product->id), ['product' => $product->postArray()]));
-
-
-        foreach($updateMetafields as $metafield) {
-            $putProduct->metafields[] = $this->putMetafield($metafield);
-        }
+            Product::instanceFromArray($this->shopifyPut(sprintf('admin/products/%d.json', $product->id), ['product' => $product->putArray()]));
 
         return $putProduct;
     }
@@ -113,9 +107,6 @@ class SynchronousAPIClient extends Client {
         $pagedResponse = [];
         $pageSize = $pageSize ? $pageSize : self::DEFAULT_PAGE_SIZE;
         $page = $specificPageOnly ? $specificPageOnly : 1;
-
-        var_dump(func_get_args());
-
 
         while(true) {
             $queryVars['page'] = $page;
@@ -161,7 +152,6 @@ class SynchronousAPIClient extends Client {
 
         $response = $this->request($method, $uri, $options);
 
-        var_dump($response->getStatusCode());
         /** @noinspection PhpUndefinedVariableInspection */
         switch($response->getStatusCode()) {
             case 200:

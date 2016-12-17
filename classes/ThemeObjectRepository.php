@@ -2,8 +2,6 @@
 
 namespace jct;
 
-
-use jct\Shopify\Metafield;
 use jct\Shopify\Product;
 use jct\Shopify\SynchronousAPIClient;
 
@@ -21,58 +19,59 @@ class ThemeObjectRepository {
         SourceTrack::getAll();
     }
 
-    /**  @return ProductProvider[] */
-    public static function getLocalProductProviders() {
-        self::optimizeQueries();
 
+    public static function getMusicStoreProducts() {
         return array_merge(Album::getAll(), Track::getAll());
     }
 
-
     /**
      * @param $remoteProducts Product[]
-     * @param $localProviders ProductProvider[]
+     * @param $musicStoreProducts MusicStoreProduct[]
      */
-    public static function sync(SynchronousAPIClient $APIClient, $remoteProducts, $localProviders) {
+    public static function sync(SynchronousAPIClient $APIClient, $musicStoreProducts, $remoteProducts) {
 
         // key remote products by id
         $remoteProducts = array_combine(array_map(function (Product $product) {
             return $product->id;
         }, $remoteProducts), $remoteProducts);
 
-        $localCreate = [];
-        $localUpdate = [];
-        $localSkip = [];
+        $returnedProduct = null;
+        foreach($musicStoreProducts as $musicStoreProduct) {
+            $shopifyProduct = $musicStoreProduct->getShopifyProduct();
+            $syncMeta = $musicStoreProduct->getShopifySyncMetadata();
 
-        foreach($localProviders as $provider) {
-            // if we have an ID && it exists remotely
-            if($provider->getShopifyID() && ($remoteProduct = @$remoteProducts[$provider->getShopifyID()])) {
+            // if we have an ID && it exists remotely...
+            // this product has been synced before
+            if($shopifyProduct->id &&
+               ($remoteProduct = @$remoteProducts[$shopifyProduct->id])
+            ) {
 
-                if($provider->shouldUpdateProduct()) {
-                    // these products just need a little update
-                    echo "need to update " . $provider->getShopifyID() . "\n";
-                    $productToUpdate = Product::fromProductProvider($provider);
-//                    Metafield::portMetafieldIDs($productToUpdate->metafields, $remoteProduct->metafields);
-                    $metafieldsToUpdate =
-                        array_map(function (MetafieldProvider $metafieldProvider) {
-                            return Metafield::fromMetafieldProvider(null, $metafieldProvider);
-                        }, $provider->getProductMetafieldProvidersToUpdate());
-                    $provider->remoteProductResponse($APIClient->putProduct($productToUpdate, $metafieldsToUpdate));
-
+                if($syncMeta->productNeedsUpdate($shopifyProduct)) {
+                    echo "need to update " . $shopifyProduct->id . "\n";
+                    $returnedProduct = $APIClient->putProduct($shopifyProduct);
 
                 } else {
-                    $localSkip[] = $provider;
+                    $localSkip[] = $musicStoreProduct;
                 }
             } else {
-
                 // we don't have an ID || the id does not exist remotely
-                $provider->remoteProductResponse($APIClient->postProduct(Product::fromProductProvider($provider)));
+                $returnedProduct = $APIClient->postProduct($shopifyProduct);
+                echo json_encode($shopifyProduct->putArray(), JSON_PRETTY_PRINT);
+                echo json_encode($returnedProduct->putArray(), JSON_PRETTY_PRINT);
             }
+
+            if($returnedProduct) {
+                $syncMeta->processAPIProductReturn($returnedProduct, $shopifyProduct);
+                $musicStoreProduct->setShopifySyncMetadata($syncMeta);
+            }
+
         }
 
-        $spareTheirLives = array_map(function (ProductProvider $provider) {
-            return $provider->getShopifyID();
-        }, array_merge($localCreate, $localSkip));
+
+        $spareTheirLives = array_map(function (MusicStoreProduct $musicStoreProduct) {
+            $shopifyProduct = $musicStoreProduct->getShopifyProduct();
+            return $shopifyProduct->id;
+        }, $musicStoreProducts);
 
         $remoteDelete = array_diff_key($remoteProducts, array_combine($spareTheirLives, $spareTheirLives));
 

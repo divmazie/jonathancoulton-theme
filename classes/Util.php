@@ -13,11 +13,6 @@ class Util {
     public static function get_posts_cached($args, $returnClass, $prepopValue = null, $prepopNull = false) {
         static $res_cache = [];
 
-
-        if($prepopNull === 'secret') {
-            var_dump($res_cache);
-            die();
-        }
         // if someone passes us an ID as a string... convert it here,
         // treat as the same
         if(!is_array($args)) {

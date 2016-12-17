@@ -40,7 +40,11 @@ abstract class MusicStoreProduct extends JCTPost {
      * @return MusicStoreProductSyncMetadata
      */
     public function getShopifySyncMetadata() {
-        return $this->get_field(self::META_SHOPIFY_SYNC_METADATA);
+        $syncMeta = $this->get_field(self::META_SHOPIFY_SYNC_METADATA);
+        if($syncMeta) {
+            return $syncMeta;
+        }
+        return new MusicStoreProductSyncMetadata();
     }
 
     public function setShopifySyncMetadata(MusicStoreProductSyncMetadata $syncMetadata) {
@@ -62,7 +66,8 @@ abstract class MusicStoreProduct extends JCTPost {
     }
 
 
-    public function getShopifyProduct($dropUnchangedMetaFields = false) {
+    /** @return Product */
+    public function getShopifyProduct() {
         $syncMeta = $this->getShopifySyncMetadata();
         $product = new Product();
 
@@ -71,13 +76,16 @@ abstract class MusicStoreProduct extends JCTPost {
         $product->body_html = $this->getDownloadStoreBodyHtml();
         $product->product_type = self::DEFAULT_SHOPIFY_PRODUCT_TYPE;
         $product->vendor = self::DEFAULT_SHOPIFY_PRODUCT_VENDOR;
-        $product->variants = array_map(function (EncodedAssetConfig $assetConfig) {
+        $product->variants = array_map(function (EncodedAssetConfig $assetConfig) use ($syncMeta) {
             $variant = new ProductVariant();
-
             $variant->title = $assetConfig->getConfigName();
+            $variant->sku = $assetConfig->getShopifyProductVariantSKU();
             $variant->price = $this->getPrice();
-            $variant->title = $assetConfig->getShopifyProductVariantSKU();
             $variant->option1 = $assetConfig->getConfigName();
+
+            $variant->id = $syncMeta->getIDForVariant($variant);
+
+            return $variant;
         }, $this->getEncodedAssetConfigs());
 
         $formatOption = new ProductOption();
@@ -86,14 +94,12 @@ abstract class MusicStoreProduct extends JCTPost {
 
         $productImage = new Image();
         $productImage->src = $this->getCoverArt()->getURL();
-        $product->image = $syncMeta->getProductID();
 
-        $product->metafields = $this->getShopifyMetafields();
-        if($dropUnchangedMetaFields) {
-            $product->metafields = array_map(function (Metafield $metafield) use ($syncMeta) {
-                return $syncMeta->metafieldNeedsUpdate($metafield);
-            }, $product->metafields);
-        }
+        // pair metafields up with their ids
+        $product->metafields = array_map(function (Metafield $metafield) use ($syncMeta) {
+            $metafield->id = $syncMeta->getIDForMetafield($metafield);
+            return $metafield;
+        }, $this->getShopifyMetafields());
 
         return $product;
     }

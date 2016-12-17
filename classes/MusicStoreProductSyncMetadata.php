@@ -3,6 +3,7 @@ namespace jct;
 
 use jct\Shopify\Metafield;
 use jct\Shopify\Product;
+use jct\Shopify\ProductVariant;
 use jct\Shopify\Struct;
 
 class MusicStoreProductSyncMetadata {
@@ -17,15 +18,19 @@ class MusicStoreProductSyncMetadata {
     // a hierarchical map of the various quantities we need to track...
     private $trackingArray = [];
 
-    public function processAPIProductReturn(Product $product) {
-        $this->trackingArray[self::PRODUCT][self::OBJECT_ID] = $product->id;
-        $this->trackingArray[self::PRODUCT][self::VERSION_HASH] = self::versionHash($product);
+    public function processAPIProductReturn(Product $remoteProduct, Product $forLocalProduct) {
+        $this->trackingArray[self::PRODUCT][self::OBJECT_ID] = $remoteProduct->id;
+        $this->trackingArray[self::PRODUCT][self::VERSION_HASH] = self::versionHash($forLocalProduct);
 
-        foreach($product->metafields as $metafield) {
+        foreach($remoteProduct->metafields as $metafield) {
             $this->trackingArray[self::PRODUCT][self::METAFIELDS][$metafield->namespace][$metafield->key][self::OBJECT_ID] =
                 $metafield->id;
             $this->trackingArray[self::PRODUCT][self::METAFIELDS][$metafield->namespace][$metafield->key][self::VERSION_HASH] =
-                $this->versionHash($metafield);
+                self::versionHash($metafield);
+        }
+        foreach($remoteProduct->variants as $variant) {
+            $this->trackingArray[self::PRODUCT][self::VARIANTS][$variant->sku][self::OBJECT_ID] =
+                $variant->id;
         }
     }
 
@@ -40,6 +45,10 @@ class MusicStoreProductSyncMetadata {
 
     public function getIDForMetafield(Metafield $metafield) {
         return @$this->trackingArray[self::PRODUCT][self::METAFIELDS][$metafield->namespace][$metafield->key][self::OBJECT_ID];
+    }
+
+    public function getIDForVariant(ProductVariant $variant) {
+        return @$this->trackingArray[self::PRODUCT][self::VARIANTS][$variant->sku][self::OBJECT_ID];
     }
 
     public function metafieldNeedsUpdate(Metafield $metafield) {

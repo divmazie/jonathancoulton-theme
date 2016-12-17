@@ -61,11 +61,11 @@ $remotepord = $apiClient->getAllProducts(['product_type' => ThemeObjectRepositor
 //var_dump($remotepord);
 //die();
 //$prod0 = $products[0];11
-$lcoals = ThemeObjectRepository::getLocalProductProviders();
+$lcoals = ThemeObjectRepository::getMusicStoreProducts();
 
 //var_dump(Product::fromProductProvider($lcoals[1])->putArray());
 //die();
-ThemeObjectRepository::sync($apiClient, $remotepord, $lcoals);
+ThemeObjectRepository::sync($apiClient, $lcoals, $remotepord);
 die();
 //var_dump($products);
 echo "beep";
