@@ -169,26 +169,6 @@ class EncodeConfig extends EncodedAssetConfig {
         return $outputFormats[$encodeFormat]['file_ext'];
     }
 
-    public static function postEncodeConfigsToEncodeBot($encodeConfigs) {
-        $postArray = [];
-        $postArray['encodes'] = array_map(function (EncodeConfig $encodeConfig) {
-            return $encodeConfig->toEncodeBotArray(EncodeConfig::getEncodeAuthCode());
-        }, $encodeConfigs);
-
-        $client = new Client();
-
-        $r = $client->request('POST', Util::get_theme_option('post_encodes_link'), [
-            'json' => $postArray,
-        ]);
-
-        if($r->getStatusCode() === 200) {
-            return true;
-        }
-
-        echo "<pre>";
-        print_r($r);
-        die();
-    }
 
     public static function getEncodeAuthCode() {
         /** @noinspection PhpUndefinedFunctionInspection */

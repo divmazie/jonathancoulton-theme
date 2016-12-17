@@ -51,9 +51,10 @@
         {{ m.pipeline_button('status_x', 'Dismiss This Update', true) }}
     {% endif %}
 
+
     <h1>Pipeline Status</h1>
     <ol>
-        <li>Song Encodes ({{ pending_encodes|length }} pending of {{ all_encodes|length }})
+        <li>Song Encodes ({{ sync_man.pending_encodes|length }} pending of {{ sync_man.all_encodes|length }})
 
             <p>This is the first step in the process. Songs can only be pending once
                 they and their parent albums are filled out.</p>
@@ -63,27 +64,52 @@
 
             {{ m.pipeline_button('encodes', "Submit Remaining Encodes for Processing", can_encode ) }}
         </li>
-        <li>Album Zips ({{ pending_zips|length }} pending of {{ all_zips|length }})
+        <li>Album Zips ({{ sync_man.pending_zips|length }} pending of {{ sync_man.all_zips|length }})
             <p>Once all the songs are encoded we can zip up the albums.</p>
 
             {{ m.pipeline_button('zips', "Zip Up Albums", can_zip ) }}
         </li>
         <li>S3 Uploads
-            ({{ uploaded_assets|length }} uploaded,
-            {{ un_uploaded_assets|length }} waiting to upload
-            ({{ total_asset_count }} total))
+            ({{ sync_man.uploaded_assets|length }} uploaded,
+            {{ sync_man.un_uploaded_assets|length }} waiting to upload
+            ({{ sync_man.uploadable_assets|length }} total))
             <p>Once all tracks and albums are created, they need to be uploaded to s3</p>
 
             {{ m.pipeline_button('s3', "Upload all the stuff we got", can_upload ) }}
 
         </li>
+        <li>Shopify Remote Cache
+            <p>Shopify is SLOWWW to talk to, so we have to take precautions to say as little as possible.
+                This pulls down the products and caches them locally so we can use that cache, rather than
+                asking for it repeatedly.</p>
+
+            {% if sync_man.remote_shopify_products_mtime %}
+                <p style="background-color: lightgreen;">loaded shopify cache,
+                    mtime: {{ sync_man.remote_shopify_products_mtime }} </p>
+            {% endif %}
+            {{ m.pipeline_button('shopify_cache', "Huh, yes. Cache it (or refresh the cache)", true ) }}
+
+        </li>
         <li>Shopify Product Sync
-            <p>Once everything is on s3, then we make sure our records with our store are all good</p>
+            ({{ sync_man.remote_shopify_products|length }} remote products
+            ({{ sync_man.shopify_products_to_delete|length }} to delete),
+            {{ sync_man.local_music_store_products|length }} local products
+            ({{ sync_man.music_store_products_to_create|length }} to create,
+            {{ sync_man.music_store_products_to_update|length }} to update,
+            {{ sync_man.music_store_products_to_skip|length }} up to date))
+
+            <p>Once everything is on s3, then we make sure our records with our store are all good.
+                Shopify pretty much makes us wait 500 ms between each call we make. We make one call
+                per product... so... you'll wait a bit.</p>
+
+            {{ m.pipeline_button('shopify_create', "Create Products", sync_man.music_store_products_to_create) }}
+            {{ m.pipeline_button('shopify_update', "Update Products", sync_man.music_store_products_to_update) }}
+
         </li>
         <li>Shopify Product Resync
             <p>Once everything is on s3, then we make sure our records with our store are all good</p>
         </li>
-        <li>Garbage Collection ({{ garbage_attachments|length }} items)
+        <li>Garbage Collection ({{ sync_man.garbage_attachments|length }} items)
             <p>If your store all is nice and updated, why leave files from a previous iteration around?
                 They're big and unseemly and useless. Wait til everything is updated to delete them, though.
                 Till then, parts of the site may still use them.</p>
@@ -96,7 +122,7 @@
 <p></p>
 
 
-<h1>Albums ({{ albums|length }} total)</h1>
+<h1>Albums ({{ sync_man.all_albums|length }} total)</h1>
 
 <p>Albums are displayed, sorted by their sort key (which is in parentheses after the name). If two
     albums sort keys are identical, they may display in a different order in the store. </p>
@@ -111,7 +137,7 @@
 
 
 <ol>
-    {% for album in albums if album.isFilledOut %}
+    {% for album in sync_man.all_albums if album.isFilledOut %}
         <li>
             <span style="color:{{ album.isFilledOut?'green':'red' }}">{{ album.title }}</span>
             ({{ album.numTracks }} tracks)

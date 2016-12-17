@@ -18,20 +18,27 @@ class MusicStoreProductSyncMetadata {
     // a hierarchical map of the various quantities we need to track...
     private $trackingArray = [];
 
-    public function processAPIProductReturn(Product $remoteProduct, Product $forLocalProduct) {
-        $this->trackingArray[self::PRODUCT][self::OBJECT_ID] = $remoteProduct->id;
-        $this->trackingArray[self::PRODUCT][self::VERSION_HASH] = self::versionHash($forLocalProduct);
+    public function processAPIProductReturn(MusicStoreProduct $localMusicStoreProduct, Product $returnedProduct) {
+        $locallyGeneratedShopifyProductObject = $localMusicStoreProduct->getShopifyProduct();
 
-        foreach($remoteProduct->metafields as $metafield) {
+        $this->trackingArray[self::PRODUCT][self::OBJECT_ID] = $returnedProduct->id;
+        // we hash on this--there will always be unpredictable differences due to how shopify interprets our response
+        // (due to image urls, etc)
+        $this->trackingArray[self::PRODUCT][self::VERSION_HASH] =
+            self::versionHash($locallyGeneratedShopifyProductObject);
+
+        foreach($returnedProduct->metafields as $metafield) {
             $this->trackingArray[self::PRODUCT][self::METAFIELDS][$metafield->namespace][$metafield->key][self::OBJECT_ID] =
                 $metafield->id;
             $this->trackingArray[self::PRODUCT][self::METAFIELDS][$metafield->namespace][$metafield->key][self::VERSION_HASH] =
                 self::versionHash($metafield);
         }
-        foreach($remoteProduct->variants as $variant) {
+        foreach($returnedProduct->variants as $variant) {
             $this->trackingArray[self::PRODUCT][self::VARIANTS][$variant->sku][self::OBJECT_ID] =
                 $variant->id;
         }
+
+        $localMusicStoreProduct->setShopifySyncMetadata($this);
     }
 
     public function getProductID() {

@@ -2,12 +2,19 @@
 
 namespace jct;
 
+use jct\Shopify\SynchronousAPIClient;
 use Timber\Timber;
 
 class Util {
 
     public static function get_site_url() {
         return get_site_url();
+    }
+
+    public static function get_shopify_api_client() {
+        return new SynchronousAPIClient(Util::get_theme_option('shopify_api_key'),
+                                        Util::get_theme_option('shopify_api_password'),
+                                        Util::get_theme_option('shopify_handle'));
     }
 
     public static function get_posts_cached($args, $returnClass, $prepopValue = null, $prepopNull = false) {

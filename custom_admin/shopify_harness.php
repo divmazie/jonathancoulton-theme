@@ -56,16 +56,16 @@ $apiClient = new SynchronousAPIClient(Util::get_theme_option('shopify_api_key'),
 //var_dump($apiClient->shopifyPagedGet('/admin/products/9133128710/metafields.json', ['metafield[owner_resource]' => 'product']));
 
 
-$remotepord = $apiClient->getAllProducts(['product_type' => ThemeObjectRepository::DEFAULT_SHOPIFY_PRODUCT_TYPE]);
+$remotepord = $apiClient->getAllProducts(['product_type' => MusicStoreProduct::DEFAULT_SHOPIFY_PRODUCT_TYPE]);
 //var_dump($remotepord);
 //var_dump($remotepord);
 //die();
 //$prod0 = $products[0];11
-$lcoals = ThemeObjectRepository::getMusicStoreProducts();
+$lcoals = SyncManager::getMusicStoreProducts();
 
 //var_dump(Product::fromProductProvider($lcoals[1])->putArray());
 //die();
-ThemeObjectRepository::sync($apiClient, $lcoals, $remotepord);
+SyncManager::sync($apiClient, $lcoals, $remotepord);
 die();
 //var_dump($products);
 echo "beep";
