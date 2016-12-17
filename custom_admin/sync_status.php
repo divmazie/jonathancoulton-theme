@@ -9,7 +9,7 @@ SyncManager::optimizeQueries();
 //die();
 
 
-$syncMan = $context['sync_man'] = new SyncManager(Util::get_shopify_api_client());
+$syncMan = $context['sync_man'] = new SyncManager(Util::get_shopify_api_client(), Util::get_fetch_api_client());
 $context['status'] = @urldecode($_GET['status']);
 
 function status_message_loc($statusMessage) {

@@ -1,0 +1,76 @@
+●DisconnectedQuit
+● Chat started.
+
+Alex H:  Alex here with Shopify! What can I help you with today?
+Jonathan Coulton:  I have a question about deleting and recreating products and reporting
+Alex H:  Great!
+Jonathan Coulton:  If I delete and recreate a product with the same name
+Jonathan Coulton:  will it get reported under that name
+Jonathan Coulton:  or will each product, even though the names are the same, get a different line in the report?
+Alex H:  Great question, let me double check for you!
+Jonathan Coulton:  thanks
+Jonathan Coulton:  appreciate it--was hard to find the information online
+Alex H:  No problem, our platform is so detailed that some info can be really hard to track down!
+Jonathan Coulton:  it really is
+Jonathan Coulton:  (detailed, that is!)
+Alex H:  Which report are you referring to? The product list?
+Jonathan Coulton:  I guess I'm referring to sales reporting
+Jonathan Coulton:  Like if I look back to see stats on what I've sold
+Jonathan Coulton:  Will it lump identically named products together
+Jonathan Coulton:  (One that now does NOT exist and one that now does?)
+Jonathan Coulton:  I'd actually love it if it did that
+Alex H:  No it won't, it will still recognize that they're separate products.
+Jonathan Coulton:  Ah
+Jonathan Coulton:  So if I were to delete and recreate a bunch of products
+Jonathan Coulton:  my sales reports would have
+Jonathan Coulton:  tons of identical seeming lines in them
+Jonathan Coulton:  cool--just wanted to check
+Jonathan Coulton:  this what my limited testing indicated
+Jonathan Coulton:  the way the API is structured, creating a product with metafields is easier than updating one
+Jonathan Coulton:  so deleting and recreating a product
+Alex H:  Yup!
+Jonathan Coulton:  takes fewer calls and is simpler
+Jonathan Coulton:  but if it messes with reporting
+Jonathan Coulton:  i will keep going down the road of the more complex updates
+Jonathan Coulton:  i actually have one more question about reporting and variants
+Jonathan Coulton:  it seems like the IDs of the variants on my products have been changing when i update them via the API
+Jonathan Coulton:  but i've been including the original variant ID in my put request
+Jonathan Coulton:  (apologies if this is getting too technical)
+Alex H:  hahaha no problem!
+Jonathan Coulton:  will the changing variant IDs affect reporting? or is variant reporting by sku?
+Alex H:  Variant reporting is by SKU
+Jonathan Coulton:  awesome
+Jonathan Coulton:  then what i currently have is working
+Alex H:  Also, if you're ever looking to get even more technical, have a look at our API forum here
+Jonathan Coulton:  ah, ok
+Jonathan Coulton:  i will check that out
+Jonathan Coulton:  if you have a moment for one more api question
+Jonathan Coulton:  i think i'll be tapped out
+Alex H:  Let's see if I know it!
+Alex H:  No promises ;)
+Alex H:  :D
+Jonathan Coulton:  when i create a product, i post a bunch of metafields
+Jonathan Coulton:  and i record their ids (which i need to get via a separate request :()
+Jonathan Coulton:  but when i do a put on the products endpoint
+Jonathan Coulton:  with updated metafields
+Jonathan Coulton:  even including the ids of the metafields
+Jonathan Coulton:  it won't let me update them
+Jonathan Coulton:  is there any way to do a product update, including metafields
+Jonathan Coulton:  in a single API call
+Jonathan Coulton:  or am i correct that i need to
+Jonathan Coulton:  detect if a metafield has changed
+Jonathan Coulton:  and update them one by one
+Alex H:  Honestly, off the top of my head, I can't answer that 100% confidently. I do believe you if it's formatted correctly, it should be doable in a single API call. If you haven't yet take a look at our product update api reference documentation here
+Jonathan Coulton:  i'll post in the forums
+Jonathan Coulton:  maybe i'm formatting it wrong
+Alex H:  We've also got API pro Gurus browsing the forums who might be able to answer that one!
+Alex H:  There's a good chance it's a formatting issue for sure!
+Jonathan Coulton:  cool, thanks for your hlep
+Alex H:  No problem! :)
+Alex H:  Anything else? :D
+Jonathan Coulton:  that's it
+Jonathan Coulton:  thank you so much alex!
+Alex H:  No problem Jonathan!
+Alex H:  Have a great day!
+Jonathan Coulton:  Thanks, you too!
+● Chat ended.

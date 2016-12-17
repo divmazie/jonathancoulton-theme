@@ -2,6 +2,7 @@
 
 namespace jct;
 
+use FetchApp\API\FetchApp;
 use jct\Shopify\SynchronousAPIClient;
 use Timber\Timber;
 
@@ -15,6 +16,11 @@ class Util {
         return new SynchronousAPIClient(Util::get_theme_option('shopify_api_key'),
                                         Util::get_theme_option('shopify_api_password'),
                                         Util::get_theme_option('shopify_handle'));
+    }
+
+    public static function get_fetch_api_client() {
+        return new FetchApp(Util::get_theme_option('fetch_key'),
+                            Util::get_theme_option('fetch_token'));
     }
 
     public static function get_posts_cached($args, $returnClass, $prepopValue = null, $prepopNull = false) {

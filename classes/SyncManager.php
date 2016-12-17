@@ -2,6 +2,7 @@
 
 namespace jct;
 
+use FetchApp\API\FetchApp;
 use GuzzleHttp\Client;
 use jct\Shopify\Product;
 use jct\Shopify\SynchronousAPIClient;
@@ -9,7 +10,7 @@ use jct\Shopify\SynchronousAPIClient;
 class SyncManager {
     const SHOPIFY_REMOTE_CACHE_PREFIX = 'shopify_remote_products_cache';
 
-    private $shopifyApiClient;
+    private $shopifyApiClient, $fetchAppApiClient;
 
     public
         $all_albums,
@@ -22,6 +23,7 @@ class SyncManager {
         $unuploaded_assets,
         $uploaded_assets,
         $garbage_attachments,
+        $remote_shopify_products_filename,
         $remote_shopify_products_mtime,
         $remote_shopify_products,
         $local_music_store_products,
@@ -30,9 +32,9 @@ class SyncManager {
         $music_store_products_to_skip,
         $shopify_products_to_delete;
 
-    public function __construct(SynchronousAPIClient $shopifyApiClient) {
+    public function __construct(SynchronousAPIClient $shopifyApiClient, FetchApp $fetchApp) {
         $this->shopifyApiClient = $shopifyApiClient;
-
+        $this->fetchAppApiClient = $fetchApp;
 
         self::optimizeQueries();
 
@@ -97,13 +99,24 @@ class SyncManager {
         exit();
     }
 
-    private function loopTilDone(callable $loopFunction, $array, $finishedLoc, $loopXSec = 44) {
+    private function loopTilDoneStaticArray(callable $loopFunction, $array, $finishedLoc, $loopXSec = 44) {
         $idx = intval(@$_GET['idx']);
 
         if($array && $idx < count($array)) {
             $params = $_GET;
             $params['idx'] = $this->loopForX($loopFunction, $array, $loopXSec, $idx);
             Util::redirect('./?' . \http_build_query($params));
+            exit();
+        } else {
+            Util::redirect($finishedLoc);
+            exit();
+        }
+    }
+
+    private function loopTilDone(callable $loopFunction, $array, $finishedLoc, $loopXSec = 44) {
+        if($array) {
+            $this->loopForX($loopFunction, $array, $loopXSec, 0);
+            $this->maintenanceRedirect();
             exit();
         } else {
             Util::redirect($finishedLoc);
@@ -145,18 +158,18 @@ class SyncManager {
     }
 
     public function cacheRemoteProducts() {
-        $remotes =
+        $this->remote_shopify_products =
             $this->shopifyApiClient->getAllProducts(['product_type' => MusicStoreProduct::DEFAULT_SHOPIFY_PRODUCT_TYPE]);
-
         // key remote products by id
-        $remotes = array_combine(array_map(function (Product $product) {
+        $this->remote_shopify_products = array_combine(array_map(function (Product $product) {
             return $product->id;
-        }, $remotes), $remotes);
+        }, $this->remote_shopify_products), $this->remote_shopify_products);
 
-        $fileName = tempnam(sys_get_temp_dir(), self::SHOPIFY_REMOTE_CACHE_PREFIX);
-        file_put_contents($fileName, serialize($remotes));
+        return static::setFileCache($this->remote_shopify_products, self::SHOPIFY_REMOTE_CACHE_PREFIX);
+    }
 
-        return $fileName;
+    private function updateShopifyCache() {
+        static::setFileCache($this->remote_shopify_products, self::SHOPIFY_REMOTE_CACHE_PREFIX);
     }
 
     public function deleteGarbage($finishedUrl) {
@@ -166,24 +179,18 @@ class SyncManager {
     }
 
     private function loadShopifyRemoteCache() {
-        $chosenMTime = 0;
-        $chosenFile = null;
-        foreach(glob(sys_get_temp_dir() . '/' . self::SHOPIFY_REMOTE_CACHE_PREFIX . '*', GLOB_NOSORT) as $cacheFile) {
-            if(filemtime($cacheFile) > $chosenMTime) {
-                $chosenMTime = filemtime($cacheFile);
-                $chosenFile = $cacheFile;
-            }
-        }
+        $fileName = '';
+        $this->remote_shopify_products = static::getFileArrayCache(self::SHOPIFY_REMOTE_CACHE_PREFIX, $fileName);
 
-        if($chosenFile) {
-            $this->remote_shopify_products_mtime = date('F d Y h:i a e', $chosenMTime);
-            $this->remote_shopify_products = unserialize(file_get_contents($chosenFile));
+        if($fileName) {
+            $this->remote_shopify_products_filename = $fileName;
+            $this->remote_shopify_products_mtime = date('F d Y h:i a e', filemtime($fileName));
         }
     }
 
     private function sortShopifyProducts() {
 
-        if($this->local_music_store_products && $this->remote_shopify_products_mtime) {
+        if($this->local_music_store_products && $this->remote_shopify_products_filename) {
             foreach($this->local_music_store_products as $musicStoreProduct) {
                 /** @var MusicStoreProduct $musicStoreProduct */
                 /** @var Product $shopifyProduct */
@@ -224,7 +231,10 @@ class SyncManager {
 
     public function doShopifyCreates($finishedUrl) {
         $this->loopTilDone(function (MusicStoreProduct $musicStoreProduct) {
-            $this->recordReturnedProduct($musicStoreProduct, $this->shopifyApiClient->postProduct($musicStoreProduct->getShopifyProduct()));
+            $returnedProduct = $this->shopifyApiClient->postProduct($musicStoreProduct->getShopifyProduct());
+            $this->remote_shopify_products[$returnedProduct->id] = $returnedProduct;
+            $this->updateShopifyCache();
+            $this->recordReturnedProduct($musicStoreProduct, $returnedProduct);
         }, $this->music_store_products_to_create, $finishedUrl);
     }
 
@@ -232,6 +242,42 @@ class SyncManager {
         $this->loopTilDone(function (MusicStoreProduct $musicStoreProduct) {
             $this->recordReturnedProduct($musicStoreProduct, $this->shopifyApiClient->putProduct($musicStoreProduct->getShopifyProduct()));
         }, $this->music_store_products_to_update, $finishedUrl);
+    }
+
+    private static function getFileArrayCache($uniqueFilePrefix, &$cacheFileName = '') {
+        $cacheFileName = static::chooseCacheFile($uniqueFilePrefix);
+        if($cacheFileName) {
+            return unserialize(file_get_contents($cacheFileName));
+        }
+        return null;
+    }
+
+    private static function setFileCache($serializable, $uniqueFilePrefix) {
+        $file = static::chooseCacheFile($uniqueFilePrefix, true);
+        file_put_contents($file, serialize($serializable));
+        return $file;
+    }
+
+    private static function chooseCacheFile($uniqueFilePrefix, $create = false) {
+        $chosenMTime = 0;
+        $chosenFile = null;
+        foreach(glob(static::getTempBaseDir() . '/' . $uniqueFilePrefix .
+                     '*', GLOB_NOSORT) as $cacheFile) {
+            if(($mtime = filemtime($cacheFile)) > $chosenMTime) {
+                $chosenMTime = $mtime;
+                $chosenFile = $cacheFile;
+            }
+        }
+
+        if($create && !$chosenFile) {
+            $chosenFile = tempnam(static::getTempBaseDir(), $uniqueFilePrefix);
+        }
+
+        return $chosenFile;
+    }
+
+    private static function getTempBaseDir() {
+        return sys_get_temp_dir();
     }
 
 
