@@ -13,14 +13,23 @@ class Util {
     }
 
     public static function get_shopify_api_client() {
-        return new SynchronousAPIClient(Util::get_theme_option('shopify_api_key'),
-                                        Util::get_theme_option('shopify_api_password'),
-                                        Util::get_theme_option('shopify_handle'));
+        static $client = null;
+        if(!$client) {
+            $client = new SynchronousAPIClient(Util::get_theme_option('shopify_api_key'),
+                                               Util::get_theme_option('shopify_api_password'),
+                                               Util::get_theme_option('shopify_handle'));
+        }
+        return $client;
     }
 
     public static function get_fetch_api_client() {
-        return new FetchApp(Util::get_theme_option('fetch_key'),
-                            Util::get_theme_option('fetch_token'));
+        static $fetch = null;
+        if(!$fetch) {
+            $fetch = new FetchApp();
+            $fetch->setAuthenticationKey(Util::get_theme_option('fetch_key'));
+            $fetch->setAuthenticationToken(Util::get_theme_option('fetch_token'));
+        }
+        return $fetch;
     }
 
     public static function get_posts_cached($args, $returnClass, $prepopValue = null, $prepopNull = false) {

@@ -31,7 +31,7 @@ switch(@$_GET['pipeline_stage']) {
         break;
 
     case 'shopify_cache':
-        $filename = $syncMan->cacheRemoteProducts();
+        $filename = $syncMan->cacheRemoteShopifyProducts();
         Util::redirect(status_message_loc("Remote Products cached in $filename. Thx! "));
         break;
 
@@ -41,6 +41,11 @@ switch(@$_GET['pipeline_stage']) {
 
     case 'shopify_update':
         $syncMan->doShopifyUpdates(status_message_loc("updates completed"));
+        break;
+
+    case 'fetch_cache':
+        $filename = $syncMan->cacheRemoteFetchProducts();
+        Util::redirect(status_message_loc("Fetch cached in $filename. Thx!"));
         break;
 
     case 'garbage':

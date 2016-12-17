@@ -30,8 +30,8 @@ abstract class MusicStoreProduct extends JCTPost {
 
     abstract public function getDownloadStoreBodyHtml();
 
-    /** @return EncodedAssetConfig[] */
-    abstract public function getEncodedAssetConfigs();
+    /** @return EncodedAsset[] */
+    abstract public function getEncodedAssets();
 
     /** @return CoverArt */
     abstract public function getCoverArt();
@@ -76,17 +76,17 @@ abstract class MusicStoreProduct extends JCTPost {
         $product->body_html = $this->getDownloadStoreBodyHtml();
         $product->product_type = self::DEFAULT_SHOPIFY_PRODUCT_TYPE;
         $product->vendor = self::DEFAULT_SHOPIFY_PRODUCT_VENDOR;
-        $product->variants = array_map(function (EncodedAssetConfig $assetConfig) use ($syncMeta) {
+        $product->variants = array_map(function (EncodedAsset $assetConfig) use ($syncMeta) {
             $variant = new ProductVariant();
-            $variant->title = $assetConfig->getConfigName();
+            $variant->title = $assetConfig->getShopifyProductVariantTitle();
             $variant->sku = $assetConfig->getShopifyProductVariantSKU();
             $variant->price = $this->getPrice();
-            $variant->option1 = $assetConfig->getConfigName();
+            $variant->option1 = $assetConfig->getShopifyProductVariantTitle();
 
             $variant->id = $syncMeta->getIDForVariant($variant);
 
             return $variant;
-        }, $this->getEncodedAssetConfigs());
+        }, $this->getEncodedAssets());
 
         $formatOption = new ProductOption();
         $formatOption->name = 'Format';

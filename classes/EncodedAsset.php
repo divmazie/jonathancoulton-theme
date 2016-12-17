@@ -27,6 +27,10 @@ abstract class EncodedAsset extends WPAttachment {
         return substr($this->getUniqueKey(), 0, 7);
     }
 
+    abstract public function getShopifyProductVariantSKU();
+
+    abstract public function getShopifyProductVariantTitle();
+
     public function getConfigPayloadArray() {
         return $this->get_field(self::META_CONFIG_PAYLOAD);
     }

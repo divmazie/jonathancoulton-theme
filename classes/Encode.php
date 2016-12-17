@@ -11,6 +11,16 @@ class Encode extends EncodedAsset {
         return $this->getParentPost(Track::class);
     }
 
+
+    public function getShopifyProductVariantTitle() {
+        return $this->getEncodeConfig()->getConfigName();
+    }
+
+    public function getShopifyProductVariantSKU() {
+        return $this->getParentTrack()->getPostID() . ':' . $this->getEncodeConfig()->getConfigName();
+    }
+
+
     /**
      * @return EncodeConfig
      */

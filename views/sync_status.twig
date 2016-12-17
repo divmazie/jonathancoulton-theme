@@ -84,7 +84,8 @@
                 asking for it repeatedly.</p>
 
             {% if sync_man.remote_shopify_products_mtime %}
-                <p style="background-color: lightgreen;">loaded shopify cache,
+                <p style="background-color: lightgreen;">loaded shopify cache
+                    [{{ sync_man.remote_shopify_products_filename }}],
                     mtime: {{ sync_man.remote_shopify_products_mtime }} </p>
             {% endif %}
             {{ m.pipeline_button('shopify_cache', "Huh, yes. Cache it (or refresh the cache)", true ) }}
@@ -106,9 +107,34 @@
             {{ m.pipeline_button('shopify_update', "Update Products", sync_man.music_store_products_to_update) }}
 
         </li>
-        <li>Shopify Product Resync
-            <p>Once everything is on s3, then we make sure our records with our store are all good</p>
+        <li>Fetch remote cache
+            <p>A service called Fetch actually handles fulfilling the digital downloads sold through
+                shopify. We cache their list of everything to speed up the rest of our sync, which is the next
+                step.</p>
+
+            {% if sync_man.fetch_remote_products_mtime %}
+                <p style="background-color: lightgreen;">loaded fetch cache
+                    [{{ sync_man.fetch_remote_products_filename }}],
+                    mtime: {{ sync_man.fetch_remote_products_mtime }} </p>
+            {% endif %}
+
+            {{ m.pipeline_button('fetch_cache', "Fetch the cache of fetch files and cache them in the fetch cache", true ) }}
+
         </li>
+        <li>Fetch Product Sync
+            ({{ sync_man.fetch_remote_products|length }} remote products
+            ({{ sync_man.remote_fetch_delete_products|length }} to delete),
+            {{ sync_man.uploadable_assets|length }} local products
+            ({{ sync_man.local_fetch_create_products|length }} to create,
+            {{ sync_man.local_fetch_update_products|length }} to update)
+
+            <p>You must be getting tired of reading this. Fetch takes all the individual digital assets and ties
+            them to the shopify SKU (multiple SKUs per product representing encode types), and links
+            fetch to the s3 assets we uploaded earlier.</p>
+
+
+        </li>
+
         <li>Garbage Collection ({{ sync_man.garbage_attachments|length }} items)
             <p>If your store all is nice and updated, why leave files from a previous iteration around?
                 They're big and unseemly and useless. Wait til everything is updated to delete them, though.

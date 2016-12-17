@@ -73,8 +73,10 @@ class Track extends MusicStoreProduct {
         return EncodeConfig::getConfigsForTrack($this);
     }
 
-    public function getEncodedAssetConfigs() {
-        return $this->getTrackEncodeConfigs();
+    public function getEncodedAssets() {
+        return array_map(function (EncodeConfig $encodeConfig) {
+            return $encodeConfig->getAsset();
+        }, $this->getTrackEncodeConfigs());
     }
 
 

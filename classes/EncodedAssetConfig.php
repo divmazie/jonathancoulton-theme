@@ -1,9 +1,6 @@
 <?php
 namespace jct;
 
-use jct\Shopify\Provider\ProductOptionProvider;
-use jct\Shopify\Provider\ProductVariantProvider;
-
 abstract class EncodedAssetConfig {
     const STORAGE_KEY_PARENT_ID = 'parentID';
     const STORAGE_KEY_ENCODE_FORMAT = 'encodeFormat';
@@ -90,12 +87,6 @@ abstract class EncodedAssetConfig {
             static::STORAGE_KEY_RECONSTITUTE_AS => static::class,
         ];
     }
-
-
-    public function getShopifyProductVariantSKU() {
-        return $this->getParentPost()->getPostID() . ':' . $this->getConfigName();
-    }
-
 
     /**
      * @param array $array

@@ -83,9 +83,12 @@ class Album extends MusicStoreProduct {
         return AlbumZipConfig::getConfigsForAlbum($this);
     }
 
-    public function getEncodedAssetConfigs() {
-        return $this->getAlbumZipConfigs();
+    public function getEncodedAssets() {
+        return array_map(function (AlbumZipConfig $encodeConfig) {
+            return $encodeConfig->getAsset();
+        }, $this->getAlbumZipConfigs());
     }
+
 
     public function getAlbumZipConfigByName($configName) {
         return AlbumZipConfig::getConfigsForAlbumByName($this, $configName);

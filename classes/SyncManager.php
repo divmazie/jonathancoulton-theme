@@ -6,9 +6,12 @@ use FetchApp\API\FetchApp;
 use GuzzleHttp\Client;
 use jct\Shopify\Product;
 use jct\Shopify\SynchronousAPIClient;
+use \FetchApp\API\Product as FetchProduct;
 
 class SyncManager {
     const SHOPIFY_REMOTE_CACHE_PREFIX = 'shopify_remote_products_cache';
+    const FETCH_CACHE_PREFIX = 'fetch_remote_products_cache';
+    const FETCH_PAGE_SIZE = 10000;
 
     private $shopifyApiClient, $fetchAppApiClient;
 
@@ -30,11 +33,20 @@ class SyncManager {
         $music_store_products_to_create,
         $music_store_products_to_update,
         $music_store_products_to_skip,
-        $shopify_products_to_delete;
+        $shopify_products_to_delete,
+        $fetch_remote_products_filename,
+        $fetch_remote_products_mtime,
+        $fetch_remote_products,
+        $local_fetch_create_products,
+        $local_fetch_update_products,
+        $remote_fetch_delete_products;
 
-    public function __construct(SynchronousAPIClient $shopifyApiClient, FetchApp $fetchApp) {
+    public function __construct(SynchronousAPIClient $shopifyApiClient, FetchApp $fetchApp, $tz = 'America/New_York') {
         $this->shopifyApiClient = $shopifyApiClient;
         $this->fetchAppApiClient = $fetchApp;
+
+        // display mtimes in nyc\
+        date_default_timezone_set($tz);
 
         self::optimizeQueries();
 
@@ -60,10 +72,16 @@ class SyncManager {
         $this->garbage_attachments =
             array_diff_key($this->uploadable_assets, array_merge($this->all_zips, $this->all_encodes));
 
+        $this->local_music_store_products = array_merge($this->all_albums, $this->all_tracks);
+
         $this->loadShopifyRemoteCache();
-        if($this->remote_shopify_products_mtime) {
-            $this->local_music_store_products = array_merge($this->all_albums, $this->all_tracks);
+        if($this->remote_shopify_products_filename) {
             $this->sortShopifyProducts();
+        }
+
+        $this->loadFetchRemoteCache();
+        if($this->fetch_remote_products_filename) {
+            $this->sortFetchProducts();
         }
     }
 
@@ -157,7 +175,7 @@ class SyncManager {
         }, $this->unuploaded_assets, $finishedUrl);
     }
 
-    public function cacheRemoteProducts() {
+    public function cacheRemoteShopifyProducts() {
         $this->remote_shopify_products =
             $this->shopifyApiClient->getAllProducts(['product_type' => MusicStoreProduct::DEFAULT_SHOPIFY_PRODUCT_TYPE]);
         // key remote products by id
@@ -184,7 +202,7 @@ class SyncManager {
 
         if($fileName) {
             $this->remote_shopify_products_filename = $fileName;
-            $this->remote_shopify_products_mtime = date('F d Y h:i a e', filemtime($fileName));
+            $this->remote_shopify_products_mtime = self::formattedMTime($this->remote_shopify_products_filename);
         }
     }
 
@@ -242,6 +260,79 @@ class SyncManager {
         $this->loopTilDone(function (MusicStoreProduct $musicStoreProduct) {
             $this->recordReturnedProduct($musicStoreProduct, $this->shopifyApiClient->putProduct($musicStoreProduct->getShopifyProduct()));
         }, $this->music_store_products_to_update, $finishedUrl);
+    }
+
+    public function cacheRemoteFetchProducts() {
+        $all = $this->fetchAppApiClient->getProducts(self::FETCH_PAGE_SIZE, 1);
+
+        // key by sku
+        $cacheArray = [];
+        foreach($all as $product) {
+            $product = self::serializableFetchProduct($product);
+            $cacheArray[$product->getSKU()] = self::serializableFetchProduct($product);
+        }
+
+        //var_dump($cacheArray);
+        //die();
+
+        $this->fetch_remote_products = &$cacheArray;
+        return $this->fetch_remote_products_filename =
+            $this->setFileCache($this->fetch_remote_products, self::FETCH_CACHE_PREFIX);
+    }
+
+    private function loadFetchRemoteCache() {
+        $fileName = '';
+        $this->fetch_remote_products = static::getFileArrayCache(self::FETCH_CACHE_PREFIX, $fileName);
+
+        if($fileName) {
+            $this->fetch_remote_products_filename = $fileName;
+            $this->fetch_remote_products_mtime = self::formattedMTime($this->fetch_remote_products_filename);
+        }
+    }
+
+    private function sortFetchProducts() {
+        if($this->fetch_remote_products_filename) {
+            $local_skus = [];
+            foreach($this->uploadable_assets as $uploadable_asset) {
+                /** @var EncodedAsset $uploadable_asset */
+                $sku = $uploadable_asset->getShopifyProductVariantSKU();
+                $local_skus[] = $sku;
+                if(isset($this->fetch_remote_products[$sku])) {
+                    // exists... update it
+                    $this->local_fetch_update_products[$sku] = $uploadable_asset;
+                } else {
+                    // not exist... create it
+                    $this->local_fetch_create_products[$sku] = $uploadable_asset;
+                }
+            }
+
+            $this->remote_fetch_delete_products =
+                array_diff_key($this->fetch_remote_products, array_combine($local_skus, $local_skus));
+        }
+    }
+
+    public function doFetchSync($finishedUrl) {
+        $this->loopTilDone(function (MusicStoreProduct $musicStoreProduct) {
+            $this->recordReturnedProduct($musicStoreProduct, $this->shopifyApiClient->putProduct($musicStoreProduct->getShopifyProduct()));
+        }, $this->music_store_products_to_update, $finishedUrl);
+    }
+
+
+    private static function formattedMTime($filename) {
+        return date('F d Y h:i a e', filemtime($filename));
+    }
+
+    private static function serializableFetchProduct(FetchProduct $product) {
+        $reflection = new \ReflectionClass($product);
+        $props = $reflection->getProperties();
+        foreach($props as $prop) {
+            $prop->setAccessible(true);
+            if(($value = $prop->getValue($product)) instanceof \SimpleXMLElement) {
+                $prop->setValue($product, (string)$value);
+            }
+        }
+
+        return $product;
     }
 
     private static function getFileArrayCache($uniqueFilePrefix, &$cacheFileName = '') {
