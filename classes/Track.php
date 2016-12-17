@@ -8,7 +8,7 @@ use jct\Shopify\Provider\ProductProvider;
 use jct\Shopify\Provider\ProductVariantProvider;
 use Timber\Timber;
 
-class Track extends ShopifyProduct {
+class Track extends MusicStoreProduct {
 
     const PLAYER_ENCODE_CONFIG_NAME = 'MP3';
 

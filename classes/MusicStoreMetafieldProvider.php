@@ -9,7 +9,7 @@ class MusicStoreMetafieldProvider implements MetafieldProvider {
 
     private $key, $value, $namespace, $parentProduct;
 
-    public function __construct(ShopifyProduct $parentProduct, $key, $value) {
+    public function __construct(MusicStoreProduct $parentProduct, $key, $value) {
         $this->key = $key;
         $this->value = $value;
         $this->parentProduct = $parentProduct;
@@ -38,7 +38,7 @@ class MusicStoreMetafieldProvider implements MetafieldProvider {
         return is_string($this->value) ? 'string' : 'integer';
     }
 
-    public static function getForProduct(ShopifyProduct $product) {
+    public static function getForProduct(MusicStoreProduct $product) {
         $trackNumber = 0;
         if($product instanceof Track) {
             $trackNumber = $product->getTrackNumber();

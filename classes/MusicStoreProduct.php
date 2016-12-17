@@ -15,7 +15,7 @@ use jct\Shopify\Provider\MetafieldProvider;
 use jct\Shopify\Provider\ProductProvider;
 use Timber\Post;
 
-abstract class ShopifyProduct extends JCTPost implements ProductProvider, ImageProvider {
+abstract class MusicStoreProduct extends JCTPost implements ProductProvider, ImageProvider {
     public $postID;
 
     const META_SHOPIFY_ID_MAP = 'shopify_id_map';
@@ -36,13 +36,19 @@ abstract class ShopifyProduct extends JCTPost implements ProductProvider, ImageP
     }
 
     private function getShopifyIDMap() {
-        return $this->get_field(self::META_SHOPIFY_ID_MAP);
+        $map = $this->get_field(self::META_SHOPIFY_ID_MAP);
+        if($map) {
+            return $map;
+        }
+        return [];
     }
 
     private function setShopifyIDMap(Product $product) {
         // track what we learn about shopify's names for things
         // this will allow us to do more effcient updates
-        $map = [];
+        // start with what we have... if we don't hear back about thing
+        // assume it's unchanged...
+        $map = $this->getShopifyIDMap();
         $map[self::ID_MAP_ID] = $product->id;
         foreach($product->variants as $variant) {
             $map[self::ID_MAP_VARIANT][$variant->sku] = $variant->id;

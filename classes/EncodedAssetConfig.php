@@ -16,7 +16,7 @@ abstract class EncodedAssetConfig implements ProductVariantProvider, ProductOpti
 
     private $parentPost, $encodeFormat, $ffmpegFlags, $configName;
 
-    public function __construct(ShopifyProduct $parentPost, $encodeFormat, $ffmpegFlags, $configName) {
+    public function __construct(MusicStoreProduct $parentPost, $encodeFormat, $ffmpegFlags, $configName) {
         $this->parentPost = $parentPost;
         $this->encodeFormat = $encodeFormat;
         $this->ffmpegFlags = $ffmpegFlags;
@@ -24,7 +24,7 @@ abstract class EncodedAssetConfig implements ProductVariantProvider, ProductOpti
     }
 
     /**
-     * @return ShopifyProduct
+     * @return MusicStoreProduct
      */
     public function getParentPost() {
         return $this->parentPost;

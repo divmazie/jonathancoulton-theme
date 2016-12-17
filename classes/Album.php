@@ -9,7 +9,7 @@ use jct\Shopify\Provider\ProductProvider;
 use jct\Shopify\Provider\ProductVariantProvider;
 use Timber\Timber;
 
-class Album extends ShopifyProduct  {
+class Album extends MusicStoreProduct  {
     // meta fields acf will load (here for autocomplete purposes)
     public $album_artist, $album_price, $album_year, $album_genre, $album_art, $album_comment, $album_sort_order, $album_description, $shopify_collection_id, $bonus_assets, $show_album_in_store;
 
