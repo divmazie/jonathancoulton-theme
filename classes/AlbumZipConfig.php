@@ -26,7 +26,7 @@ class AlbumZipConfig extends EncodedAssetConfig {
     }
 
     public function getUniqueKey() {
-        $album_info = [$this->getParentAlbum()->getAlbumTitle()];
+        $album_info = [$this->getParentAlbum()->getTitle()];
         foreach($this->getParentAlbum()->getAlbumBonusAssetObjects() as $bonus_asset) {
             $album_info[] = $bonus_asset->getCanonicalContentHash();
         }
@@ -90,7 +90,7 @@ class AlbumZipConfig extends EncodedAssetConfig {
         if($zipArchive->open($zipFileName, \ZipArchive::CREATE) !== true) {
             throw new JCTException("Cannot open zip file: <$zipFileName>!");
         }
-        $zipInnerDirectoryPath = $this->getParentAlbum()->getAlbumTitle();
+        $zipInnerDirectoryPath = $this->getParentAlbum()->getTitle();
 
         // populate targetFiles with $filePath=>$zipPath
         $targetFiles = [];
@@ -124,10 +124,6 @@ class AlbumZipConfig extends EncodedAssetConfig {
         $zipArchive->close();
 
         AlbumZip::createFromTempFile($zipFileName, $this);
-    }
-
-    public function getProductVariantPrice() {
-        return $this->getParentAlbum()->getAlbumPrice();
     }
 
     /**

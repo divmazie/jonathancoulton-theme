@@ -24,15 +24,6 @@ class ProductOption extends Struct {
         return $this->postProperties();
     }
 
-
-    public static function fromProductOptionProvider(Product $parent, ProductOptionProvider $optionProvider) {
-        $option = new static($parent);
-
-        $option->name = $optionProvider->getProductOptionTitle();
-
-        return $option;
-    }
-
 }
 
 ?>

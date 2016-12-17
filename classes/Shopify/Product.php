@@ -73,44 +73,4 @@ class Product extends Struct {
 
         parent::setProperty($propertyName, $property);
     }
-
-
-    /**
-     * @param ProductProvider $productProvider
-     * @return Product
-     */
-    public static function fromProductProvider(ProductProvider $productProvider) {
-        $product = new static();
-
-        $product->id = $productProvider->getShopifyID();
-        $product->title = $productProvider->getShopifyTitle();
-        $product->body_html = $productProvider->getShopifyBodyHtml();
-        $product->product_type = $productProvider->getShopifyProductType();
-        $product->vendor = $productProvider->getShopifyVendor();
-        $product->tags = $productProvider->getShopifyTags();
-
-        // fill out the whole darn tree
-        $product->variants = array_map(function (ProductVariantProvider $variantProvider) use ($product) {
-            return ProductVariant::fromProductVariantProvider($product, $variantProvider);
-        }, $productProvider->getProductVariantProviders());
-
-        $product->options = array_map(function (ProductOptionProvider $provider) use ($product) {
-            return ProductOption::fromProductOptionProvider($product, $provider);
-        }, $productProvider->getProductOptionProviders());
-
-        $product->images = array_map(function (ImageProvider $provider) use ($product) {
-            return Image::fromImageProvider($product, $provider);
-        }, $productProvider->getProductImageProviders());
-
-        if(count($product->images)) {
-            $product->image = $product->images[0];
-        }
-
-        $product->metafields = array_map(function (MetafieldProvider $provider) use ($product) {
-            return Metafield::fromMetafieldProvider($product, $provider);
-        }, $productProvider->getProductMetafieldProviders());
-
-        return $product;
-    }
-
 }

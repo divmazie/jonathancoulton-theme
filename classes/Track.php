@@ -2,11 +2,7 @@
 
 namespace jct;
 
-use jct\Shopify\Provider\ImageProvider;
-use jct\Shopify\Provider\ProductOptionProvider;
-use jct\Shopify\Provider\ProductProvider;
-use jct\Shopify\Provider\ProductVariantProvider;
-use Timber\Timber;
+use jct\Shopify\Metafield;
 
 class Track extends MusicStoreProduct {
 
@@ -22,20 +18,11 @@ class Track extends MusicStoreProduct {
         return Album::getByID($this->track_album);
     }
 
-    public function getTrackTitle() {
-        return $this->title();
-    }
-
-    function getTitle() {
-        return $this->getTrackTitle();
-    }
-
-
     public function getTrackNumber() {
         return abs(intval($this->track_number));
     }
 
-    public function getTrackPrice() {
+    public function getPrice() {
         return abs(intval($this->track_price));
     }
 
@@ -56,9 +43,9 @@ class Track extends MusicStoreProduct {
     }
 
     /** @returns CoverArt */
-    public function getTrackArtObject() {
+    public function getCoverArt() {
         $trackArtObject = $this->track_art ? Util::get_posts_cached($this->track_art, CoverArt::class) : null;
-        return $trackArtObject ? $trackArtObject : $this->getAlbum()->getAlbumArtObject();
+        return $trackArtObject ? $trackArtObject : $this->getAlbum()->getCoverArt();
     }
 
     /**
@@ -69,12 +56,12 @@ class Track extends MusicStoreProduct {
     }
 
     public function isFilledOut() {
-        return $this->getAlbum()->isFilledOut() && $this->getTrackTitle() && $this->getTrackArtist() &&
+        return $this->getAlbum()->isFilledOut() && $this->getTitle() && $this->getTrackArtist() &&
                $this->getTrackSourceFileObject() && $this->getTrackSourceFileObject()->fileAssetExists() &&
-               $this->getTrackArtObject() && $this->getTrackArtObject()->fileAssetExists();
+               $this->getCoverArt() && $this->getCoverArt()->fileAssetExists();
     }
 
-    public function getMusicLink() {
+    public function getListenLink() {
         return EncodeConfig::getConfigForTrackByName(
             $this, self::PLAYER_ENCODE_CONFIG_NAME)->getEncode()->getURL();
     }
@@ -86,62 +73,39 @@ class Track extends MusicStoreProduct {
         return EncodeConfig::getConfigsForTrack($this);
     }
 
+    public function getEncodedAssetConfigs() {
+        return $this->getTrackEncodeConfigs();
+    }
+
+
     public function getEncodeConfigByName($configName) {
         return EncodeConfig::getConfigForTrackByName($this, $configName);
     }
 
     public function getPublicFilename($withExtension = null) {
-        return sprintf('%02d %s', $this->getTrackNumber(), $this->getTrackTitle()) .
+        return sprintf('%02d %s', $this->getTrackNumber(), $this->getTitle()) .
                ($withExtension ? '.' . $withExtension : '');
     }
 
-    public function syncToStore($shopify) {
-        return $shopify->syncProduct($this);
+    public function getDownloadStoreTitle() {
+        return $this->getTitle();
     }
 
-    public function getProductImageSourceUrl() {
-        //return $this->getTrackArtObject()->getURL();
-        return 'http://www.jonathancoulton.com/images/jc-face-blog-thumb.jpg';
-    }
-
-    public function getShopifyTitle() {
-        return $this->getTrackTitle();
-    }
-
-    public function getShopifyBodyHtml() {
+    public function getDownloadStoreBodyHtml() {
         return sprintf('%s by %s. From the album %s. Released in %d.',
-                       $this->getShopifyTitle(),
+                       $this->getDownloadStoreTitle(),
                        $this->getTrackArtist(),
-                       $this->getAlbum()->getAlbumTitle(),
+                       $this->getAlbum()->getTitle(),
                        $this->getTrackYear());
     }
 
-    public function getShopifyProductType() {
-        return ThemeObjectRepository::DEFAULT_SHOPIFY_PRODUCT_TYPE;
-    }
+    public function getShopifyMetafields() {
+        $musicLink = new Metafield();
+        $musicLink->key = 'music_link';
+        $musicLink->value = $this->getListenLink();
+        $musicLink->useInferredValueType();
 
-    public function getShopifyVendor() {
-        return 'Jonathan Coulton';
-    }
-
-    public function getShopifyTags() {
-        return $this->getAlbum()->getFilenameFriendlyTitle();
-    }
-
-    public function getProductVariantProviders() {
-        return $this->getTrackEncodeConfigs();
-    }
-
-    public function getProductOptionProviders() {
-        return [$this->getTrackEncodeConfigs()[0]];
-    }
-
-    public function getProductImageProviders() {
-        return [$this];
-    }
-
-    public function getProductMetafieldProviders() {
-        return MusicStoreMetafieldProvider::getForProduct($this);
+        return array_merge([$musicLink], parent::getShopifyMetafields());
     }
 
     public static function getPostType() {

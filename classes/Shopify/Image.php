@@ -31,12 +31,4 @@ class Image extends Struct {
         return ['id', 'src'];
     }
 
-    public static function fromImageProvider(Struct $parent, ImageProvider $imageProvider) {
-        $image = new static($parent);
-
-        $image->src = $imageProvider->getProductImageSourceUrl();
-        $image->id = $imageProvider->getShopifyImageID();
-
-        return $image;
-    }
 }

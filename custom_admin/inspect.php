@@ -36,7 +36,7 @@ switch($class) {
         var_dump($post->getAlbumTracks());
 
         new_section('art');
-        var_dump($post->getAlbumArtObject());
+        var_dump($post->getCoverArt());
 
         new_section('all child zips');
         var_dump($post->getAllChildZips());
@@ -45,7 +45,7 @@ switch($class) {
     case Track::class;
         /** @var $post Track */
         new_section('track art');
-        var_dump($post->getTrackArtObject());
+        var_dump($post->getCoverArt());
 
         new_section('track src');
         var_dump($post->getTrackSourceFileObject());

@@ -2,14 +2,7 @@
 
 namespace jct;
 
-use jct\Shopify\Product;
-use jct\Shopify\Provider\ImageProvider;
-use jct\Shopify\Provider\ProductOptionProvider;
-use jct\Shopify\Provider\ProductProvider;
-use jct\Shopify\Provider\ProductVariantProvider;
-use Timber\Timber;
-
-class Album extends MusicStoreProduct  {
+class Album extends MusicStoreProduct {
     // meta fields acf will load (here for autocomplete purposes)
     public $album_artist, $album_price, $album_year, $album_genre, $album_art, $album_comment, $album_sort_order, $album_description, $shopify_collection_id, $bonus_assets, $show_album_in_store;
 
@@ -17,19 +10,11 @@ class Album extends MusicStoreProduct  {
         parent::__construct($pid);
     }
 
-    public function getAlbumTitle() {
-        return $this->title();
-    }
-
-    public function getTitle() {
-        return $this->getAlbumTitle();
-    }
-
     public function getAlbumArtist() {
         return $this->album_artist;
     }
 
-    public function getAlbumPrice() {
+    public function getPrice() {
         return abs(intval($this->album_price));
     }
 
@@ -53,21 +38,12 @@ class Album extends MusicStoreProduct  {
         return $this->album_description;
     }
 
-    public function getShopifyCollectionId() {
-        return $this->shopify_collection_id;
-    }
-
-    public function setShopifyCollectionId($id) {
-        $this->update('shopify_collection_id', $id);
-        $this->shopify_collection_id = $id;
-    }
-
     public function getAlbumShow() {
         return $this->show_album_in_store;
     }
 
     /** @return CoverArt */
-    public function getAlbumArtObject() {
+    public function getCoverArt() {
         return Util::get_posts_cached($this->album_art, CoverArt::class);
     }
 
@@ -81,8 +57,8 @@ class Album extends MusicStoreProduct  {
     }
 
     public function isFilledOut() {
-        return ($this->getAlbumShow() && $this->getAlbumTitle() && $this->getAlbumArtist() &&
-                $this->getAlbumArtObject() && $this->getAlbumArtObject()->fileAssetExists());
+        return ($this->getAlbumShow() && $this->getTitle() && $this->getAlbumArtist() &&
+                $this->getCoverArt() && $this->getCoverArt()->fileAssetExists());
     }
 
     /**
@@ -107,85 +83,23 @@ class Album extends MusicStoreProduct  {
         return AlbumZipConfig::getConfigsForAlbum($this);
     }
 
+    public function getEncodedAssetConfigs() {
+        return $this->getAlbumZipConfigs();
+    }
+
     public function getAlbumZipConfigByName($configName) {
         return AlbumZipConfig::getConfigsForAlbumByName($this, $configName);
     }
 
-    public function syncToStore($shopify, $step = 0) {
-        if($step == 0) {
-            $context = [];
-            $context['sync_responses'] = [];
-            $response = $shopify->syncProduct($this);
-            $context['sync_responses'][] = $response['response'];
-            $missing_files = $response['missing_files'];
-            $track_product_ids = [0 => $response['response']->product->id];
-        } else {
-            $context = get_transient('temp_context');
-            $missing_files = get_transient('temp_missing_files');
-            $track_product_ids = get_transient('track_product_ids');
-        }
-        $tracks = $this->getAlbumTracks();
-        $track_counter = 0;
-        foreach($tracks as $track) {
-            if(($step == 0 && $track_counter < 8) || ($step > 0 && $track_counter >= 8)) {
-                $response = $track->syncToStore($shopify);
-                $context['sync_responses'][] = $response['response'];
-                $missing_files = array_merge($missing_files, $response['missing_files']);
-                $track_product_ids[intval($track->getTrackNumber())] = $response['response']->product->id;
-            }
-            $track_counter++;
-        }
-        set_transient('track_product_ids', $track_product_ids);
-        if($step == 0) {
-            set_transient('temp_context', $context);
-            set_transient('temp_missing_files', $missing_files);
-        } else {
-            delete_transient('temp_context');
-            delete_transient('temp_missing_files');
-            //$context['collection_sync_response'] = $shopify->syncAlbumCollection($this,$track_product_ids);
-            $missing_files_context = $missing_files;
-            $context['missing_files'] = $missing_files_context;
-        }
-        return $context;
+    public function getDownloadStoreTitle() {
+        return $this->getTitle() . ' (Full Album)';
     }
 
-    public function syncCollection($shopify) {
-        $track_product_ids = get_transient('track_product_ids');
-        $response = $shopify->syncAlbumCollection($this, $track_product_ids);
-        delete_transient('track_product_ids');
-        return $response;
-    }
-
-    public function getProductImageSourceUrl() {
-        return $this->getAlbumArtObject()->getURL();
-    }
-
-    public function getShopifyTitle() {
-        return $this->getAlbumTitle() . ' (Full Album)';
-    }
-
-    public function getShopifyBodyHtml() {
+    public function getDownloadStoreBodyHtml() {
         return sprintf('%s by %s. Released %s.',
-                       $this->getShopifyTitle(),
+                       $this->getDownloadStoreTitle(),
                        $this->getAlbumArtist(),
                        $this->getAlbumYear());
-    }
-
-
-    public function getShopifyTags() {
-        return $this->getFilenameFriendlyTitle();
-    }
-
-    public function getProductVariantProviders() {
-        return $this->getAlbumZipConfigs();
-    }
-
-    public function getProductOptionProviders() {
-        return [$this->getAlbumZipConfigs()[0]];
-    }
-
-    public function getProductImageProviders() {
-        return [$this];
     }
 
 

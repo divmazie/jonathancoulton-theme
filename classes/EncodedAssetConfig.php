@@ -4,7 +4,7 @@ namespace jct;
 use jct\Shopify\Provider\ProductOptionProvider;
 use jct\Shopify\Provider\ProductVariantProvider;
 
-abstract class EncodedAssetConfig implements ProductVariantProvider, ProductOptionProvider {
+abstract class EncodedAssetConfig {
     const STORAGE_KEY_PARENT_ID = 'parentID';
     const STORAGE_KEY_ENCODE_FORMAT = 'encodeFormat';
     const STORAGE_KEY_FFMPEG_FLAGS = 'ffmpegFlags';
@@ -91,34 +91,9 @@ abstract class EncodedAssetConfig implements ProductVariantProvider, ProductOpti
         ];
     }
 
-    public function getProductVariantShopifyID() {
-        return $this->getParentPost()->getVariantID($this->getProductVariantSKU());
-    }
 
-    public function getProductOptionTitle() {
-        return 'Format';
-    }
-
-    public function getProductVariantTitle() {
-        return $this->getConfigName();
-    }
-
-    abstract public function getProductVariantPrice();
-
-    public function getProductVariantSKU() {
+    public function getShopifyProductVariantSKU() {
         return $this->getParentPost()->getPostID() . ':' . $this->getConfigName();
-    }
-
-    public function getProductVariantOption1() {
-        return $this->getConfigName();
-    }
-
-    public function getProductVariantOption2() {
-        return null;
-    }
-
-    public function getProductVariantOption3() {
-        return null;
     }
 
 

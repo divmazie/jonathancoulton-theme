@@ -7,7 +7,7 @@ use jct\Util;
 
 class Metafield extends Struct {
     public
-        $namespace,
+        $namespace = 'global',
         $key,
         $value,
         $value_type,
@@ -27,35 +27,8 @@ class Metafield extends Struct {
         return array_merge(['id'], $this->postProperties());
     }
 
-
-    public static function fromMetafieldProvider(Struct $parent = null, MetafieldProvider $metafieldProvider) {
-        $metafield = new static($parent);
-
-        $metafield->id = $metafieldProvider->getMetafieldID();
-        $metafield->namespace = $metafieldProvider->getMetafieldNamespace();
-        $metafield->key = $metafieldProvider->getMetafieldKey();
-        $metafield->value = $metafieldProvider->getMetafieldValue();
-        $metafield->value_type = $metafieldProvider->getMetafieldValueType();
-
-        return $metafield;
+    public function useInferredValueType() {
+        $this->value_type = is_string($this->value) ? 'string' : 'integer';
     }
 
-    /**
-     * @param $metafieldsWithoutID Metafield[]
-     * @param $metafieldsWithID Metafield[]
-     * @return Metafield[] metafields with id that were NOT ported
-     */
-    public static function portMetafieldIDs($metafieldsWithoutID, $metafieldsWithID) {
-        $idDict = [];
-        foreach($metafieldsWithID as $withID) {
-            $idDict[$withID->namespace][$withID->key] = $withID->id;
-        }
-
-        foreach($metafieldsWithoutID as $noID) {
-            $noID->id = @$idDict[$noID->namespace][$noID->key];
-            unset($idDict[$noID->namespace][$noID->key]);
-        }
-
-        return Util::array_merge_flatten_1L($idDict);
-    }
 }

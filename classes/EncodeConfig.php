@@ -73,12 +73,12 @@ class EncodeConfig extends EncodedAssetConfig {
             'art_url'       =>
                 $forUseInUniqueKey ?
                     '' :
-                    ($parent->getTrackArtObject() ? $parent->getTrackArtObject()->getURL() : 'MISSING!!!'),
-            'art_md5'       => $parent->getTrackArtObject() ? $parent->getTrackArtObject()->getCanonicalContentHash() : 'MISSING!!!',
+                    ($parent->getCoverArt() ? $parent->getCoverArt()->getURL() : 'MISSING!!!'),
+            'art_md5'       => $parent->getCoverArt() ? $parent->getCoverArt()->getCanonicalContentHash() : 'MISSING!!!',
             'metadata'      => [
-                'title'        => $parent->getTrackTitle(),
+                'title'        => $parent->getTitle(),
                 'track'        => $parent->getTrackNumber(),
-                'album'        => $parent->getAlbum()->getAlbumTitle(),
+                'album'        => $parent->getAlbum()->getTitle(),
                 'album_artist' => $parent->getAlbum()->getAlbumArtist(),
                 'artist'       => $parent->getTrackArtist(),
                 'comment'      => $parent->getTrackComment(),
@@ -110,7 +110,7 @@ class EncodeConfig extends EncodedAssetConfig {
     }
 
     public function getProductVariantPrice() {
-        return $this->getParentTrack()->getTrackPrice();
+        return $this->getParentTrack()->getPrice();
     }
 
     /** @return EncodeConfig[] keyed by unique key */

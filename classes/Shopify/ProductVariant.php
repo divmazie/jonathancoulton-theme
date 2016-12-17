@@ -45,21 +45,6 @@ class ProductVariant extends Struct {
         return array_merge(['id'], $this->postProperties());
     }
 
-
-    public static function fromProductVariantProvider(Product $product, ProductVariantProvider $variantProvider) {
-        $variant = new self($product);
-
-        $variant->id = $variantProvider->getProductVariantShopifyID();
-        $variant->title = $variantProvider->getProductVariantTitle();
-        $variant->price = $variantProvider->getProductVariantPrice();
-        $variant->sku = $variantProvider->getProductVariantSKU();
-        $variant->option1 = $variantProvider->getProductVariantOption1();
-        $variant->option2 = $variantProvider->getProductVariantOption2();
-        $variant->option3 = $variantProvider->getProductVariantOption3();
-
-        return $variant;
-    }
-
 }
 
 ?>
