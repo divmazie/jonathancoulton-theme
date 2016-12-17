@@ -1,15 +1,6 @@
 module.exports = function(grunt) {
 
-    // must run npm install grunt-contrib-less --save-dev
-    grunt.loadNpmTasks('grunt-contrib-less');
-    // must run npm install grunt-contrib-watch --save-dev
-    grunt.loadNpmTasks('grunt-contrib-watch');
-    // npm install grunt-bower-task --save-dev
-    grunt.loadNpmTasks('grunt-bower-task');
-    //npm install grunt-composer --save-dev
-    grunt.loadNpmTasks('grunt-composer');
-    //npm install grunt-sftp-deploy --saves-dev
-    grunt.loadNpmTasks('grunt-sftp-deploy');
+    require('load-grunt-tasks')(grunt);
 
     // Project configuration.
     grunt.initConfig({
@@ -85,11 +76,6 @@ module.exports = function(grunt) {
         }
     });
 
-    require('load-grunt-tasks')(grunt);
-
-    // Load the plugin that provides the "uglify" task.
-    //grunt.loadNpmTasks('grunt-contrib-uglify');
-    //grunt.loadNpmTasks('grunt-bower-concat');
 
     // Default task(s).
     grunt.registerTask('default', ['uglify']);
