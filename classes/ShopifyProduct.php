@@ -68,7 +68,7 @@ abstract class ShopifyProduct extends JCTPost implements ProductProvider, ImageP
 
     public function metafieldProviderNeedsSync(MetafieldProvider $metafieldProvider) {
         return @$this->getShopifyIDMap()[self::ID_MAP_META][$metafieldProvider->getMetafieldNamespace()]
-        [$metafieldProvider->getMetafieldKey()][self::ID_MAP_HASH] ===
+        [$metafieldProvider->getMetafieldKey()][self::ID_MAP_HASH] !==
                static::metafieldProviderFreshnessHash($metafieldProvider);
     }
 

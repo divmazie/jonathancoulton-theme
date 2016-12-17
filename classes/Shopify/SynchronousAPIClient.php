@@ -64,7 +64,7 @@ class SynchronousAPIClient extends Client {
     /** @return Product */
     public function putProduct(Product $product, $updateMetafields = []) {
         //var_dump(sprintf(self::PRODUCTS_UPDATE_ENDPOINT_ID_PATTERN, $product->id));
-        //var_dump($product->putArray());
+        var_dump($product->putArray());
 
         // we can't sync these, believe me i tried
         $product->metafields = null;
