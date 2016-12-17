@@ -43,6 +43,14 @@ switch(@$_GET['pipeline_stage']) {
         $syncMan->doShopifyUpdates(status_message_loc("updates completed"));
         break;
 
+    case 'shopify_force_update':
+        $syncMan->forceShopifyUpdates(status_message_loc("forced updates completed"));
+        break;
+
+    case 'shopify_delete':
+        $syncMan->doShopifyDeletes(status_message_loc("shopify deletions completed (we think--maybe refresj the cache and check?)"));
+        break;
+
     case 'fetch_cache':
         $filename = $syncMan->cacheRemoteFetchProducts();
         Util::redirect(status_message_loc("Fetch cached in $filename. Thx!"));
@@ -53,7 +61,11 @@ switch(@$_GET['pipeline_stage']) {
         break;
 
     case 'fetch_update':
-        $syncMan->dpFetchUpdates(status_message_loc("We updated those fetch products!"));
+        $syncMan->doFetchUpdates(status_message_loc("We updated those fetch products!"));
+        break;
+
+    case 'fetch_delete':
+        $syncMan->doFetchDeletes(status_message_loc("We deleted those products! Felt good."));
         break;
 
     case 'garbage':

@@ -54,12 +54,7 @@ class SynchronousAPIClient extends Client {
     }
 
     /**
-     * @param Product $product to update
-     * NOTE: every metafield in this product will generate a query... don't pass any
-     * if they don't need to be updated!
-     * You will not get metafields in your product response ...
      * @return Product
-     * @throws Exception\Exception
      */
     public function putProduct(Product $product) {
         $putProduct =
@@ -67,6 +62,14 @@ class SynchronousAPIClient extends Client {
 
         return $putProduct;
     }
+
+    /**
+     * @return Product
+     */
+    public function deleteProduct(Product $product) {
+        $this->shopifyRateLimitedRequest('DELETE', sprintf('admin/products/%d.json', $product->id));
+    }
+
 
     /** @return Product */
     public function postProduct(Product $product) {

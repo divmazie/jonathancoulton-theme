@@ -88,7 +88,7 @@
                     [{{ sync_man.remote_shopify_products_filename }}],
                     mtime: {{ sync_man.remote_shopify_products_mtime }} </p>
             {% endif %}
-            {{ m.pipeline_button('shopify_cache', "Huh, yes. Cache it (or refresh the cache)", true ) }}
+            {{ m.pipeline_button('shopify_cache', "Cache it (or refresh the cache)", true ) }}
 
         </li>
         <li>Shopify Product Sync
@@ -105,6 +105,8 @@
 
             {{ m.pipeline_button('shopify_create', "Create Products", sync_man.music_store_products_to_create) }}
             {{ m.pipeline_button('shopify_update', "Update Products", sync_man.music_store_products_to_update) }}
+            {{ m.pipeline_button('shopify_force_update', "Force Update Allegedly Up To Date Products", sync_man.music_store_products_to_skip) }}
+            {{ m.pipeline_button('shopify_delete', "Delete extraneous products!", sync_man.shopify_products_to_delete) }}
 
         </li>
         <li>Fetch remote cache
@@ -118,7 +120,7 @@
                     mtime: {{ sync_man.fetch_remote_products_mtime }} </p>
             {% endif %}
 
-            {{ m.pipeline_button('fetch_cache', "Fetch the cache of fetch files and cache them in the fetch cache", true ) }}
+            {{ m.pipeline_button('fetch_cache', "Fetch the cache of fetch files and cache them in the fetch cache or refresh the fetch cache with freshly fetched files from fetch", true ) }}
 
         </li>
         <li>Fetch Product Sync
@@ -137,11 +139,13 @@
                 will always be available, but is only necessary if the S3 urls change.
             </p>
 
-            <p>Updates are recommended if any new products are encoded or uploaded to s3.</p>
+            <p>Updates are recommended if any new products are encoded or uploaded to s3. If you have hundreds of files
+                to delete, we recommend using the purge products function on fetch's backend...</p>
 
 
-            {{ m.pipeline_button('fetch_create', "Create Fetch Products", sync_man.local_fetch_create_products|length ) }}
-            {{ m.pipeline_button('fetch_update', "Update Fetch Products", sync_man.local_fetch_update_products|length ) }}
+            {{ m.pipeline_button('fetch_create', "Create Fetch Products", sync_man.local_fetch_create_products ) }}
+            {{ m.pipeline_button('fetch_update', "Update (Any Created) Fetch Products", sync_man.local_fetch_update_products ) }}
+            {{ m.pipeline_button('fetch_delete', "Delete Fetch Products", sync_man.remote_fetch_delete_products ) }}
 
         </li>
 
@@ -165,6 +169,12 @@
 
 <p>The number in parentheses is the track number in the backend. The other number is
     simply a result of it being an HTML list.</p>
+
+<p>
+    Due to the nature of the latter phases of the sync process, showing per track sync status
+    with online shops would require a fair amount of messy code and, thus, has not been
+    done.
+</p>
 
 <p style="margin-left:15px;">
     <strong style="color:green">green</strong> stuff is done <br/>

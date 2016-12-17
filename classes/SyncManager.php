@@ -262,6 +262,21 @@ class SyncManager {
         }, $this->music_store_products_to_update, $finishedUrl);
     }
 
+    public function forceShopifyUpdates($finishedUrl) {
+        $this->loopTilDoneStaticArray(function (MusicStoreProduct $musicStoreProduct) {
+            $this->recordReturnedProduct($musicStoreProduct, $this->shopifyApiClient->putProduct($musicStoreProduct->getShopifyProduct()));
+        }, $this->music_store_products_to_skip, $finishedUrl);
+    }
+
+    public function doShopifyDeletes($finishedUrl) {
+        $this->loopTilDone(function (Product $product) {
+            $this->shopifyApiClient->deleteProduct($product);
+            unset($this->remote_shopify_products[$product->id]);
+            $this->updateShopifyCache();
+        }, $this->shopify_products_to_delete, $finishedUrl);
+    }
+
+
     public function cacheRemoteFetchProducts() {
         $all = $this->fetchAppApiClient->getProducts(self::FETCH_PAGE_SIZE, 1);
 
@@ -328,7 +343,7 @@ class SyncManager {
         }, $this->local_fetch_create_products, $finishedUrl);
     }
 
-    public function dpFetchUpdates($finishedUrl) {
+    public function doFetchUpdates($finishedUrl) {
         $this->loopTilDoneStaticArray(function (EncodedAsset $encodedAsset) {
             $fetch_product = $encodedAsset->getFetchAppProduct();
             //var_dump($fetch_product);
@@ -345,6 +360,12 @@ class SyncManager {
         }, $this->local_fetch_update_products, $finishedUrl);
     }
 
+    public function doFetchDeletes($finishedUrl) {
+        $this->loopTilDone(function (FetchProduct $fetch_product) {
+            $rv = $fetch_product->delete();
+            unset($this->fetch_remote_products[$fetch_product->getSKU()]);
+        }, $this->remote_fetch_delete_products, $finishedUrl);
+    }
 
     private static function formattedMTime($filename) {
         return date('F d Y h:i a e', filemtime($filename));
