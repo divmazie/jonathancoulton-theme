@@ -36,19 +36,24 @@ switch(@$_GET['pipeline_stage']) {
         break;
 
     case 'shopify_create':
-        $syncMan->doShopifyCreates(status_message_loc("we create the products, for you!"));
+        $syncMan->doShopifyProductCreates(status_message_loc("we create the products, for you!"));
         break;
 
     case 'shopify_update':
-        $syncMan->doShopifyUpdates(status_message_loc("updates completed"));
+        $syncMan->doShopifyProductUpdates(status_message_loc("updates completed"));
         break;
 
     case 'shopify_force_update':
-        $syncMan->forceShopifyUpdates(status_message_loc("forced updates completed"));
+        $syncMan->forceShopifyProductUpdates(status_message_loc("forced updates completed"));
         break;
 
     case 'shopify_delete':
-        $syncMan->doShopifyDeletes(status_message_loc("shopify deletions completed (we think--maybe refresj the cache and check?)"));
+        $syncMan->doShopifyProductDeletes(status_message_loc("shopify deletions completed (we think--maybe refresj the cache and check?)"));
+        break;
+
+    case 'shopify_collections_cache':
+        $filename = $syncMan->cacheRemoteShopifyCustomCollections();
+        Util::redirect(status_message_loc("Remote Collections cached in $filename. Thx! "));
         break;
 
     case 'fetch_cache':

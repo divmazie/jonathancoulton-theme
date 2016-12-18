@@ -78,13 +78,14 @@
             {{ m.pipeline_button('s3', "Upload all the stuff we got", can_upload ) }}
 
         </li>
-        <li>Shopify Remote Cache
-            <p>Shopify is SLOWWW to talk to, so we have to take precautions to say as little as possible.
-                This pulls down the products and caches them locally so we can use that cache, rather than
+        <li>Shopify Product Cache
+            <p>Shopify is SLOWWW to talk to (pretty much makes us wait 500 ms between each call we make),
+                so we take precautions to say as little as possible. This pulls down the products and caches them
+                locally so we can use that cache, rather than
                 asking for it repeatedly.</p>
 
             {% if sync_man.remote_shopify_products_mtime %}
-                <p style="background-color: lightgreen;">loaded shopify cache
+                <p style="background-color: lightgreen;">loaded products cache
                     [{{ sync_man.remote_shopify_products_filename }}],
                     mtime: {{ sync_man.remote_shopify_products_mtime }} </p>
             {% endif %}
@@ -99,14 +100,42 @@
             {{ sync_man.music_store_products_to_update|length }} to update,
             {{ sync_man.music_store_products_to_skip|length }} up to date))
 
-            <p>Once everything is on s3, then we make sure our records with our store are all good.
-                Shopify pretty much makes us wait 500 ms between each call we make. We make one call
-                per product... so... you'll wait a bit.</p>
+            <p> We create a product for each track and each album.
+                We make one call per product... so... you'll wait a bit.</p>
 
             {{ m.pipeline_button('shopify_create', "Create Products", sync_man.music_store_products_to_create) }}
             {{ m.pipeline_button('shopify_update', "Update Products", sync_man.music_store_products_to_update) }}
             {{ m.pipeline_button('shopify_force_update', "Force Update Allegedly Up To Date Products", sync_man.music_store_products_to_skip) }}
             {{ m.pipeline_button('shopify_delete', "Delete extraneous products!", sync_man.shopify_products_to_delete) }}
+
+        </li>
+        <li>Shopify Collections Cache
+            <p>We place albums in collections at shopify to group the products together. This caches those results,
+                the next step syncs those results.</p>
+
+            {% if sync_man.remote_shopify_collections_mtime %}
+                <p style="background-color: lightgreen;">loaded collections cache
+                    [{{ sync_man.remote_shopify_collections_filename }}],
+                    mtime: {{ sync_man.remote_shopify_collections_mtime }} </p>
+            {% endif %}
+            {{ m.pipeline_button('shopify_collections_cache', "Cache it (or refresh the cache)", true ) }}
+
+        </li>
+
+        <li>Shopify Collections Sync
+            ({{ sync_man.remote_shopify_collections|length }} remote products
+            ({{ sync_man.remote_shopify_delete_collections|length }} to delete),
+            {{ sync_man.all_albums|length }} local products
+            ({{ sync_man.local_shopify_create_collections|length }} to create,
+            {{ sync_man.local_shopify_recreate_collections|length }} to update,
+            {{ sync_man.local_shopify_skip_collections|length }} up to date))
+
+            <p> We create one collection per album. This helps our front end store display that stuff...</p>
+
+            {{ m.pipeline_button('shopify_collections_create', "Create Collections", sync_man.local_shopify_create_collections) }}
+            {{ m.pipeline_button('shopify_collections_update', "Update Collections", sync_man.local_shopify_recreate_collections) }}
+            {{ m.pipeline_button('shopify_collections_force_update', "Force Update Allegedly Up To Date Collections", sync_man.local_shopify_skip_collections) }}
+            {{ m.pipeline_button('shopify_collections_delete', "Delete extraneous Collections!", sync_man.remote_shopify_delete_collections) }}
 
         </li>
         <li>Fetch remote cache

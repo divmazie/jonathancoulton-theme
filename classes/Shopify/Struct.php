@@ -79,7 +79,7 @@ abstract class Struct {
             if(property_exists(get_class($this), $propertyName)) {
                 $this->setProperty($propertyName, $property);
             } else {
-                throw new Exception('unanticipated property in response');
+                throw new Exception("unanticipated property [$propertyName][$property] in response");
             }
         }
     }
@@ -93,10 +93,6 @@ abstract class Struct {
         $obj = new static();
         $obj->setProperties($array);
         $obj->setParent($parent);
-
-        if(!$obj->id) {
-            throw new Exception('no id for resource');
-        }
 
         return $obj;
     }

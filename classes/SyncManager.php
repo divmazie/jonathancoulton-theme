@@ -4,12 +4,14 @@ namespace jct;
 
 use FetchApp\API\FetchApp;
 use GuzzleHttp\Client;
+use jct\Shopify\CustomCollection;
 use jct\Shopify\Product;
 use jct\Shopify\SynchronousAPIClient;
 use FetchApp\API\Product as FetchProduct;
 
 class SyncManager {
-    const SHOPIFY_REMOTE_CACHE_PREFIX = 'shopify_remote_products_cache';
+    const SHOPIFY_REMOTE_PRODUCT_CACHE_PREFIX = 'shopify_remote_products_cache';
+    const SHOPIFY_REMOTE_COLLECTION_CACHE_PREFIX = 'shopify_remote_collections_cache';
     const FETCH_CACHE_PREFIX = 'fetch_remote_products_cache';
     const FETCH_PAGE_SIZE = 10000;
 
@@ -39,7 +41,14 @@ class SyncManager {
         $fetch_remote_products,
         $local_fetch_create_products,
         $local_fetch_update_products,
-        $remote_fetch_delete_products;
+        $remote_fetch_delete_products,
+        $remote_shopify_collections_filename,
+        $remote_shopify_collections_mtime,
+        $remote_shopify_collections,
+        $local_shopify_create_collections,
+        $local_shopify_recreate_collections,
+        $local_shopify_skip_collections,
+        $remote_shopify_delete_collections;
 
     public function __construct(SynchronousAPIClient $shopifyApiClient, FetchApp $fetchApp, $tz = 'America/New_York') {
         $this->shopifyApiClient = $shopifyApiClient;
@@ -74,9 +83,14 @@ class SyncManager {
 
         $this->local_music_store_products = array_merge($this->all_albums, $this->all_tracks);
 
-        $this->loadShopifyRemoteCache();
+        $this->loadShopifyProductCache();
         if($this->remote_shopify_products_filename) {
             $this->sortShopifyProducts();
+        }
+
+        $this->loadShopifyCollectionsCache();
+        if($this->remote_shopify_collections_filename) {
+            $this->sortShopifyCollections();
         }
 
         $this->loadFetchRemoteCache();
@@ -183,22 +197,17 @@ class SyncManager {
             return $product->id;
         }, $this->remote_shopify_products), $this->remote_shopify_products);
 
-        return static::setFileCache($this->remote_shopify_products, self::SHOPIFY_REMOTE_CACHE_PREFIX);
+        return static::setFileCache($this->remote_shopify_products, self::SHOPIFY_REMOTE_PRODUCT_CACHE_PREFIX);
     }
 
-    private function updateShopifyCache() {
-        static::setFileCache($this->remote_shopify_products, self::SHOPIFY_REMOTE_CACHE_PREFIX);
+    private function updateShopifyProductCache() {
+        static::setFileCache($this->remote_shopify_products, self::SHOPIFY_REMOTE_PRODUCT_CACHE_PREFIX);
     }
 
-    public function deleteGarbage($finishedUrl) {
-        $this->loopTilDone(function (EncodedAsset $encodedAsset) {
-            $encodedAsset->deleteAttachment(true);
-        }, $this->garbage_attachments, $finishedUrl);
-    }
-
-    private function loadShopifyRemoteCache() {
+    private function loadShopifyProductCache() {
         $fileName = '';
-        $this->remote_shopify_products = static::getFileArrayCache(self::SHOPIFY_REMOTE_CACHE_PREFIX, $fileName);
+        $this->remote_shopify_products =
+            static::getFileArrayCache(self::SHOPIFY_REMOTE_PRODUCT_CACHE_PREFIX, $fileName);
 
         if($fileName) {
             $this->remote_shopify_products_filename = $fileName;
@@ -247,35 +256,92 @@ class SyncManager {
         $musicStoreProduct->getShopifySyncMetadata()->processAPIProductReturn($musicStoreProduct, $returnedProduct);
     }
 
-    public function doShopifyCreates($finishedUrl) {
+    public function doShopifyProductCreates($finishedUrl) {
         $this->loopTilDone(function (MusicStoreProduct $musicStoreProduct) {
             $returnedProduct = $this->shopifyApiClient->postProduct($musicStoreProduct->getShopifyProduct());
             $this->remote_shopify_products[$returnedProduct->id] = $returnedProduct;
-            $this->updateShopifyCache();
+            $this->updateShopifyProductCache();
             $this->recordReturnedProduct($musicStoreProduct, $returnedProduct);
         }, $this->music_store_products_to_create, $finishedUrl);
     }
 
-    public function doShopifyUpdates($finishedUrl) {
+    public function doShopifyProductUpdates($finishedUrl) {
         $this->loopTilDone(function (MusicStoreProduct $musicStoreProduct) {
             $this->recordReturnedProduct($musicStoreProduct, $this->shopifyApiClient->putProduct($musicStoreProduct->getShopifyProduct()));
         }, $this->music_store_products_to_update, $finishedUrl);
     }
 
-    public function forceShopifyUpdates($finishedUrl) {
+    public function forceShopifyProductUpdates($finishedUrl) {
         $this->loopTilDoneStaticArray(function (MusicStoreProduct $musicStoreProduct) {
             $this->recordReturnedProduct($musicStoreProduct, $this->shopifyApiClient->putProduct($musicStoreProduct->getShopifyProduct()));
         }, $this->music_store_products_to_skip, $finishedUrl);
     }
 
-    public function doShopifyDeletes($finishedUrl) {
+    public function doShopifyProductDeletes($finishedUrl) {
         $this->loopTilDone(function (Product $product) {
             $this->shopifyApiClient->deleteProduct($product);
             unset($this->remote_shopify_products[$product->id]);
-            $this->updateShopifyCache();
+            $this->updateShopifyProductCache();
         }, $this->shopify_products_to_delete, $finishedUrl);
     }
 
+    public function cacheRemoteShopifyCustomCollections() {
+        $this->remote_shopify_collections =
+            $this->shopifyApiClient->getAllCustomCollections();
+
+        // we only want ones with the custom suffix we are targetting
+        array_filter($this->remote_shopify_collections, function (CustomCollection $collection) {
+            return $collection->template_suffix === Album::ALBUM_SHOPIFY_COLLECTION_CUSTOM_SUFFIX;
+        });
+
+        // key by id
+        $this->remote_shopify_collections = array_combine(array_map(function (CustomCollection $collection) {
+            return $collection->id;
+        }, $this->remote_shopify_collections), $this->remote_shopify_collections);
+
+        return static::setFileCache($this->remote_shopify_collections, self::SHOPIFY_REMOTE_COLLECTION_CACHE_PREFIX);
+    }
+
+    private function updateShopifyCollectionsCache() {
+        static::setFileCache($this->remote_shopify_collections, self::SHOPIFY_REMOTE_COLLECTION_CACHE_PREFIX);
+    }
+
+    private function loadShopifyCollectionsCache() {
+        $fileName = '';
+        $this->remote_shopify_collections =
+            static::getFileArrayCache(self::SHOPIFY_REMOTE_COLLECTION_CACHE_PREFIX, $fileName);
+
+        if($fileName) {
+            $this->remote_shopify_collections_filename = $fileName;
+            $this->remote_shopify_collections_mtime = self::formattedMTime($this->remote_shopify_collections_filename);
+        }
+    }
+
+    public function sortShopifyCollections() {
+        // copy all to delete collection
+        // we'll unset the ones that have matches from here soon
+        $deleteCollection = $this->remote_shopify_collections;
+
+        foreach($this->all_albums as $album) {
+            /** @var Album $album */
+            $collection = $album->getShopifyCustomCollection();
+            if($collection->id && isset($this->remote_shopify_collections[$collection->id])) {
+                // if it has an id it has been synced before
+                if($album->getShopifySyncMetadata()->customCollectionHasChanged($album)) {
+                    $this->local_shopify_recreate_collections[] = $album;
+                } else {
+                    $this->local_shopify_skip_collections[] = $album;
+                }
+
+                unset($deleteCollection[$collection->id]);
+            } else {
+                // it does not exist and needs to be created
+                $this->local_shopify_create_collections[] = $album;
+            }
+        }
+
+        $this->remote_shopify_delete_collections = &$deleteCollection;
+    }
 
     public function cacheRemoteFetchProducts() {
         $all = $this->fetchAppApiClient->getProducts(self::FETCH_PAGE_SIZE, 1);
@@ -366,6 +432,14 @@ class SyncManager {
             unset($this->fetch_remote_products[$fetch_product->getSKU()]);
         }, $this->remote_fetch_delete_products, $finishedUrl);
     }
+
+
+    public function deleteGarbage($finishedUrl) {
+        $this->loopTilDone(function (EncodedAsset $encodedAsset) {
+            $encodedAsset->deleteAttachment(true);
+        }, $this->garbage_attachments, $finishedUrl);
+    }
+
 
     private static function formattedMTime($filename) {
         return date('F d Y h:i a e', filemtime($filename));

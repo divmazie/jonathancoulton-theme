@@ -127,7 +127,7 @@ class AlbumZipConfig extends EncodedAssetConfig {
     }
 
     /**
-     * @return AlbumZipConfig
+     * @return AlbumZipConfig[]
      */
     public static function getConfigsForAlbum(Album $album, $keyByName = false) {
         /** @var AlbumZipConfig[] $allZipConfigs */

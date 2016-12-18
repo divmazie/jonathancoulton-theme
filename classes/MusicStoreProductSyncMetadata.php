@@ -1,6 +1,7 @@
 <?php
 namespace jct;
 
+use jct\Shopify\CustomCollection;
 use jct\Shopify\Metafield;
 use jct\Shopify\Product;
 use jct\Shopify\ProductVariant;
@@ -14,6 +15,9 @@ class MusicStoreProductSyncMetadata {
     const METAFIELDS = 'metafields';
     const IMAGE = 'image';
     const VERSION_HASH = 'version_hash';
+
+    const COLLECTION = 'collection';
+
 
     // a hierarchical map of the various quantities we need to track...
     private $trackingArray = [];
@@ -39,6 +43,23 @@ class MusicStoreProductSyncMetadata {
         }
 
         $localMusicStoreProduct->setShopifySyncMetadata($this);
+    }
+
+    public function processAPICollectionReturn(Album $musicStoreAlbum, CustomCollection $returnedCollection) {
+        $this->trackingArray[self::COLLECTION][self::OBJECT_ID] = $returnedCollection->id;
+        $this->trackingArray[self::COLLECTION][self::VERSION_HASH] =
+            $this->versionHash($musicStoreAlbum->getShopifyCustomCollection());
+
+        $musicStoreAlbum->setShopifySyncMetadata($this);
+    }
+
+    public function getCustomCollectionID() {
+        return @$this->trackingArray[self::COLLECTION][self::OBJECT_ID];
+    }
+
+    public function customCollectionHasChanged(Album $forAlbum) {
+        return $this->versionHash($forAlbum->getShopifyCustomCollection()) !==
+               @$this->trackingArray[self::COLLECTION][self::VERSION_HASH];
     }
 
     public function getProductID() {

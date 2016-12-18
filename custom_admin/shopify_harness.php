@@ -41,9 +41,7 @@ use jct\Shopify\Product;
  */
 echo "<pre>";
 
-$apiClient = new SynchronousAPIClient(Util::get_theme_option('shopify_api_key'),
-                                      Util::get_theme_option('shopify_api_password'),
-                                      Util::get_theme_option('shopify_handle'));
+$apiClient = Util::get_shopify_api_client();
 
 
 //var_dump($otherClient->makeCall('admin/custom_collections'));
@@ -55,6 +53,9 @@ $apiClient = new SynchronousAPIClient(Util::get_theme_option('shopify_api_key'),
 
 //var_dump($apiClient->shopifyPagedGet('/admin/products/9133128710/metafields.json', ['metafield[owner_resource]' => 'product']));
 
+
+
+die();
 
 $remotepord = $apiClient->getAllProducts(['product_type' => MusicStoreProduct::DEFAULT_SHOPIFY_PRODUCT_TYPE]);
 //var_dump($remotepord);

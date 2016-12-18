@@ -97,6 +97,13 @@ class SynchronousAPIClient extends Client {
         return Product::instancesFromArray($allProducts);
     }
 
+    public function getAllCustomCollections($queryVars = [], $limitNumber = null) {
+        $allCollections =
+            $this->shopifyPagedGet('/admin/custom_collections.json', $queryVars, $limitNumber, $limitNumber ? 1 : null);
+
+        return CustomCollection::instancesFromArray($allCollections);
+    }
+
     /**
      * @param $endPoint
      * @param array $queryVars

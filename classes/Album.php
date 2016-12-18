@@ -2,7 +2,15 @@
 
 namespace jct;
 
+use jct\Shopify\CustomCollection;
+use jct\Shopify\Exception\Exception;
+use jct\Shopify\Image;
+use jct\Shopify\Product;
+
 class Album extends MusicStoreProduct {
+
+    const ALBUM_SHOPIFY_COLLECTION_CUSTOM_SUFFIX = 'album_collection';
+
     // meta fields acf will load (here for autocomplete purposes)
     public $album_artist, $album_price, $album_year, $album_genre, $album_art, $album_comment, $album_sort_order, $album_description, $shopify_collection_id, $bonus_assets, $show_album_in_store;
 
@@ -79,6 +87,7 @@ class Album extends MusicStoreProduct {
                                       ], BonusAsset::class);
     }
 
+    /** @return AlbumZipConfig[] */
     public function getAlbumZipConfigs() {
         return AlbumZipConfig::getConfigsForAlbum($this);
     }
@@ -103,6 +112,33 @@ class Album extends MusicStoreProduct {
                        $this->getDownloadStoreTitle(),
                        $this->getAlbumArtist(),
                        $this->getAlbumYear());
+    }
+
+    /** @return CustomCollection */
+    public function getShopifyCustomCollection() {
+        $collection = new CustomCollection();
+
+        $collection->id = $this->getShopifySyncMetadata()->getCustomCollectionID();
+        $collection->title = $this->getTitle();
+        $collection->body_html = "All products in " . $this->getDownloadStoreBodyHtml();
+        $collection->template_suffix = self::ALBUM_SHOPIFY_COLLECTION_CUSTOM_SUFFIX;
+        $image = new Image();
+        $image->src = $this->getCoverArt()->getURL();
+        $collection->image = $image;
+        $collection->sort_order = 'manual';
+
+        $collectProducts = array_merge([$this->getShopifyProduct()], array_map(function (Track $track) {
+            return $this->getShopifyProduct();
+        }, $this->getAlbumTracks()));
+
+        // syntax for this bad boy https://help.shopify.com/api/reference/customcollection#update
+        $collectArray = array_map(function (Product $product, $position) {
+            return ['product_id' => $product->id, 'position' => $position];
+        }, $collectProducts, range(1, count($collectProducts)));
+
+        $collection->collects = $collectArray;
+
+        return $collection;
     }
 
 
