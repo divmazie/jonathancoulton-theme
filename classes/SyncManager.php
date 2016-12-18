@@ -256,6 +256,10 @@ class SyncManager {
         $musicStoreProduct->getShopifySyncMetadata()->processAPIProductReturn($musicStoreProduct, $returnedProduct);
     }
 
+    public function recordReturnedCollection(Album $album, CustomCollection $customCollection) {
+        $album->getShopifySyncMetadata()->processAPICollectionReturn($album, $customCollection);
+    }
+
     public function doShopifyProductCreates($finishedUrl) {
         $this->loopTilDone(function (MusicStoreProduct $musicStoreProduct) {
             $returnedProduct = $this->shopifyApiClient->postProduct($musicStoreProduct->getShopifyProduct());
@@ -290,9 +294,10 @@ class SyncManager {
             $this->shopifyApiClient->getAllCustomCollections();
 
         // we only want ones with the custom suffix we are targetting
-        array_filter($this->remote_shopify_collections, function (CustomCollection $collection) {
-            return $collection->template_suffix === Album::ALBUM_SHOPIFY_COLLECTION_CUSTOM_SUFFIX;
-        });
+        $this->remote_shopify_collections =
+            array_filter($this->remote_shopify_collections, function (CustomCollection $collection) {
+                return $collection->template_suffix === Album::ALBUM_SHOPIFY_COLLECTION_CUSTOM_SUFFIX;
+            });
 
         // key by id
         $this->remote_shopify_collections = array_combine(array_map(function (CustomCollection $collection) {
@@ -342,6 +347,38 @@ class SyncManager {
 
         $this->remote_shopify_delete_collections = &$deleteCollection;
     }
+
+    public function doCollectionPostAction($finishedUrl, $albumArray, $deleteFirst = false, $staticArray = false) {
+        $callable = function (Album $album) use ($deleteFirst) {
+            if($deleteFirst) {
+                $this->shopifyApiClient->deleteCollection($album->getShopifyCustomCollection());
+                unset($this->remote_shopify_collections[$album->getShopifyCustomCollection()->id]);
+            }
+            $returnedCollection = $this->shopifyApiClient->postCustomCollection($album->getShopifyCustomCollection());
+            $this->recordReturnedCollection($album, $returnedCollection);
+
+            $this->remote_shopify_collections[$returnedCollection->id] = $returnedCollection;
+            $this->updateShopifyCollectionsCache();
+        };
+
+        if($staticArray) {
+            // this option will be used for force update, where the list of products
+            // won't change
+            $this->loopTilDoneStaticArray($callable, $albumArray, $finishedUrl);
+        } else {
+            $this->loopTilDone($callable, $albumArray, $finishedUrl);
+        }
+    }
+
+
+    public function doShopifyCollectionDeletes($finishedUrl) {
+        $this->loopTilDone(function (CustomCollection $customCollection) {
+            $this->shopifyApiClient->deleteCollection($customCollection);
+            unset($this->remote_shopify_collections[$customCollection->id]);
+            $this->updateShopifyCollectionsCache();
+        }, $this->remote_shopify_delete_collections, $finishedUrl);
+    }
+
 
     public function cacheRemoteFetchProducts() {
         $all = $this->fetchAppApiClient->getProducts(self::FETCH_PAGE_SIZE, 1);

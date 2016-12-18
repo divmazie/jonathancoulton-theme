@@ -5,6 +5,7 @@ namespace jct;
 use jct\Shopify\CustomCollection;
 use jct\Shopify\Exception\Exception;
 use jct\Shopify\Image;
+use jct\Shopify\Metafield;
 use jct\Shopify\Product;
 
 class Album extends MusicStoreProduct {
@@ -120,25 +121,40 @@ class Album extends MusicStoreProduct {
 
         $collection->id = $this->getShopifySyncMetadata()->getCustomCollectionID();
         $collection->title = $this->getTitle();
-        $collection->body_html = "All products in " . $this->getDownloadStoreBodyHtml();
+        $collection->body_html = $this->getAlbumDescription();
         $collection->template_suffix = self::ALBUM_SHOPIFY_COLLECTION_CUSTOM_SUFFIX;
+
+        // i know it's a bit weird to attach src in the other function and base64 encode it here
+        // but the api dies when you give it bad links (which dev links ARE)... so
+        // given the smaller number of calls needed here, this just wasn't a bad fix
         $image = new Image();
-        $image->src = $this->getCoverArt()->getURL();
+        $image->attachment = base64_encode(file_get_contents($this->getCoverArt()->getPath()));
         $collection->image = $image;
         $collection->sort_order = 'manual';
 
         $collectProducts = array_merge([$this->getShopifyProduct()], array_map(function (Track $track) {
-            return $this->getShopifyProduct();
+            return $track->getShopifyProduct();
         }, $this->getAlbumTracks()));
 
         // syntax for this bad boy https://help.shopify.com/api/reference/customcollection#update
         $collectArray = array_map(function (Product $product, $position) {
-            return ['product_id' => $product->id, 'position' => $position];
+            return ['product_id' => $product->id, 'sort_value' => $position];
         }, $collectProducts, range(1, count($collectProducts)));
 
         $collection->collects = $collectArray;
 
+        $collection->metafields = $this->getShopifyCollectionMetafields();
+
         return $collection;
+    }
+
+    public function getShopifyCollectionMetafields() {
+        $sort_order = new Metafield();
+        $sort_order->key = 'album_sort_order';
+        $sort_order->value = $this->getAlbumSortOrder();
+        $sort_order->useInferredValueType();
+
+        return [$sort_order];
     }
 
 

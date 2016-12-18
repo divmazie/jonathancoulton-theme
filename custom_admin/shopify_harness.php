@@ -54,6 +54,7 @@ $apiClient = Util::get_shopify_api_client();
 //var_dump($apiClient->shopifyPagedGet('/admin/products/9133128710/metafields.json', ['metafield[owner_resource]' => 'product']));
 
 
+var_dump($apiClient->shopifyPagedGet('/admin/custom_collections.json'));
 
 die();
 

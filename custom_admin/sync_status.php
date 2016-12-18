@@ -56,6 +56,35 @@ switch(@$_GET['pipeline_stage']) {
         Util::redirect(status_message_loc("Remote Collections cached in $filename. Thx! "));
         break;
 
+    case 'shopify_collections_create':
+        $syncMan->doCollectionPostAction(
+            status_message_loc("we create the collections, for you!"),
+            $syncMan->local_shopify_create_collections,
+            false, false
+        );
+        break;
+
+    case 'shopify_collections_update':
+        $syncMan->doCollectionPostAction(
+            status_message_loc("we updated (recreated) those collections, for you!"),
+            $syncMan->local_shopify_recreate_collections,
+            true, false
+        );
+        break;
+
+    case 'shopify_collections_force_update':
+        $syncMan->doCollectionPostAction(
+            status_message_loc("we force recreated the specified collections, for you!"),
+            $syncMan->local_shopify_skip_collections,
+            true, true
+        );
+        break;
+
+    case 'shopify_collections_delete':
+        $syncMan->doShopifyCollectionDeletes(status_message_loc("we deleted the collections, for you!"));
+        break;
+
+
     case 'fetch_cache':
         $filename = $syncMan->cacheRemoteFetchProducts();
         Util::redirect(status_message_loc("Fetch cached in $filename. Thx!"));

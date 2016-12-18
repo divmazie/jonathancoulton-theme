@@ -9,6 +9,8 @@ class Image extends Struct {
         $product_id,
         // url
         $src,
+        $attachment,
+
 
         // date time
         $created_at,
@@ -22,11 +24,11 @@ class Image extends Struct {
 
 
     protected function postProperties() {
-        return ['src'];
+        return ['src', 'attachment'];
     }
 
     protected function putProperties() {
-        return ['id', 'src'];
+        return ['id', 'src', 'attachment'];
     }
 
 }

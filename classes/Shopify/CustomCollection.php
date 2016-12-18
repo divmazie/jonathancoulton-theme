@@ -2,6 +2,8 @@
 
 namespace jct\Shopify;
 
+use jct\Shopify\Exception\Exception;
+
 class CustomCollection extends Struct {
     public
         $title,
@@ -10,6 +12,7 @@ class CustomCollection extends Struct {
         $template_suffix,
         $image,
         $collects = [],
+        $metafields = [],
 
         // unused/shopify default
         $handle,
@@ -19,11 +22,12 @@ class CustomCollection extends Struct {
 
 
     protected function postProperties() {
-        return ['title', 'body_html', 'sort_order', 'template_suffix', 'image'];
+        // post appears not to *work* if you attach collects...
+        return ['title', 'body_html', 'template_suffix', 'image', 'metafields', 'collects', 'sort_order'];
     }
 
     protected function putProperties() {
-        array_merge(['id'], $this->postProperties());
+        throw new Exception('not implemented');
     }
 
 

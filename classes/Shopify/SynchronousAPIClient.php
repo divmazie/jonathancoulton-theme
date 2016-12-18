@@ -64,10 +64,21 @@ class SynchronousAPIClient extends Client {
     }
 
     /**
-     * @return Product
+     * @return CustomCollection
      */
+    public function putCustomCollection(CustomCollection $customCollection) {
+        $putProduct =
+            Product::instanceFromArray($this->shopifyPut(sprintf('admin/custom_collections/%d.json', $customCollection->id), ['product' => $customCollection->putArray()]));
+
+        return $putProduct;
+    }
+
     public function deleteProduct(Product $product) {
         $this->shopifyRateLimitedRequest('DELETE', sprintf('admin/products/%d.json', $product->id));
+    }
+
+    public function deleteCollection(CustomCollection $customCollection) {
+        $this->shopifyRateLimitedRequest('DELETE', sprintf('admin/custom_collections/%d.json', $customCollection->id));
     }
 
 
@@ -79,8 +90,16 @@ class SynchronousAPIClient extends Client {
         return $postedProduct;
     }
 
+    /** @return CustomCollection */
+    public function postCustomCollection(CustomCollection $customCollection) {
+        $postedCollection =
+            CustomCollection::instanceFromArray($this->shopifyPost('admin/custom_collections.json', ['custom_collection' => $customCollection->postArray()]));
+        return $postedCollection;
+    }
+
     private function shopifyPost($endPoint, $array) {
-        return $this->shopifyRateLimitedRequest('POST', $endPoint, ['json' => $array]);
+        $response = $this->shopifyRateLimitedRequest('POST', $endPoint, ['json' => $array]);
+        return $response;
     }
 
     /** @return Product */
