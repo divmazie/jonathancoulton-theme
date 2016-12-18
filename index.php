@@ -13,41 +13,32 @@
  * @since   Timber 0.1
  */
 
-if ( !class_exists( 'Timber' ) ) {
-    echo 'Timber not activated. Make sure you activate the plugin in <a href="/wp-admin/plugins.php#timber">/wp-admin/plugins.php</a>';
-    return;
+namespace jct;
+
+if(!class_exists('Timber\Timber')) {
+    die('you need to install the timber plugin for this theme to render things');
 }
+
+use Timber\Post;
+use Timber\Timber;
+
 $context = Timber::get_context();
-include_once(get_template_directory().'/include/sitewide_context.php');
-$context['post'] = new TimberPost();
+$context['post'] = new Post();
 $context['showcase_tiles'] = Timber::get_posts('post_type=showcase_tile');
-$context['blurb_header'] = get_field('front_page_blurb_header','options');
-$context['blurb_content'] = get_field('front_page_blurb_content','options');
-$context['twitter'] = include(get_template_directory().'/config/twitter.php');
-$context['instagram'] = include(get_template_directory().'/config/instagram.php');
-$context['facebook_link'] = get_field('facebook_link','options');
-$apiKey = get_field('shopify_api_key','options');
-$apiPassword = get_field('shopify_api_password','options');
-$handle = get_field('shopify_handle','options');
-$shopify = new jct\ShopifyAPIClient($apiKey, $apiPassword, $handle);
-$store = $shopify->getStoreContext();
-if (is_array($store)) {
-    foreach ($store as $category) {
-        if ($category['shopify_type'] == "Music download") {
-            $context['albums'] = $category['products'];
-        }
-    }
-}
-$context['store'] = $store;
-$bandsintown = get_transient('bandsintown');
-if (!$bandsintown) {
-    $bandsintown = json_decode(file_get_contents("http://api.bandsintown.com/artists/jonathancoulton/events.json?date=2015-01-01,2017-01-31")); // to test w/ old shows
-    set_transient('bandsintown',$bandsintown,600);
+$context['blurb_header'] = Util::get_theme_option('front_page_blurb_header');
+$context['blurb_content'] = Util::get_theme_option('front_page_blurb_content');
+
+$bandsintown = get_site_transient('bandsintown');
+if(!$bandsintown) {
+    $bandsintown =
+        // checkit for lols https://www.bandsintown.com/api/authentication
+        json_decode(file_get_contents("http://api.bandsintown.com/artists/jonathancoulton/events.json?api_version=2.0&app_id=jonathancoulton.com")); // to test w/ old shows
+    set_site_transient('bandsintown', $bandsintown, 600);
 }
 $context['bandsintown'] = $bandsintown;
 
-$templates = array( 'index.twig' );
-if ( is_home() ) {
-    array_unshift( $templates, 'home.twig' );
+$templates = ['index.twig'];
+if(is_home()) {
+    array_unshift($templates, 'home.twig');
 }
-Timber::render( $templates, $context );
+Timber::render($templates, $context);

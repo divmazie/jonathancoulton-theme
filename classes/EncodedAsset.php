@@ -11,7 +11,7 @@ abstract class EncodedAsset extends WPAttachment {
     const META_CONFIG_PAYLOAD = 'jct_asset_config_payload';
     const META_S3_URL = 'jct_s3_url';
     const META_S3_HASH = 'jct_s3_hash';
-
+    const FETCH_ID_PREFIX = 'jct_auto_prod:';
 
     private $awsUrl;
     private $createdTime, $uploadedTime;
@@ -93,7 +93,7 @@ abstract class EncodedAsset extends WPAttachment {
 
     public function getFetchAppProduct() {
         $fetch_product = new FetchProduct();
-        $fetch_product->setProductID($this->getShopifyProductVariantSKU());
+        $fetch_product->setProductID(self::FETCH_ID_PREFIX . $this->getShopifyProductVariantSKU());
         $fetch_product->setSKU($this->getShopifyProductVariantSKU());
         $fetch_product->setName(sprintf('%s (%s)', $this->getParentMusicStoreProduct()->getDownloadStoreTitle(),
                                         $this->getEncodedAssetConfig()->getConfigName()));

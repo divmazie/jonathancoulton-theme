@@ -8,15 +8,19 @@
  * @subpackage  Timber
  * @since    Timber 0.1
  */
+namespace jct;
+
+use Timber\Helper;
+use Timber\Post;
+use Timber\Timber;
 
 $context = Timber::get_context();
-include_once(get_template_directory().'/include/sitewide_context.php');
-$post = Timber::query_post();
+$post = new Post();
 $context['post'] = $post;
-$context['comment_form'] = TimberHelper::get_comment_form();
+$context['comment_form'] = Helper::get_comment_form();
 
-if ( post_password_required( $post->ID ) ) {
-	Timber::render( 'single-password.twig', $context );
+if(post_password_required($post->ID)) {
+    Timber::render('single-password.twig', $context);
 } else {
-	Timber::render( array( 'single-' . $post->ID . '.twig', 'single-' . $post->post_type . '.twig', 'single.twig' ), $context );
+    Timber::render(['single-' . $post->ID . '.twig', 'single-' . $post->post_type . '.twig', 'single.twig'], $context);
 }

@@ -386,8 +386,12 @@ class SyncManager {
         // key by sku
         $cacheArray = [];
         foreach($all as &$product) {
-            $product = FetchProductUtil::makeSerializable($product);
-            $cacheArray[$product->getSKU()] = $product;
+            // if the product id indicates that this is one of ours, include it
+            // otherwise, drop it
+            if(strpos($product->getProductID(), EncodedAsset::FETCH_ID_PREFIX) === 0) {
+                $product = FetchProductUtil::makeSerializable($product);
+                $cacheArray[$product->getSKU()] = $product;
+            }
         }
 
         $this->fetch_remote_products = &$cacheArray;

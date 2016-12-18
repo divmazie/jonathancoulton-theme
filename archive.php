@@ -14,6 +14,10 @@
  * @since   Timber 0.2
  */
 
+namespace jct;
+
+use Timber\Timber;
+
 $templates = array( 'archive.twig', 'index.twig' );
 
 $data = Timber::get_context();

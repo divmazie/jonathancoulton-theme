@@ -101,6 +101,7 @@ class Util {
         /** @noinspection PhpUndefinedFunctionInspection */
         static $all_options = null;
         if(!$all_options) {
+            /** @noinspection PhpUndefinedFunctionInspection */
             $all_options = get_fields('options');
         }
 

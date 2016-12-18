@@ -21,36 +21,35 @@
  * @since    Timber 0.1
  */
 
+namespace jct;
+
+use Timber\Post;
+use Timber\Timber;
+
 $context = Timber::get_context();
-include_once(get_template_directory().'/include/sitewide_context.php');
-$post = new TimberPost();
+$post = new Post();
 $context['post'] = $post;
-if ($post->slug == "faq") {
+
+if($post->slug == "faq") {
     $context['faqs'] = Timber::get_posts('post_type=faq&numberposts=-1');
 }
-if ($post->slug == "store") {
-    $apiKey = get_field('shopify_api_key','options');
-    $apiPassword = get_field('shopify_api_password','options');
-    $handle = get_field('shopify_handle','options');
-    $shopify = new jct\ShopifyAPIClient($apiKey, $apiPassword, $handle);
-    $context['store'] = $shopify->getStoreContext();
+
+if($post->slug == "store") {
+    $context['store'] = 'boop';
     $context['thisisthestore'] = true;
 }
-if ($post->slug == 'news') {
+
+if($post->slug == 'news') {
     global $paged;
-    if (!isset($paged) || !$paged){
+    if(!isset($paged) || !$paged) {
         $paged = 1;
     }
-    $args = array(
-        'post_type' => 'post',
-        'posts_per_page' => 4,
-        'paged' => $paged
-    );
-    query_posts($args);
-    $context['posts'] = Timber::get_posts();
+    $context['posts'] = Util::get_posts_cached([
+                                                   'post_type'      => 'post',
+                                                   'posts_per_page' => 4,
+                                                   'paged'          => $paged,
+                                               ], JCTPost::class);
     $context['pagination'] = Timber::get_pagination();
-    $context['twitter'] = include(get_template_directory().'/config/twitter.php');
-    $context['instagram'] = include(get_template_directory().'/config/instagram.php');
-    $context['facebook_link'] = get_field('facebook_link','options');
+
 }
-Timber::render( array( 'page-' . $post->post_name . '.twig', 'page.twig' ), $context );
+Timber::render(['page-' . $post->post_name . '.twig', 'page.twig'], $context);
