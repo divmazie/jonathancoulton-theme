@@ -11,7 +11,6 @@ abstract class EncodedAsset extends WPAttachment {
     const META_CONFIG_PAYLOAD = 'jct_asset_config_payload';
     const META_S3_URL = 'jct_s3_url';
     const META_S3_HASH = 'jct_s3_hash';
-    const FETCH_ID_PREFIX = 'jct_auto_prod:';
 
     private $awsUrl;
     private $createdTime, $uploadedTime;
@@ -32,7 +31,7 @@ abstract class EncodedAsset extends WPAttachment {
         return substr($this->getUniqueKey(), 0, 7);
     }
 
-    abstract public function getShopifyProductVariantSKU();
+    abstract public function getShopifyAndFetchSKU();
 
     abstract public function getShopifyProductVariantTitle();
 
@@ -93,22 +92,25 @@ abstract class EncodedAsset extends WPAttachment {
 
     public function getFetchAppProduct() {
         $fetch_product = new FetchProduct();
-        $fetch_product->setProductID(self::FETCH_ID_PREFIX . $this->getShopifyProductVariantSKU());
-        $fetch_product->setSKU($this->getShopifyProductVariantSKU());
-        $fetch_product->setName(sprintf('%s (%s)', $this->getParentMusicStoreProduct()->getDownloadStoreTitle(),
-                                        $this->getEncodedAssetConfig()->getConfigName()));
+        $fetch_product->setProductID($this->getShopifyAndFetchSKU());
+        $fetch_product->setSKU($this->getShopifyAndFetchSKU());
+        $fetch_product->setName($this->getFetchAppName());
         $fetch_product->setDescription($this->getParentMusicStoreProduct()->getDownloadStoreBodyHtml());
         $fetch_product->setPrice($this->getParentMusicStoreProduct()->getPrice());
         $fetch_product->setCurrency(Currency::USD);
-        FetchProductUtil::setUrls($fetch_product, $this->getFetchAppUrlsArray());
 
         return $fetch_product;
     }
 
-    public function getFetchAppUrlsArray() {
-        return [["url" => $this->getS3Url(), "name" => "audio"]];
+    public function getFetchAppName($withExtension = false) {
+        return sprintf('%s (%s)', $this->getParentMusicStoreProduct()->getDownloadStoreTitle(),
+                       $this->getEncodedAssetConfig()->getConfigName())
+               . ($withExtension ? '.' . $this->getEncodedAssetConfig()->getFileExtension() : '');
     }
 
+    public function getFetchAppUrlsArray() {
+        return [["url" => $this->getS3Url(), "name" => $this->getFetchAppName(true)]];
+    }
 
     public static function createFromTempFile($tempFilePath, EncodedAssetConfig $encodedAssetConfig) {
         /** @noinspection PhpUndefinedFunctionInspection */

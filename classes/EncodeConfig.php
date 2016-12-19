@@ -41,8 +41,9 @@ class EncodeConfig extends EncodedAssetConfig {
     }
 
     public function getUploadRelativeStorageDirectory() {
-        return sprintf('%s/%s', static::BASE_UPLOADS_FOLDER,
-                       $this->getParentTrack()->getAlbum()->getFilenameFriendlyTitle());
+        return sprintf('%s/%s/%s', static::BASE_UPLOADS_FOLDER,
+                       $this->getParentTrack()->getAlbum()->getFilenameFriendlyTitle(),
+                       $this->getEncodeFormat());
     }
 
     /**
@@ -83,7 +84,9 @@ class EncodeConfig extends EncodedAssetConfig {
                 'artist'       => $parent->getTrackArtist(),
                 'comment'      => $parent->getTrackComment(),
                 'genre'        => $parent->getTrackGenre(),
+                'date'         => $parent->getTrackYear(),
                 'filename'     => $forUseInUniqueKey ? '' : $this->getConfigUniqueFilename(),
+                'encoded_by'   => 'jonathancoulton.com',
             ],
         ];
         if($this->getFfmpegFlags()) {

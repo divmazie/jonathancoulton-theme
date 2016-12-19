@@ -27,7 +27,7 @@ abstract class Struct {
         // we get back the object vars that are not null that are in the VERB array
             array_filter(get_object_vars($this), function ($v) {
                 // allow 0 value through
-                return $v || is_int($v);
+                return !is_null($v);
             }),
             array_combine(call_user_func($callable), call_user_func($callable))
         );

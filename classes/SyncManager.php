@@ -5,6 +5,7 @@ namespace jct;
 use FetchApp\API\FetchApp;
 use GuzzleHttp\Client;
 use jct\Shopify\CustomCollection;
+use jct\Shopify\Metafield;
 use jct\Shopify\Product;
 use jct\Shopify\SynchronousAPIClient;
 use FetchApp\API\Product as FetchProduct;
@@ -25,6 +26,7 @@ class SyncManager {
         $all_zips,
         $pending_zips,
         $uploadable_assets,
+        $uploadable_asset_skus,
         $unuploaded_assets,
         $uploaded_assets,
         $garbage_attachments,
@@ -41,16 +43,23 @@ class SyncManager {
         $fetch_remote_products,
         $local_fetch_create_products,
         $local_fetch_update_products,
-        $remote_fetch_delete_products,
+        // currently unused... no good way to sort
+        // fetch products that are generated vs not
+        $remote_fetch_delete_products = [],
         $remote_shopify_collections_filename,
         $remote_shopify_collections_mtime,
         $remote_shopify_collections,
         $local_shopify_create_collections,
         $local_shopify_recreate_collections,
         $local_shopify_skip_collections,
-        $remote_shopify_delete_collections;
+        $remote_shopify_delete_collections,
+        $store_headers_all,
+        $store_headers_to_display,
+        $store_headers_to_hide,
+        $store_category_freshness_indicator;
 
     public function __construct(SynchronousAPIClient $shopifyApiClient, FetchApp $fetchApp, $tz = 'America/New_York') {
+
         $this->shopifyApiClient = $shopifyApiClient;
         $this->fetchAppApiClient = $fetchApp;
 
@@ -69,8 +78,10 @@ class SyncManager {
         $this->pending_zips = AlbumZipConfig::getPending();
 
         $this->uploadable_assets = array_merge(Encode::getAll(), AlbumZip::getAll());
+        $this->uploadable_asset_skus = [];
         foreach($this->uploadable_assets as $uploadable_asset) {
             /** @var EncodedAsset $uploadable_asset */
+            $this->uploadable_asset_skus[] = $uploadable_asset->getShopifyAndFetchSKU();
             if($uploadable_asset->isUploadedToS3()) {
                 $this->uploaded_assets[] = $uploadable_asset;
             } else {
@@ -83,22 +94,33 @@ class SyncManager {
 
         $this->local_music_store_products = array_merge($this->all_albums, $this->all_tracks);
 
-        $this->loadShopifyProductCache();
-        if($this->remote_shopify_products_filename) {
-            $this->sortShopifyProducts();
-        }
+        if($this->can_sync_remote()) {
+            $this->loadShopifyProductCache();
+            if($this->remote_shopify_products_filename) {
+                $this->sortShopifyProducts();
+            }
 
-        $this->loadShopifyCollectionsCache();
-        if($this->remote_shopify_collections_filename) {
-            $this->sortShopifyCollections();
-        }
+            $this->loadShopifyCollectionsCache();
+            if($this->remote_shopify_collections_filename) {
+                $this->sortShopifyCollections();
+            }
 
-        $this->loadFetchRemoteCache();
-        if($this->fetch_remote_products_filename) {
-            $this->sortFetchProducts();
+            $this->loadFetchRemoteCache();
+            if($this->fetch_remote_products_filename) {
+                $this->sortFetchProducts();
+            }
+        } else {
+            self::clearCaches();
         }
+        $this->sortStoreHeaders();
     }
 
+
+    public function can_sync_remote() {
+        return !$this->pending_zips &&
+               !$this->pending_encodes &&
+               !$this->unuploaded_assets;
+    }
 
     public static function optimizeQueries() {
         // basically this will get everything we'll need in a few
@@ -386,10 +408,8 @@ class SyncManager {
         // key by sku
         $cacheArray = [];
         foreach($all as &$product) {
-            // if the product id indicates that this is one of ours, include it
-            // otherwise, drop it
-            if(strpos($product->getProductID(), EncodedAsset::FETCH_ID_PREFIX) === 0) {
-                $product = FetchProductUtil::makeSerializable($product);
+            // if this is one of ours, include it
+            if(in_array($product->getSKU(), $this->uploadable_asset_skus)) {
                 $cacheArray[$product->getSKU()] = $product;
             }
         }
@@ -419,7 +439,7 @@ class SyncManager {
             $local_skus = [];
             foreach($this->uploadable_assets as $uploadable_asset) {
                 /** @var EncodedAsset $uploadable_asset */
-                $sku = $uploadable_asset->getShopifyProductVariantSKU();
+                $sku = $uploadable_asset->getShopifyAndFetchSKU();
                 $local_skus[] = $sku;
                 if(isset($this->fetch_remote_products[$sku])) {
                     // exists... update it
@@ -430,17 +450,16 @@ class SyncManager {
                 }
             }
 
-            $this->remote_fetch_delete_products =
-                array_diff_key($this->fetch_remote_products, array_combine($local_skus, $local_skus));
+            //   $this->remote_fetch_delete_products =
+            //     array_diff_key($this->fetch_remote_products, array_combine($local_skus, $local_skus));
         }
     }
 
     public function doFetchCreates($finishedUrl) {
         $this->loopTilDone(function (EncodedAsset $encodedAsset) {
             $fetch_product = $encodedAsset->getFetchAppProduct();
-            $rv = $fetch_product->create([]);
+            $rv = $fetch_product->create([], $encodedAsset->getFetchAppUrlsArray());
             if($rv === true) {
-                $fetch_product = FetchProductUtil::makeSerializable($fetch_product);
                 $this->fetch_remote_products[$fetch_product->getSKU()] = $fetch_product;
             } else {
                 var_dump($rv);
@@ -455,9 +474,8 @@ class SyncManager {
             $fetch_product = $encodedAsset->getFetchAppProduct();
             //var_dump($fetch_product);
             //var_dump($this->fetch_remote_products[$fetch_product->getSKU()]);
-            $rv = $fetch_product->update($encodedAsset->getFetchAppUrlsArray());
+            $rv = $fetch_product->update([], $encodedAsset->getFetchAppUrlsArray());
             if($rv === true) {
-                $fetch_product = FetchProductUtil::makeSerializable($fetch_product);
                 $this->fetch_remote_products[$fetch_product->getSKU()] = $fetch_product;
             } else {
                 var_dump($rv);
@@ -479,6 +497,73 @@ class SyncManager {
         $this->loopTilDone(function (EncodedAsset $encodedAsset) {
             $encodedAsset->deleteAttachment(true);
         }, $this->garbage_attachments, $finishedUrl);
+    }
+
+    public function sortStoreHeaders() {
+        $this->store_headers_all = Util::get_theme_option('store_categories');
+        $store_types_to_fetch = [];
+        // only get the store headers we are supposed to display
+        for($i = 0; $i < count($this->store_headers_all); $i++) {
+            $store_header = $this->store_headers_all[$i];
+            // add in some keys that markup uses
+            $store_header['slug'] = $i === 0 ? 'downloads' : Util::slugify($store_header['display_name']);
+            $store_header['name'] = $store_header['display_name'];
+            if($i === 0 || $store_header['display']) {
+                $this->store_headers_to_display[] = $store_header;
+                if($i > 0) {
+                    // we don't fetch download store information--just for other
+                    // categories
+                    $store_types_to_fetch[] = $store_header['shopify_type'];
+                }
+            } else {
+                $this->store_headers_to_hide[] = $store_header;
+            }
+        }
+        $this->store_category_freshness_indicator = md5(serialize($store_types_to_fetch));
+    }
+
+    public function buildMusicStoreLockFile() {
+        $lockArray = [];
+        $lockArray['category_freshness'] = $this->store_category_freshness_indicator;
+        $lockArray['store_headers'] = $this->store_headers_to_display;
+
+        $lockArray['download_store']['header'] = $this->store_headers_to_display[0];
+        // e.g. {id: 9146558214, url: 'http://192.168....mp3', title: 'Test Track'}
+        $lockArray['download_store']['playlist'] = array_map(function (Track $track) {
+            $product = $track->getShopifyProduct();
+            return [
+                'id'    => $product->id,
+                'url'   => $track->getEncodeConfigByName(Track::PLAYER_ENCODE_CONFIG_NAME)->getEncode()->getURL(),
+                'title' => $product->title,
+            ];
+        }, $this->all_tracks);
+        $lockArray['download_store']['collections'] = array_map(function (Album $album) {
+            return [
+                'collection' => $album->getShopifyCustomCollection()->putArray(),
+                'products'   => array_map(function (Product $product) {
+                    // key these by metafield key
+
+                    $product->metafields = array_combine(array_map(function (Metafield $metafield) {
+                        return $metafield->key;
+                    }, $product->metafields), $product->metafields);
+
+                    return $product->putArray();
+                }, $album->getShopifyCollectionProducts()),
+            ];
+        }, $this->all_albums);
+        /*
+                for($i = 1; $i < count($this->store_headers_to_display); $i++) {
+                    $header = $this->store_headers_to_display[$i];
+                    $lockArray['other_stores'][] = [
+                        'header'   => $header,
+                        'products' => array_map(function (Product $product) {
+                            return $product->putArray();
+                        }, $this->shopifyApiClient->getAllProducts(['product_type' => $header['shopify_type']])),
+                    ];
+                }*/
+        return json_encode($lockArray, JSON_PRETTY_PRINT | JSON_OBJECT_AS_ARRAY);
+
+        //die();
     }
 
 
@@ -521,6 +606,20 @@ class SyncManager {
 
     private static function getTempBaseDir() {
         return sys_get_temp_dir();
+    }
+
+    private static function clearCaches() {
+        foreach([
+                    self::SHOPIFY_REMOTE_COLLECTION_CACHE_PREFIX,
+                    self::SHOPIFY_REMOTE_PRODUCT_CACHE_PREFIX,
+                    self::FETCH_CACHE_PREFIX,
+                ]
+                as $cachePrefix) {
+
+            while($file = self::chooseCacheFile($cachePrefix)) {
+                unlink($file);
+            }
+        }
     }
 
 

@@ -62,22 +62,28 @@
             <p> Once songs are submitted to be encoded they will start coming in. You don't need to resubmit them a
                 bunch of times. You can refresh this page to check status.</p>
 
-            {{ m.pipeline_button('encodes', "Submit Remaining Encodes for Processing", can_encode ) }}
+            {{ m.pipeline_button('encodes', "Submit Remaining Encodes for Processing", sync_man.pending_encodes ) }}
         </li>
         <li>Album Zips ({{ sync_man.pending_zips|length }} pending of {{ sync_man.all_zips|length }})
             <p>Once all the songs are encoded we can zip up the albums.</p>
 
-            {{ m.pipeline_button('zips', "Zip Up Albums", can_zip ) }}
+            {{ m.pipeline_button('zips', "Zip Up Albums", not sync_man.pending_encodes and sync_man.pending_zips ) }}
         </li>
         <li>S3 Uploads
             ({{ sync_man.uploaded_assets|length }} uploaded,
-            {{ sync_man.un_uploaded_assets|length }} waiting to upload
+            {{ sync_man.unuploaded_assets|length }} waiting to upload
             ({{ sync_man.uploadable_assets|length }} total))
             <p>Once all tracks and albums are created, they need to be uploaded to s3</p>
 
-            {{ m.pipeline_button('s3', "Upload all the stuff we got", can_upload ) }}
+            {{ m.pipeline_button('s3', "Upload all the stuff we got",
+            not (sync_man.pending_encodes or sync_man.pending_zips)
+            and sync_man.unuploaded_assets
+            ) }}
 
         </li>
+        {% if not sync_man.can_sync_remote %}
+        <li>More steps available once the above are completed</li>
+        {% else %}
         <li>Shopify Product Cache
             <p>Shopify is SLOWWW to talk to (pretty much makes us wait 500 ms between each call we make),
                 so we take precautions to say as little as possible. This pulls down the products and caches them
@@ -89,7 +95,7 @@
                     [{{ sync_man.remote_shopify_products_filename }}],
                     mtime: {{ sync_man.remote_shopify_products_mtime }} </p>
             {% endif %}
-            {{ m.pipeline_button('shopify_cache', "Cache it (or refresh the cache)", true ) }}
+            {{ m.pipeline_button('shopify_cache', "Cache it (or refresh the cache)", sync_man.can_sync_remote ) }}
 
         </li>
         <li>Shopify Product Sync
@@ -171,6 +177,9 @@
             <p>Updates are recommended if any new products are encoded or uploaded to s3. If you have hundreds of files
                 to delete, we recommend using the purge products function on fetch's backend...</p>
 
+            <p>Currently deletion is disabled. There is no reliable way with current tools to tell whether an
+                uploaded asset to fetch was automatically created. Crazy right? </p>
+
 
             {{ m.pipeline_button('fetch_create', "Create Fetch Products", sync_man.local_fetch_create_products ) }}
             {{ m.pipeline_button('fetch_update', "Update (Any Created) Fetch Products", sync_man.local_fetch_update_products ) }}
@@ -183,9 +192,11 @@
                 They're big and unseemly and useless. Wait til everything is updated to delete them, though.
                 Till then, parts of the site may still use them.</p>
 
-            {{ m.pipeline_button('garbage', "Take Out The Trash Baby!", garbage_attachments ) }}
+            {{ m.pipeline_button('garbage', "Take Out The Trash Baby!", sync_man.garbage_attachments ) }}
 
         </li>
+
+        {% endif %}
     </ol>
 </form>
 <p></p>

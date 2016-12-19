@@ -4,21 +4,21 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "e53090e60599ace3338282b0a2e0b268",
-    "content-hash": "ec44032ff886bdec33e3b95f1342b52c",
+    "hash": "96dd9b3cedf5b28541c8f66fe6c6ccac",
+    "content-hash": "407bc113cecba6eaf180d254ca03c310",
     "packages": [
         {
             "name": "aws/aws-sdk-php",
-            "version": "3.20.4",
+            "version": "3.20.7",
             "source": {
                 "type": "git",
                 "url": "https://github.com/aws/aws-sdk-php.git",
-                "reference": "4541d9e350644a5c70b298d42e526b65275fc804"
+                "reference": "d45648693759a237ad991f15c011136d77cfffb5"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/aws/aws-sdk-php/zipball/4541d9e350644a5c70b298d42e526b65275fc804",
-                "reference": "4541d9e350644a5c70b298d42e526b65275fc804",
+                "url": "https://api.github.com/repos/aws/aws-sdk-php/zipball/d45648693759a237ad991f15c011136d77cfffb5",
+                "reference": "d45648693759a237ad991f15c011136d77cfffb5",
                 "shasum": ""
             },
             "require": {
@@ -85,7 +85,7 @@
                 "s3",
                 "sdk"
             ],
-            "time": "2016-12-08 20:59:19"
+            "time": "2016-12-15 21:05:32"
         },
         {
             "name": "cosenary/instagram",
@@ -140,13 +140,13 @@
             "version": "dev-master",
             "source": {
                 "type": "git",
-                "url": "https://github.com/fetchapp/fetchapp-php-2.0.git",
-                "reference": "0e1ef8d6bbf855445afda9a3e4a2801c446683d5"
+                "url": "https://github.com/drewwestphal/fetchapp-php-2.0.git",
+                "reference": "0977685fd6d78c9a29d79d111a71f48e3af9fcf1"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/fetchapp/fetchapp-php-2.0/zipball/0e1ef8d6bbf855445afda9a3e4a2801c446683d5",
-                "reference": "0e1ef8d6bbf855445afda9a3e4a2801c446683d5",
+                "url": "https://api.github.com/repos/drewwestphal/fetchapp-php-2.0/zipball/0977685fd6d78c9a29d79d111a71f48e3af9fcf1",
+                "reference": "0977685fd6d78c9a29d79d111a71f48e3af9fcf1",
                 "shasum": ""
             },
             "type": "library",
@@ -155,7 +155,6 @@
                     "FetchApp": "src/"
                 }
             },
-            "notification-url": "https://packagist.org/downloads/",
             "authors": [
                 {
                     "name": "Brendon Dugan",
@@ -171,7 +170,10 @@
                 }
             ],
             "description": "A PHP library for access to version 2.0 of the FetchApp API",
-            "time": "2016-07-21 13:50:57"
+            "support": {
+                "source": "https://github.com/drewwestphal/fetchapp-php-2.0/tree/master"
+            },
+            "time": "2016-12-19 22:34:54"
         },
         {
             "name": "guzzlehttp/guzzle",

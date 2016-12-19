@@ -1,4 +1,10 @@
 {
+  "repositories": [
+    {
+      "type": "vcs",
+      "url": "https://github.com/drewwestphal/fetchapp-php-2.0"
+    }
+  ],
   "require": {
     "tgmpa/tgm-plugin-activation": "dev-master",
     "ricardoper/twitteroauth": "2.*",

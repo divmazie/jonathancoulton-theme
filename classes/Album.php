@@ -94,9 +94,9 @@ class Album extends MusicStoreProduct {
     }
 
     public function getEncodedAssets() {
-        return array_map(function (AlbumZipConfig $encodeConfig) {
+        return array_filter(array_map(function (AlbumZipConfig $encodeConfig) {
             return $encodeConfig->getAsset();
-        }, $this->getAlbumZipConfigs());
+        }, $this->getAlbumZipConfigs()));
     }
 
 
@@ -124,21 +124,22 @@ class Album extends MusicStoreProduct {
         $collection->body_html = $this->getAlbumDescription();
         $collection->template_suffix = self::ALBUM_SHOPIFY_COLLECTION_CUSTOM_SUFFIX;
 
-        // i know it's a bit weird to attach src in the other function and base64 encode it here
-        // but the api dies when you give it bad links (which dev links ARE)... so
-        // given the smaller number of calls needed here, this just wasn't a bad fix
         $image = new Image();
-        $image->attachment = base64_encode(file_get_contents($this->getCoverArt()->getPath()));
+        if(WP_DEBUG) {
+            // the collections api dies when you give it bad links (which dev links ARE)... so
+            // we use WP_DEBUG as a proxy for being on dev
+            $image->attachment = base64_encode(file_get_contents($this->getCoverArt()->getPath()));
+        } else {
+            $image->src = $this->getCoverArt()->getURL();
+        }
         $collection->image = $image;
         $collection->sort_order = 'manual';
 
-        $collectProducts = array_merge([$this->getShopifyProduct()], array_map(function (Track $track) {
-            return $track->getShopifyProduct();
-        }, $this->getAlbumTracks()));
+        $collectProducts = $this->getShopifyCollectionProducts();
 
         // syntax for this bad boy https://help.shopify.com/api/reference/customcollection#update
         $collectArray = array_map(function (Product $product, $position) {
-            return ['product_id' => $product->id, 'sort_value' => $position];
+            return ['product_id' => $product->id, 'sort_value' => $position, 'position' => $position];
         }, $collectProducts, range(1, count($collectProducts)));
 
         $collection->collects = $collectArray;
@@ -146,6 +147,12 @@ class Album extends MusicStoreProduct {
         $collection->metafields = $this->getShopifyCollectionMetafields();
 
         return $collection;
+    }
+
+    public function getShopifyCollectionProducts() {
+        return array_merge([$this->getShopifyProduct()], array_map(function (Track $track) {
+            return $track->getShopifyProduct();
+        }, $this->getAlbumTracks()));
     }
 
     public function getShopifyCollectionMetafields() {

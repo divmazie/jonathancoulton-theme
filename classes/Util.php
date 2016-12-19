@@ -135,6 +135,32 @@ class Util {
         return call_user_func_array('array_merge', $arrayOfArrays);
     }
 
+    static public function slugify($text) {
+        // replace non letter or digits by -
+        $text = preg_replace('~[^\pL\d]+~u', '-', $text);
+
+        // transliterate
+        $text = iconv('utf-8', 'us-ascii//TRANSLIT', $text);
+
+        // remove unwanted characters
+        $text = preg_replace('~[^-\w]+~', '', $text);
+
+        // trim
+        $text = trim($text, '-');
+
+        // remove duplicate -
+        $text = preg_replace('~-+~', '-', $text);
+
+        // lowercase
+        $text = strtolower($text);
+
+        if(empty($text)) {
+            return 'n-a';
+        }
+
+        return $text;
+    }
+
     public static function register_generic_cpt($name, $plural_name = "") {
         if(!isset($plural_name) || $plural_name == "") {
             $plural_name = $name . "s";

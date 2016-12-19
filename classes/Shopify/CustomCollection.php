@@ -27,7 +27,7 @@ class CustomCollection extends Struct {
     }
 
     protected function putProperties() {
-        throw new Exception('not implemented');
+        return array_merge(['id'], $this->postProperties());
     }
 
 

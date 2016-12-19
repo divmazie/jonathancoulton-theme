@@ -36,7 +36,7 @@ class ProductVariant extends Struct {
         $updated_at;
 
     protected function postProperties() {
-        return ['product_id', 'sku', 'title', 'price', 'option1', 'option2', 'option3', 'taxable', 'require_shipping'];
+        return ['product_id', 'sku', 'title', 'price', 'option1', 'option2', 'option3', 'taxable', 'requires_shipping'];
     }
 
     protected function putProperties() {

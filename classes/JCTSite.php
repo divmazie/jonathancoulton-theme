@@ -39,7 +39,14 @@ class JCTSite extends Site {
         /* this is where you can add your own fuctions to twig */
         $twig->addExtension(new \Twig_Extension_StringLoader());
         $twig->addExtension(new \Twig_Extension_Debug());
-        $twig->addFilter('myfoo', new \Twig_Filter_Function('myfoo'));
+        $twig->addFilter(new \Twig_SimpleFilter('slugify', function ($string, array $options = []) {
+            return Util::slugify($string);
+        }));
+        $twig->addFunction(new \Twig_SimpleFunction('jdump', function ($thing) {
+            echo "<pre>";
+            var_dump($thing);
+            echo "</pre>";
+        }));
         return $twig;
     }
 

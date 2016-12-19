@@ -35,7 +35,12 @@ if($post->slug == "faq") {
 }
 
 if($post->slug == "store") {
-    $context['store'] = 'boop';
+    $syncMan = new SyncManager(Util::get_shopify_api_client(), Util::get_fetch_api_client());
+
+    //$context['store'] = include(__DIR__ . '/cache/cached_store_context.php');
+    $context['store'] = json_decode($syncMan->buildMusicStoreLockFile(), true);
+
+
     $context['thisisthestore'] = true;
 }
 

@@ -74,9 +74,10 @@ class Track extends MusicStoreProduct {
     }
 
     public function getEncodedAssets() {
-        return array_map(function (EncodeConfig $encodeConfig) {
+        // remove nulls...
+        return array_filter(array_map(function (EncodeConfig $encodeConfig) {
             return $encodeConfig->getAsset();
-        }, $this->getTrackEncodeConfigs());
+        }, $this->getTrackEncodeConfigs()));
     }
 
 

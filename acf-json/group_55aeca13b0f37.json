@@ -278,7 +278,7 @@
             "label": "Store categories",
             "name": "store_categories",
             "type": "repeater",
-            "instructions": "These determine the tabs within the store part of the site and what Shopify product types they should display. \"Music download\" must be present to display the download part of the store.",
+            "instructions": "These determine the tabs within the store part of the site and what Shopify product types they should display. The first category is the download store (only the display name is used, the rest is hardcoded).",
             "required": 0,
             "conditional_logic": 0,
             "wrapper": {
@@ -332,6 +332,22 @@
                     "maxlength": "",
                     "readonly": 0,
                     "disabled": 0
+                },
+                {
+                    "key": "field_561589df3a07a2",
+                    "label": "Allow Multiple In Cart",
+                    "name": "allow_multiple",
+                    "type": "true_false",
+                    "instructions": "For items it doesn't make sense to have two of in your cart (e.g. digital files)",
+                    "required": 0,
+                    "conditional_logic": 0,
+                    "wrapper": {
+                        "width": "",
+                        "class": "",
+                        "id": ""
+                    },
+                    "message": "",
+                    "default_value": 0
                 },
                 {
                     "key": "field_561589df3a07a",

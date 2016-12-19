@@ -54,12 +54,13 @@ $apiClient = Util::get_shopify_api_client();
 //var_dump($apiClient->shopifyPagedGet('/admin/products/9133128710/metafields.json', ['metafield[owner_resource]' => 'product']));
 
 
-var_dump($apiClient->shopifyPagedGet('/admin/custom_collections.json'));
+//var_dump($apiClient->shopifyPagedGet('/admin/custom_collections.json'));
 
-die();
 
-$remotepord = $apiClient->getAllProducts(['product_type' => MusicStoreProduct::DEFAULT_SHOPIFY_PRODUCT_TYPE]);
+$remotepord = $apiClient->getAllProducts(['product_type' => 'Karaoke']);
+var_dump($remotepord);
 //var_dump($remotepord);
+die();
 //var_dump($remotepord);
 //die();
 //$prod0 = $products[0];11

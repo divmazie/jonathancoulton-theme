@@ -12,13 +12,15 @@ if(class_exists('Timber\Timber')) {
     new JCTSite();
 }
 
-if(!is_admin()) {
-    //wp_enqueue_style('bootstrap',get_template_directory_uri().'/css/bootstrap.css');
-    wp_enqueue_script('bower', get_template_directory_uri() . '/js/bower.min.js');
-    wp_enqueue_script('site', get_template_directory_uri() . '/js/site.js');
-    wp_dequeue_script('jquery');
-    wp_dequeue_script('jquery-core');
-}
+add_action('wp_enqueue_scripts', function () {
+    if(!is_admin()) {
+        //wp_enqueue_style('bootstrap',get_template_directory_uri().'/css/bootstrap.css');
+        wp_enqueue_script('bower', get_template_directory_uri() . '/js/bower.min.js');
+        wp_enqueue_script('site', get_template_directory_uri() . '/js/site.js');
+        wp_dequeue_script('jquery');
+        wp_dequeue_script('jquery-core');
+    }
+});
 
 if(function_exists('acf_add_options_page')) {
     acf_add_options_page([

@@ -11,7 +11,7 @@ use jct\Util;
 class SynchronousAPIClient extends Client {
 
     const DEFAULT_PAGE_SIZE = 250;
-    const DEFAULT_TIMEOUT = 5.0;
+    const DEFAULT_TIMEOUT = 10.0;
     const MAX_TRIES_REQUEST = 1;
     const CALL_LIMIT_HEADER = 'X-Shopify-Shop-Api-Call-Limit';
     const MINIMUM_CALL_LIMIT_HEAD_ROOM = 4;
@@ -131,10 +131,10 @@ class SynchronousAPIClient extends Client {
      * @return Struct[]
      */
     public function shopifyPagedGet($endPoint, $queryVars = [], $pageSize = null, $specificPageOnly = null) {
+        $pageSize = $pageSize ? $pageSize : self::DEFAULT_PAGE_SIZE;
         $queryVars['limit'] = $pageSize;
 
         $pagedResponse = [];
-        $pageSize = $pageSize ? $pageSize : self::DEFAULT_PAGE_SIZE;
         $page = $specificPageOnly ? $specificPageOnly : 1;
 
         while(true) {

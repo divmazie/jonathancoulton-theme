@@ -24,7 +24,7 @@ class AlbumZip extends EncodedAsset {
         return $this->getAlbumZipConfig()->getConfigName();
     }
 
-    public function getShopifyProductVariantSKU() {
+    public function getShopifyAndFetchSKU() {
         return $this->getParentAlbum()->getPostID() . ':' . $this->getAlbumZipConfig()->getConfigName();
     }
 

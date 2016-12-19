@@ -61,7 +61,7 @@ abstract class EncodedAssetConfig {
     }
 
 
-    public function getConfigsForPost(JCTPost $JCTPost, $keyByName = false) {
+    public static function getConfigsForPost(MusicStoreProduct $JCTPost, $keyByName = false) {
         $encTypes = Util::get_encode_types();
         $configs = [];
 
@@ -74,7 +74,7 @@ abstract class EncodedAssetConfig {
     /**
      * @return static
      */
-    public function getConfigForPostByConfigName(JCTPost $JCTPost, $configName) {
+    public static function getConfigForPostByConfigName(MusicStoreProduct $JCTPost, $configName) {
         return static::getConfigsForPost($JCTPost, true)[$configName];
     }
 

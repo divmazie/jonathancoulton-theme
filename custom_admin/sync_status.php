@@ -102,6 +102,18 @@ switch(@$_GET['pipeline_stage']) {
         $syncMan->doFetchDeletes(status_message_loc("We deleted those products! Felt good."));
         break;
 
+    case 'lock_files':
+        echo "<pre>";
+        var_dump(json_decode($syncMan->buildMusicStoreLockFile(), true));
+        die();
+        break;
+
+    case 'lock_files2':
+        echo "<pre>";
+        var_dump(include(dirname(__DIR__) . '/cache/cached_store_context.php'));
+        die();
+        break;
+
     case 'garbage':
         $syncMan->deleteGarbage(status_message_loc("We deleted that garbage."));
         break;

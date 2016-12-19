@@ -79,7 +79,7 @@ abstract class MusicStoreProduct extends JCTPost {
         $product->variants = array_map(function (EncodedAsset $assetConfig) use ($syncMeta) {
             $variant = new ProductVariant();
             $variant->title = $assetConfig->getShopifyProductVariantTitle();
-            $variant->sku = $assetConfig->getShopifyProductVariantSKU();
+            $variant->sku = $assetConfig->getShopifyAndFetchSKU();
             $variant->price = $this->getPrice();
             $variant->option1 = $assetConfig->getShopifyProductVariantTitle();
 
