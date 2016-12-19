@@ -12,10 +12,6 @@ abstract class EncodedAsset extends WPAttachment {
     const META_S3_URL = 'jct_s3_url';
     const META_S3_HASH = 'jct_s3_hash';
 
-    private $awsUrl;
-    private $createdTime, $uploadedTime;
-
-
     abstract public function getAwsName();
 
     /** @return EncodedAssetConfig */
