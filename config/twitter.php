@@ -117,7 +117,7 @@ function hash_and_at($text) {
 }
 
 function retweet_text($raw) {
-    if($raw['retweeted_status']) {
+    if(@$raw['retweeted_status']) {
         $text = "RT @" . $raw['retweeted_status']['user']['screen_name'] . ": " . $raw['retweeted_status']['text'];
         return $text;
     } else {

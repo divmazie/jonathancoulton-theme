@@ -125,13 +125,7 @@ class Album extends MusicStoreProduct {
         $collection->template_suffix = self::ALBUM_SHOPIFY_COLLECTION_CUSTOM_SUFFIX;
 
         $image = new Image();
-        if(WP_DEBUG) {
-            // the collections api dies when you give it bad links (which dev links ARE)... so
-            // we use WP_DEBUG as a proxy for being on dev
-            $image->attachment = base64_encode(file_get_contents($this->getCoverArt()->getPath()));
-        } else {
-            $image->src = $this->getCoverArt()->getURL();
-        }
+        $image->src = $this->getCoverArt()->getURL();
         $collection->image = $image;
         $collection->sort_order = 'manual';
 
