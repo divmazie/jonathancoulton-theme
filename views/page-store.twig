@@ -15,10 +15,13 @@
                     </div>
                     <div class="modal-body">
                         <div data-bind="visible: store_view() == 'downloads'">
-                            <label><input type="checkbox" data-bind="checked: remember_format" /> Make this format my default.</label>
+                            <label><input type="checkbox" data-bind="checked: remember_format"/> Make this format my
+                                default.</label>
                         </div>
                         {% for variant in variants %}
-                            <button class="option" onclick='addToCart({{ id }},"{{ name|escape('js') }}",{{ variant.price|number_format }},{{ variants_json|json_encode() }},{{ variant.id }},{{ allow_multiple }})' id="product{{ id }}_{{ variant.title }}">{{ variant.title }}</button>
+                            <button class="option"
+                                    onclick='addToCart({{ id }},"{{ name|escape('js') }}",{{ variant.price|number_format }},{{ variants_json|json_encode() }},{{ variant.id }},{{ allow_multiple }})'
+                                    id="product{{ id }}_{{ variant.title }}">{{ variant.title }}</button>
                         {% endfor %}
                         <div class="clearfix"></div>
                     </div>
@@ -28,7 +31,7 @@
     {% else %}
         <script>
             function add_{{ id }}_to_cart() {
-                addToCart({{ id }},"{{ name }}",{{ variants[0].price|number_format }},{{ variants_json|json_encode() }},{{ variants[0].id }},{{ allow_multiple }});
+                addToCart({{ id }}, "{{ name }}", {{ variants[0].price|number_format }}, {{ variants_json|json_encode() }}, {{ variants[0].id }}, {{ allow_multiple }});
             }
         </script>
     {% endif %}
@@ -40,16 +43,20 @@
         <div class="container">
             <ul>
                 {% for category in store %}
-                    {% if not loop.first %}<div class="menu_slash">/</div>{% endif %}
-                    <li class="menu-item" data-bind="css: { 'current-menu-item': store_view() == '{{ category.html_name }}' }">
+                    {% if not loop.first %}
+                        <div class="menu_slash">/</div>{% endif %}
+                    <li class="menu-item"
+                        data-bind="css: { 'current-menu-item': store_view() == '{{ category.html_name }}' }">
                         <a onclick="store_nav('{{ category.html_name }}')">{{ category.name }}</a>
                     </li>
                 {% endfor %}
                 <div class="cart_link cart_link_disabled" data-bind="visible: cart().length==0">
-                    <span class="cart_image" data-bind="css: { cart_full: cart().length > 0}, text: pos_cart_number"></span>
+                    <span class="cart_image"
+                          data-bind="css: { cart_full: cart().length > 0}, text: pos_cart_number"></span>
                     <span class="cart_text">CART</span>
                 </div>
-                <div class="cart_link" data-toggle="modal" data-target="#cart_modal" data-bind="visible: cart().length>0">
+                <div class="cart_link" data-toggle="modal" data-target="#cart_modal"
+                     data-bind="visible: cart().length>0">
                     <span class="cart_image cart_full" data-bind="text: pos_cart_number"></span>
                     <span class="cart_text">CART</span>
                 </div>
@@ -60,184 +67,204 @@
 {% endblock %}
 
 {% block content %}
-<div class="container" style="display: none; padding-bottom: 60px;" data-bind="fadeVisible: knockout_loaded">
-    {% if store|length < 1 %}
-        <p>The store is temporarily offline.</p>
-    {% endif %}
-    {% for category in store %}
-        {% set allow_multiple = 'true' %}
-        {% if category.shopify_type == 'Music download' or category.shopify_type == 'Karaoke' %}
-            {% set allow_multiple = 'false' %}
+    <div class="container" style="display: none; padding-bottom: 60px;" data-bind="fadeVisible: knockout_loaded">
+        {% if store|length < 1 %}
+            <p>The store is temporarily offline.</p>
         {% endif %}
-        <div data-bind="visible: store_view() == '{{ category.html_name }}'">
-            {% if category.shopify_type == 'Music download' %}
-                {% for album in category.products %}
-                    <a class="anchor" id="album{{ album.collection.id }}"></a>
-                    <div class="col-xs-12 col-sm-4">
-                        {% if album.collection.image.src %}
-                            <div class="album_square" style="background-image: url('{{ album.collection.image.src }}')"></div>
-                        {% endif %}
-                        {% for track in album.products %}
-                            {% if track.metafields.track_number == 0 %}
-                                <a data-bind="visible: !in_cart({ product_id: {{ track.id }} })" onclick="option_modal({{ track.id }})" class="no_underline">
-                                    <div class="add_to_cart_box_blue">
-                                        Add album to cart
-                                        <img src="{{ theme.link }}/images/add_to_cart_white.svg" class="track_icon_img" />
-                                    </div>
-                                </a>
-                                <div data-bind="visible: in_cart({ product_id: {{ track.id }} })" class="add_to_cart_box_blue">
-                                    Album in cart
-                                    <img src="{{ theme.link }}/images/checked_white.svg" class="track_icon_img" />
-                                </div>
+        {% for category in store %}
+            {% set allow_multiple = 'true' %}
+            {% if category.shopify_type == 'Music download' or category.shopify_type == 'Karaoke' %}
+                {% set allow_multiple = 'false' %}
+            {% endif %}
+            <div data-bind="visible: store_view() == '{{ category.html_name }}'">
+                {% if category.shopify_type == 'Music download' %}
+                    {% for album in category.products %}
+                        <a class="anchor" id="album{{ album.collection.id }}"></a>
+                        <div class="col-xs-12 col-sm-4">
+                            {% if album.collection.image.src %}
+                                <div class="album_square"
+                                     style="background-image: url('{{ album.collection.image.src }}')"></div>
                             {% endif %}
-                        {% endfor %}
-                        {% if album.collection.metafields.album_description %}{{ album.collection.metafields.album_description }}{% endif %}
-                    </div>
-                    <div class="col-xs-12 col-sm-8">
-                        <h3 class="album_title">{{ album.collection.title }}</h3>
-                        <span class="album_year">{{ album.collection.body_html }}</span>
-                        {% for track in album.products %}
-                            <div class="track_row {% if track.metafields.track_number == 0 %}album_row{% endif %}" data-bind="css: { play_row: current_song() == {{ track.id }} }">
-                                <span class="track_icon_left">{% if track.metafields.track_number > 0 %}{{ track.metafields.track_number }}{% endif %}</span>
+                            {% for track in album.products %}
+                                {% if track.metafields.track_number == 0 %}
+                                    <a data-bind="visible: !in_cart({ product_id: {{ track.id }} })"
+                                       onclick="option_modal({{ track.id }})" class="no_underline">
+                                        <div class="add_to_cart_box_blue">
+                                            Add album to cart
+                                            <img src="{{ theme.link }}/images/add_to_cart_white.svg"
+                                                 class="track_icon_img"/>
+                                        </div>
+                                    </a>
+                                    <div data-bind="visible: in_cart({ product_id: {{ track.id }} })"
+                                         class="add_to_cart_box_blue">
+                                        Album in cart
+                                        <img src="{{ theme.link }}/images/checked_white.svg" class="track_icon_img"/>
+                                    </div>
+                                {% endif %}
+                            {% endfor %}
+                            {% if album.collection.metafields.album_description %}{{ album.collection.metafields.album_description }}{% endif %}
+                        </div>
+                        <div class="col-xs-12 col-sm-8">
+                            <h3 class="album_title">{{ album.collection.title }}</h3>
+                            <span class="album_year">{{ album.collection.body_html }}</span>
+                            {% for track in album.products %}
+                                <div class="track_row {% if track.metafields.track_number == 0 %}album_row{% endif %}"
+                                     data-bind="css: { play_row: current_song() == {{ track.id }} }">
+                                    <span class="track_icon_left">{% if track.metafields.track_number > 0 %}{{ track.metafields.track_number }}{% endif %}</span>
                                 <span class="track_icon_left">{% if track.metafields.track_number > 0 %}
                                     <span data-bind="visible: player_ready">
                                         <span data-bind="visible: current_song() != {{ track.id }} || !playing()">
-                                            <a onclick="playSound({{ track.id }})"><img src="{{ theme.link }}/images/play_black.svg" class="track_play_img"></a>
+                                            <a onclick="playSound({{ track.id }})"><img
+                                                        src="{{ theme.link }}/images/play_black.svg"
+                                                        class="track_play_img"></a>
                                         </span>
                                         <span data-bind="visible: current_song() == {{ track.id }} && playing">
-                                            <a onclick="pauseSound()"><img src="{{ theme.link }}/images/pause_black.svg" class="track_play_img"></a>
+                                            <a onclick="pauseSound()"><img src="{{ theme.link }}/images/pause_black.svg"
+                                                                           class="track_play_img"></a>
                                         </span>
                                     </span>
                                     {% endif %}</span>
-                                <div class="track_title" style="z-index: 0">{{ track.title }}</div>
-                                <div class="track_icon_right_group">
+
+                                    <div class="track_title" style="z-index: 0">{{ track.title }}</div>
+                                    <div class="track_icon_right_group">
                                     <span class="track_icon_right">
-                                        <a data-bind="visible: !in_cart({ product_id: {{ track.id }} })" onclick="option_modal({{ track.id }})">
-                                            <img src="{{ theme.link }}/images/add_to_cart_blue.svg" class="track_icon_img">
+                                        <a data-bind="visible: !in_cart({ product_id: {{ track.id }} })"
+                                           onclick="option_modal({{ track.id }})">
+                                            <img src="{{ theme.link }}/images/add_to_cart_blue.svg"
+                                                 class="track_icon_img">
                                         </a>
                                         <span data-bind="visible: in_cart({ product_id: {{ track.id }} })">
                                             <img src="{{ theme.link }}/images/checked_blue.svg" class="track_icon_img">
                                         </span>
                                     </span>
-                                    <span class="track_icon_right">${{ track.variants[0].price|number_format }}</span>
+                                        <span class="track_icon_right">${{ track.variants[0].price|number_format }}</span>
                                     <span class="track_icon_right">
-                                        <a href="{{ track.metafields.wiki_link }}" class="track_info_icon {% if track.metafields.track_number == 0 %}album_info_icon{% endif %}"></a>
+                                        <a href="{{ track.metafields.wiki_link }}"
+                                           class="track_info_icon {% if track.metafields.track_number == 0 %}album_info_icon{% endif %}"></a>
                                     </span>
+                                    </div>
                                 </div>
-                            </div>
-                            {{ macros.variants_modal('Please select a file format for your download.',allow_multiple,track.id,track.title,track.variants) }}
-                        {% endfor %}
-                        <div style="height: 50px;"></div>
-                    </div>
-                    <div class="clearfix"></div>
-                {% endfor %}
-            {% else %}
-                {% for product in category.products %}
-                    <div class="col-xs-6 col-sm-4 col-md-3 product">
-                        <div class="album_square" style="background-image: url('{{ product.image.src }}')"></div>
-                        <a onclick="option_modal('{{ product.id }}')" class="no_underline">
-                            <div class="add_to_cart_box_blue" style="margin: 0 0 20px;">
+                                {{ macros.variants_modal('Please select a file format for your download.',allow_multiple,track.id,track.title,track.variants) }}
+                            {% endfor %}
+                            <div style="height: 50px;"></div>
+                        </div>
+                        <div class="clearfix"></div>
+                    {% endfor %}
+                {% else %}
+                    {% for product in category.products %}
+                        <div class="col-xs-6 col-sm-4 col-md-3 product">
+                            <div class="album_square" style="background-image: url('{{ product.image.src }}')"></div>
+                            <a onclick="option_modal('{{ product.id }}')" class="no_underline">
+                                <div class="add_to_cart_box_blue" style="margin: 0 0 20px;">
                                 <span data-bind="visible: !in_cart({ product_id: {{ product.id }} })">
                                     ${{ product.variants[0].price|number_format }} | Add to cart
-                                    <img src="{{ theme.link }}/images/add_to_cart_white.svg" class="track_icon_img" />
+                                    <img src="{{ theme.link }}/images/add_to_cart_white.svg" class="track_icon_img"/>
                                 </span>
                                 <span data-bind="visible: in_cart({ product_id: {{ product.id }} })">
                                     ${{ product.variants[0].price|number_format }} |
                                     {% if category.shopify_type == 'Karaoke' %}Added to cart
                                     {% else %}Add another{% endif %}
-                                    <img src="{{ theme.link }}/images/checked_white.svg" class="track_icon_img" />
+                                    <img src="{{ theme.link }}/images/checked_white.svg" class="track_icon_img"/>
                                 </span>
+                                </div>
+                            </a>
+
+                            <div class="product_text">
+                                <div class="product_title">{{ product.title }}</div>
+                                <div class="product_description">{{ product.body_html }}</div>
                             </div>
-                        </a>
-                        <div class="product_text">
-                            <div class="product_title">{{ product.title }}</div>
-                            <div class="product_description">{{ product.body_html }}</div>
                         </div>
-                    </div>
-                    {{ macros.variants_modal('',allow_multiple,product.id,product.title,product.variants) }}
-                {% endfor %}
-                <div class="clearfix"></div>
-            {% endif %}
-        </div>
-    {% endfor %}
-</div>
+                        {{ macros.variants_modal('',allow_multiple,product.id,product.title,product.variants) }}
+                    {% endfor %}
+                    <div class="clearfix"></div>
+                {% endif %}
+            </div>
+        {% endfor %}
+    </div>
 
     <!-- MODALS -->
 
-<div id="cart_modal" class="modal fade" role="dialog">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <button type="button" class="close" data-dismiss="modal">&times;</button>
-                <h4 class="modal-title">Your cart!</h4>
-            </div>
-            <div class="modal-body">
-                <div class="cart_row cart_headers">
-                    <span>Item</span>
-                    <span class="cart_icon_right">Remove</span>
-                    <span class="cart_icon_right">Price</span>
-                    <span class="cart_icon_right">Option</span>
-                    <span class="cart_icon_right">Duplicate item</span>
+    <div id="cart_modal" class="modal fade" role="dialog">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    <h4 class="modal-title">Your cart!</h4>
                 </div>
-                <div data-bind="foreach: cart">
-                    <div class="cart_row">
-                        <div data-bind="text: product_name" class="cart_title"></div>
-                        <span class="cart_icon_right"><a data-bind="click: $root.remove_product">&#x2715;</a></span>
-                        <span class="cart_icon_right">$<span data-bind="text: calculated_cost"></span></span>
-                        <span class="cart_icon_right"><select data-bind="options: variants, value: variant, optionsText: 'option', visible: variants().length > 1"></select></span>
-                        <span class="cart_icon_right"><a data-bind="click: duplicate_item, visible: allow_multiple">+</a></span>
+                <div class="modal-body">
+                    <div class="cart_row cart_headers">
+                        <span>Item</span>
+                        <span class="cart_icon_right">Remove</span>
+                        <span class="cart_icon_right">Price</span>
+                        <span class="cart_icon_right">Option</span>
+                        <span class="cart_icon_right">Duplicate item</span>
                     </div>
-                </div>
-                <div class="subtotal_box">
-                    <div class="subtotal_line">
-                        Subtotal <span style="float: right;">$<span data-bind="text: total_cost"></span></span>
+                    <div data-bind="foreach: cart">
+                        <div class="cart_row">
+                            <div data-bind="text: product_name" class="cart_title"></div>
+                            <span class="cart_icon_right"><a data-bind="click: $root.remove_product">&#x2715;</a></span>
+                            <span class="cart_icon_right">$<span data-bind="text: calculated_cost"></span></span>
+                            <span class="cart_icon_right"><select
+                                        data-bind="options: variants, value: variant, optionsText: 'option', visible: variants().length > 1"></select></span>
+                            <span class="cart_icon_right"><a data-bind="click: duplicate_item, visible: allow_multiple">+</a></span>
+                        </div>
                     </div>
-                    <div class="subtotal_fineprint">(Shipping and tax calculated at checkout.)</div>
-                </div>
-                <div class="clearfix"></div>
-                <div style="float: left;">
-                    <a onclick="$('#cart_modal').modal('hide')" class="no_underline">
-                        <div class="gray_arrow_left">Keep shopping</div>
-                    </a>
-                </div>
-                <div style="float: right;">
-                    <a data-bind="attr: { href: checkout_link }, visible: cart().length > 0" class="no_underline">
-                        <div class="blue_arrow_right" style="width: 200px;">Checkout</div>
-                    </a>
-                    <div class="gray_arrow_right" data-bind="visible: cart().length < 1">Checkout</div>
-                </div>
-                <div class="clearfix"></div>
-            </div>
-        </div>
-    </div>
-</div>
-<div id="cart_confirm_modal" class="modal fade" role="dialog">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <button type="button" class="close" data-dismiss="modal">&times;</button>
-                <h4 class="modal-title">
-                    Item added to cart!
-                    <br />
-                    <img src="{{ theme.link }}/images/checked_white.svg">
-                </h4>
-            </div>
-            <div class="modal-body">
-                <span id="cart_confirm_product_name"></span> has been added to your shopping cart!
-                <div class="" style="margin: 30px auto;">
-                    <div class="col-xs-6">
-                        <button class="option centered" onclick="$('#cart_confirm_modal').modal('hide')">Keep shopping</button>
+                    <div class="subtotal_box">
+                        <div class="subtotal_line">
+                            Subtotal <span style="float: right;">$<span data-bind="text: total_cost"></span></span>
+                        </div>
+                        <div class="subtotal_fineprint">(Shipping and tax calculated at checkout.)</div>
                     </div>
-                    <div class="col-xs-6">
-                        <!-- The setTimeout function prevents weird scrolling behavior from Bootstrap -->
-                        <button class="option centered" onclick="$('#cart_confirm_modal').modal('hide'); setTimeout('$(\'#cart_modal\').modal(\'show\')',400);">Checkout</button>
+                    <div class="clearfix"></div>
+                    <div style="float: left;">
+                        <a onclick="$('#cart_modal').modal('hide')" class="no_underline">
+                            <div class="gray_arrow_left">Keep shopping</div>
+                        </a>
+                    </div>
+                    <div style="float: right;">
+                        <a data-bind="attr: { href: checkout_link }, visible: cart().length > 0" class="no_underline">
+                            <div class="blue_arrow_right" style="width: 200px;">Checkout</div>
+                        </a>
+
+                        <div class="gray_arrow_right" data-bind="visible: cart().length < 1">Checkout</div>
                     </div>
                     <div class="clearfix"></div>
                 </div>
             </div>
         </div>
     </div>
-</div>
+    <div id="cart_confirm_modal" class="modal fade" role="dialog">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    <h4 class="modal-title">
+                        Item added to cart!
+                        <br/>
+                        <img src="{{ theme.link }}/images/checked_white.svg">
+                    </h4>
+                </div>
+                <div class="modal-body">
+                    <span id="cart_confirm_product_name"></span> has been added to your shopping cart!
+                    <div class="" style="margin: 30px auto;">
+                        <div class="col-xs-6">
+                            <button class="option centered" onclick="$('#cart_confirm_modal').modal('hide')">Keep
+                                shopping
+                            </button>
+                        </div>
+                        <div class="col-xs-6">
+                            <!-- The setTimeout function prevents weird scrolling behavior from Bootstrap -->
+                            <button class="option centered"
+                                    onclick="$('#cart_confirm_modal').modal('hide'); setTimeout('$(\'#cart_modal\').modal(\'show\')',400);">
+                                Checkout
+                            </button>
+                        </div>
+                        <div class="clearfix"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
     <div id="purchase_confirm_modal" class="modal fade" role="dialog">
         <div class="modal-dialog">
             <div class="modal-content">
@@ -246,11 +273,13 @@
                     <h4 class="modal-title">Item added to cart!</h4>
                 </div>
                 <div class="modal-body">
-                    Thank you for your order from jonathancoulton.com!<br />
-                    <br />
-                    You are awesome.<br />
-                    <br />
-                    <a onclick="$('#purchase_confirm_modal').modal('hide')"><div class="blue_arrow_left">Back</div></a>
+                    Thank you for your order from jonathancoulton.com!<br/>
+                    <br/>
+                    You are awesome.<br/>
+                    <br/>
+                    <a onclick="$('#purchase_confirm_modal').modal('hide')">
+                        <div class="blue_arrow_left">Back</div>
+                    </a>
                 </div>
             </div>
         </div>
@@ -263,9 +292,11 @@
                     <h4 class="modal-title">Buy something?</h4>
                 </div>
                 <div class="modal-body">
-                    {{ theme_options.buy_something_modal_text }}<br />
-                    <br />
-                    <a onclick="$('#buy_something_modal').modal('hide')" class="no_underline"><div class="blue_arrow_left">Back</div></a>
+                    {{ theme_options.buy_something_modal_text }}<br/>
+                    <br/>
+                    <a onclick="$('#buy_something_modal').modal('hide')" class="no_underline">
+                        <div class="blue_arrow_left">Back</div>
+                    </a>
                 </div>
             </div>
         </div>
@@ -284,24 +315,24 @@
         }
 
         {% if get_vars.return_from_shopify %}
-        window.onload = function() {
+        window.onload = function () {
             myViewModel.cart([]);
-            sessionStorage.setItem('cart',ko.toJSON([]));
+            sessionStorage.setItem('cart', ko.toJSON([]));
             $('#purchase_confirm_modal').modal('show');
         };
         {% endif %}
 
         var playlist = [
             {% for category in store %}
-                {% if category.shopify_type == 'Music download' %}
-                    {% for album in category.products %}
-                        {% for track in album.products %}
-                            {% if track.metafields.music_link %}
-                                { id: {{ track.id }}, url: '{{ track.metafields.music_link }}', title: '{{ track.title|e }}' },
-                            {% endif %}
-                        {% endfor %}
-                    {% endfor %}
-                {% endif %}
+            {% if category.shopify_type == 'Music download' %}
+            {% for album in category.products %}
+            {% for track in album.products %}
+            {% if track.metafields.music_link %}
+            {id: {{ track.id }}, url: '{{ track.metafields.music_link }}', title: '{{ track.title|e }}'},
+            {% endif %}
+            {% endfor %}
+            {% endfor %}
+            {% endif %}
             {% endfor %}
         ];
 
@@ -311,7 +342,7 @@
             // optional: ignore Flash where possible, use 100% HTML5 mode
             preferFlash: false,
             debugMode: false,
-            onready: function() {
+            onready: function () {
                 myViewModel.player_ready(true);
             }
         });
@@ -329,7 +360,7 @@
             if (current_song != 0) {
                 for (var i = 0; i < playlist.length; i++) {
                     if (playlist[i].id == current_song) {
-                        var next_id = i == playlist.length-1 ? playlist[0].id : playlist[i+1].id;
+                        var next_id = i == playlist.length - 1 ? playlist[0].id : playlist[i + 1].id;
                         playSound(next_id);
                     }
                 }
@@ -341,7 +372,7 @@
             if (current_song != 0) {
                 for (var i = 0; i < playlist.length; i++) {
                     if (playlist[i].id == current_song) {
-                        var next_id = i == 0 ? playlist[playlist.length-1].id : playlist[i-1].id;
+                        var next_id = i == 0 ? playlist[playlist.length - 1].id : playlist[i - 1].id;
                         playSound(next_id);
                     }
                 }
@@ -376,7 +407,7 @@
 
         function incrementListenTotal() {
             listentotal++;
-            if (listentotal>=10) {
+            if (listentotal >= 10) {
                 $('#buy_something_modal').modal('show');
                 listentotal = 0;
             }
