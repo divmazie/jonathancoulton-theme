@@ -18,7 +18,7 @@ if($from_transient) {
 
 $handle = Util::get_theme_option('instagram_handle');
 
-$json = file_get_contents("https://www.instagram.com/$handle/media/");
+$json = @file_get_contents("https://www.instagram.com/$handle/media/");
 $instagram = json_decode($json);
 $media = [];
 $i = 1;

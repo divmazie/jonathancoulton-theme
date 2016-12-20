@@ -147,22 +147,13 @@
             {% endfor %}
         </div>
 
-        {% for category in store %}
-            {% set allow_multiple = 'true' %}
-            {% if category.shopify_type == 'Music download' or category.shopify_type == 'Karaoke' %}
-                {% set allow_multiple = 'false' %}
-            {% endif %}
-
-
-
-            <div data-bind="visible: store_view() == '{{ category.slug }}'">
-                {% if category.shopify_type == 'Music download' %}
-                {% else %}
-                    {% for product in category.products %}
-                        <div class="col-xs-6 col-sm-4 col-md-3 product">
-                            <div class="album_square" style="background-image: url('{{ product.image.src }}')"></div>
-                            <a onclick="option_modal('{{ product.id }}')" class="no_underline">
-                                <div class="add_to_cart_box_blue" style="margin: 0 0 20px;">
+        {% for category in store.other_stores %}
+            <div data-bind="visible: store_view() == '{{ category.header.slug }}'">
+                {% for product in category.products %}
+                    <div class="col-xs-6 col-sm-4 col-md-3 product">
+                        <div class="album_square" style="background-image: url('{{ product.image.src }}')"></div>
+                        <a onclick="option_modal('{{ product.id }}')" class="no_underline">
+                            <div class="add_to_cart_box_blue" style="margin: 0 0 20px;">
                                 <span data-bind="visible: !in_cart({ product_id: {{ product.id }} })">
                                     ${{ product.variants[0].price|number_format }} | Add to cart
                                     <img src="{{ theme.link }}/images/add_to_cart_white.svg" class="track_icon_img"/>
@@ -173,18 +164,17 @@
                                     {% else %}Add another{% endif %}
                                     <img src="{{ theme.link }}/images/checked_white.svg" class="track_icon_img"/>
                                 </span>
-                                </div>
-                            </a>
-
-                            <div class="product_text">
-                                <div class="product_title">{{ product.title }}</div>
-                                <div class="product_description">{{ product.body_html }}</div>
                             </div>
+                        </a>
+
+                        <div class="product_text">
+                            <div class="product_title">{{ product.title }}</div>
+                            <div class="product_description">{{ product.body_html }}</div>
                         </div>
-                        {{ macros.variants_modal('',allow_multiple,product.id,product.title,product.variants) }}
-                    {% endfor %}
-                    <div class="clearfix"></div>
-                {% endif %}
+                    </div>
+                    {{ macros.variants_modal('',category.header.allow_multiple,product.id,product.title,product.variants) }}
+                {% endfor %}
+                <div class="clearfix"></div>
             </div>
         {% endfor %}
     </div>

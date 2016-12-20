@@ -551,16 +551,16 @@ class SyncManager {
                 }, $album->getShopifyCollectionProducts()),
             ];
         }, $this->all_albums);
-        /*
-                for($i = 1; $i < count($this->store_headers_to_display); $i++) {
-                    $header = $this->store_headers_to_display[$i];
-                    $lockArray['other_stores'][] = [
-                        'header'   => $header,
-                        'products' => array_map(function (Product $product) {
-                            return $product->putArray();
-                        }, $this->shopifyApiClient->getAllProducts(['product_type' => $header['shopify_type']])),
-                    ];
-                }*/
+
+        for($i = 1; $i < count($this->store_headers_to_display); $i++) {
+            $header = $this->store_headers_to_display[$i];
+            $lockArray['other_stores'][] = [
+                'header'   => $header,
+                'products' => array_map(function (Product $product) {
+                    return $product->putArray();
+                }, $this->shopifyApiClient->getAllProducts(['product_type' => $header['shopify_type']])),
+            ];
+        }
         return json_encode($lockArray, JSON_PRETTY_PRINT | JSON_OBJECT_AS_ARRAY);
 
         //die();

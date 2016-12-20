@@ -206,14 +206,16 @@ class SynchronousAPIClient extends Client {
     private function preemptiveSleep() {
         // e.g. X-Shopify-Shop-Api-Call-Limit: 32/40
         // https://help.shopify.com/api/guides/api-call-limit
-        list($x, $ofY) = array_map('intval', explode('/', $this->lastCallLimitResponse));
+        if($this->lastCallLimitResponse) {
+            list($x, $ofY) = array_map('intval', explode('/', $this->lastCallLimitResponse));
 
-        if($this->lastCallLimitResponse &&
-           self::MINIMUM_CALL_LIMIT_HEAD_ROOM >= ($ofY - $x)
-        ) {
-            var_dump(list($x, $ofY) = array_map('intval', explode('/', $this->lastCallLimitResponse)));
-            var_dump($ofY - $x);
-            self::rateLimitSleep();
+            if($this->lastCallLimitResponse &&
+               self::MINIMUM_CALL_LIMIT_HEAD_ROOM >= ($ofY - $x)
+            ) {
+                var_dump(list($x, $ofY) = array_map('intval', explode('/', $this->lastCallLimitResponse)));
+                var_dump($ofY - $x);
+                self::rateLimitSleep();
+            }
         }
     }
 
