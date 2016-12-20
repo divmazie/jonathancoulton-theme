@@ -92,8 +92,7 @@ abstract class MusicStoreProduct extends JCTPost {
         $formatOption->name = 'Format';
         $product->options = [$formatOption];
 
-        $productImage = new Image();
-        $productImage->src = $this->getCoverArt()->getURL();
+        $product->image = $this->getCoverArt()->getShopifyImage();
 
         // pair metafields up with their ids
         $product->metafields = array_map(function (Metafield $metafield) use ($syncMeta) {

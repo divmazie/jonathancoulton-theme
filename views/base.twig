@@ -30,7 +30,7 @@
 							{% if not loop.last %}<div class="menu_slash">/</div>{% endif %}
 						{% endfor %}
 						<div class="listen hidden-xs">
-							{% if thisisthestore %}
+							{% if guest_at_store %}
 								<a onclick="backControl()">
 									<img src="{{ theme.link }}/images/back_black.svg" class="controls_backnext" />
 								</a>

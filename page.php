@@ -38,10 +38,12 @@ if($post->slug == "store") {
     $syncMan = new SyncManager(Util::get_shopify_api_client(), Util::get_fetch_api_client());
 
     //$context['store'] = include(__DIR__ . '/cache/cached_store_context.php');
-    $context['store'] = json_decode($syncMan->buildMusicStoreLockFile(), true);
+    $context['store'] = file_exists(SyncManager::MUSIC_STORE_LOCK_FILE_LOCATION) ?
+        json_decode(file_get_contents(SyncManager::MUSIC_STORE_LOCK_FILE_LOCATION), true) :
+        false;
 
 
-    $context['thisisthestore'] = true;
+    $context['guest_at_store'] = true;
 }
 
 if($post->slug == 'news') {

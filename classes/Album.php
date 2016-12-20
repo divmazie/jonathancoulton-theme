@@ -124,9 +124,7 @@ class Album extends MusicStoreProduct {
         $collection->body_html = $this->getAlbumDescription();
         $collection->template_suffix = self::ALBUM_SHOPIFY_COLLECTION_CUSTOM_SUFFIX;
 
-        $image = new Image();
-        $image->src = $this->getCoverArt()->getURL();
-        $collection->image = $image;
+        $collection->image = $this->getCoverArt()->getShopifyImage();
         $collection->sort_order = 'manual';
 
         $collectProducts = $this->getShopifyCollectionProducts();

@@ -15,6 +15,7 @@ class SyncManager {
     const SHOPIFY_REMOTE_COLLECTION_CACHE_PREFIX = 'shopify_remote_collections_cache';
     const FETCH_CACHE_PREFIX = 'fetch_remote_products_cache';
     const FETCH_PAGE_SIZE = 10000;
+    const MUSIC_STORE_LOCK_FILE_LOCATION = __DIR__ . '/../cache/store_lock_file.json';
 
     private $shopifyApiClient, $fetchAppApiClient;
 
@@ -492,6 +493,14 @@ class SyncManager {
         }, $this->remote_fetch_delete_products, $finishedUrl);
     }
 
+    public function should_create_lock_file() {
+        return $this->can_sync_remote() &&
+               !$this->music_store_products_to_create &&
+               !$this->music_store_products_to_update &&
+               !$this->local_shopify_create_collections &&
+               !$this->local_shopify_recreate_collections &&
+               !$this->local_fetch_create_products;
+    }
 
     public function deleteGarbage($finishedUrl) {
         $this->loopTilDone(function (EncodedAsset $encodedAsset) {
@@ -522,7 +531,7 @@ class SyncManager {
         $this->store_category_freshness_indicator = md5(serialize($store_types_to_fetch));
     }
 
-    public function buildMusicStoreLockFile() {
+    public function buildMusicStoreLockArray() {
         $lockArray = [];
         $lockArray['category_freshness'] = $this->store_category_freshness_indicator;
         $lockArray['store_headers'] = $this->store_headers_to_display;
@@ -561,9 +570,17 @@ class SyncManager {
                 }, $this->shopifyApiClient->getAllProducts(['product_type' => $header['shopify_type']])),
             ];
         }
-        return json_encode($lockArray, JSON_PRETTY_PRINT | JSON_OBJECT_AS_ARRAY);
+        return $lockArray;
 
         //die();
+    }
+
+    public function createMusicStoreLockFile() {
+
+        file_put_contents(self::MUSIC_STORE_LOCK_FILE_LOCATION,
+                          json_encode($this->buildMusicStoreLockArray(), JSON_PRETTY_PRINT |
+                                                                         JSON_OBJECT_AS_ARRAY));
+
     }
 
 

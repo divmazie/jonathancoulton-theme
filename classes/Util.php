@@ -135,6 +135,10 @@ class Util {
         return call_user_func_array('array_merge', $arrayOfArrays);
     }
 
+    public static function is_dev() {
+        return filter_var($_SERVER['HTTP_HOST'], FILTER_VALIDATE_IP) !== false;
+    }
+
     static public function slugify($text) {
         // replace non letter or digits by -
         $text = preg_replace('~[^\pL\d]+~u', '-', $text);

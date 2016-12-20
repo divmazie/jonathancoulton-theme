@@ -68,7 +68,7 @@
 
 {% block content %}
     <div class="container" style="display: none; padding-bottom: 60px;" data-bind="fadeVisible: knockout_loaded">
-        {% if store|length < 1 %}
+        {% if not store %}
             <p>The store is temporarily offline.</p>
         {% endif %}
 

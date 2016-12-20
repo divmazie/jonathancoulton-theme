@@ -104,7 +104,7 @@ switch(@$_GET['pipeline_stage']) {
 
     case 'lock_files':
         echo "<pre>";
-        var_dump(json_decode($syncMan->buildMusicStoreLockFile(), true));
+        var_dump(json_decode($syncMan->buildMusicStoreLockArray(), true));
         die();
         break;
 
@@ -112,6 +112,12 @@ switch(@$_GET['pipeline_stage']) {
         echo "<pre>";
         var_dump(include(dirname(__DIR__) . '/cache/cached_store_context.php'));
         die();
+        break;
+
+    case 'lock_create':
+        $syncMan->createMusicStoreLockFile();
+        Util::redirect(status_message_loc("Lockfile created or updated!"));
+
         break;
 
     case 'garbage':
