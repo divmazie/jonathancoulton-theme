@@ -77,7 +77,7 @@ abstract class EncodedAsset extends WPAttachment {
                             'Bucket'              => Util::get_theme_option('aws_bucket_name'),
                             'Key'                 => $this->getAwsName(),
                             'SourceFile'          => $this->getPath(),
-                            'Content-Disposition' => 'attachment'
+                            'ContentDisposition' => 'attachment'
                             //'ACL'   =>  'public-read' // Set permissions through bucket policy for referrals from joco.fetchapp.com
                         ]);
 

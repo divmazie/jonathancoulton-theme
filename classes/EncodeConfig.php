@@ -32,10 +32,11 @@ class EncodeConfig extends EncodedAssetConfig {
 
 
     public function getConfigUniqueFilename() {
-        // track number underscore track title underscore short hash dot extension
-        return sprintf("%'.02d_%s_%s.%s",
+        // track number underscore track title underscore format underscore short hash dot extension
+        return sprintf("%'.02d_%s_%s_%s.%s",
                        $this->getParentTrack()->getTrackNumber(),
                        $this->getParentTrack()->getFilenameFriendlyTitle(),
+                       $this->getEncodeFormat(),
                        $this->getShortUniqueKey(),
                        $this->getFileExtension());
     }
