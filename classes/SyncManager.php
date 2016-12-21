@@ -617,6 +617,7 @@ class SyncManager {
             $chosenFile = tempnam(static::getTempBaseDir(), $uniqueFilePrefix);
         }
 
+        @chmod($chosenFile, 0664);
         return $chosenFile;
     }
 
