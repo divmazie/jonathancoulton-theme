@@ -7,6 +7,7 @@ use Timber\Timber;
 
 $post_id = $_GET['id'];
 $class = 'jct\\' . $_GET['class'];
+$prod = (bool)@$_GET['prod'];
 
 echo "<pre>post id: $post_id
 class: $class
@@ -15,7 +16,6 @@ class: $class
 
 $post = Timber::get_post($post_id, $class);
 
-var_dump($post);
 
 function new_section($header) {
     $header = mb_strtoupper($header);
@@ -24,6 +24,26 @@ function new_section($header) {
     \n\n$header\n$header\n$header\n\n
     ----------------------------\n------------------------------\n-----------------\n\n";
 }
+
+if($prod){
+    /** @var MusicStoreProduct $post */
+
+    echo <<<'EOT'
+<form method=post>
+<button type=submit name=submit value=submit>send</button>
+</form>
+EOT;
+
+    if(@$_POST['submit']){
+        Util::get_shopify_api_client()->putProduct($post->getShopifyProduct());
+    }
+
+    echo json_encode($post->getShopifyProduct()->putArray(), JSON_PRETTY_PRINT);
+    die();
+}
+
+var_dump($post);
+
 
 switch($class) {
 
