@@ -72,10 +72,14 @@ class AlbumZipConfig extends EncodedAssetConfig {
     }
 
     public function getUploadRelativeStorageDirectory() {
-        return self::BASE_UPLOADS_FOLDER . '/' . $this->getParentAlbum()->getFilenameFriendlyTitle();
+        return $this->getParentAlbum()->getFilenameFriendlyTitle();
     }
 
 
+    /**
+     * @return AlbumZip
+     * @throws JCTException
+     */
     public function createZip() {
         if(!$this->isZipWorthy()) {
             throw new JCTException("Album is not zip-worthy!");
@@ -123,7 +127,7 @@ class AlbumZipConfig extends EncodedAssetConfig {
 
         $zipArchive->close();
 
-        AlbumZip::createFromTempFile($zipFileName, $this);
+        return AlbumZip::createFromTempFile($zipFileName, $this);
     }
 
     /**

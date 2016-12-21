@@ -108,7 +108,7 @@ class EncodeTarget {
     }
 
     private function putSuccess($success) {
-        file_put_contents($this->successFile, $success, FILE_APPEND);
+        file_put_contents($this->successFile, $success);
     }
 
     private function postEncodeFile() {

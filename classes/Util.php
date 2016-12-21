@@ -123,7 +123,7 @@ class Util {
         header("Location: $location", true, $status);
     }
 
-    function base64_url_encode($input) {
+    public static function base64_url_encode($input) {
         return strtr(base64_encode($input), '+/=', '-_~');
     }
 

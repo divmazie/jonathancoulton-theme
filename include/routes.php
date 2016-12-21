@@ -17,7 +17,7 @@ Routes::map(EncodeConfig::RECEIVE_ENCODE_ROOT_REL_PATH . '/:auth_code/:encode_co
     $configHash = $params['encode_config_hash'];
     $authCode = $params['auth_code'];
 
-    echo "<pre>";
+    echo "<pre>\n";
     if(!EncodeConfig::isValidAuthCode($authCode)) {
         die('invalid code');
     }
@@ -50,5 +50,25 @@ Routes::map(EncodeConfig::RECEIVE_ENCODE_ROOT_REL_PATH . '/:auth_code/:encode_co
     }
 
     $encode = $targetConfig->createEncodeFromTempFile($tempFilePath);
+
+    // upload it -- we're on a post request from a server that will wait
+    if($encode->shouldUploadToS3()) {
+        $encode->uploadToS3();
+    }
+
+    // zip the parent, if we can
+    $parentZipConfig =
+        $encode->getParentTrack()->getAlbum()->getAlbumZipConfigByName(
+            $encode->getEncodeConfig()->getConfigName());
+
+    if($parentZipConfig->isZipWorthy() && !$parentZipConfig->assetExists()) {
+        $zip = $parentZipConfig->createZip();
+        if($zip->shouldUploadToS3()) {
+            // upload the parent if we can
+            $zip->uploadToS3();
+        }
+    }
+
+    die('thank you');
 });
 

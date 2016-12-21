@@ -182,7 +182,7 @@ class SyncManager {
         $postArray = [];
         $postArray['encodes'] = array_map(function (EncodeConfig $encodeConfig) {
             return $encodeConfig->toEncodeBotArray(EncodeConfig::getEncodeAuthCode());
-        }, EncodeConfig::getAll());
+        }, $this->pending_encodes);
 
         $client = new Client();
 

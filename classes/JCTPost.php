@@ -13,11 +13,11 @@ class JCTPost extends Post {
     }
 
     public function getTitle() {
-        return $this->post_title;
+        return html_entity_decode($this->post_title);
     }
 
     public function getFilenameFriendlyTitle() {
-        return Util::filename_friendly_string($this->title());
+        return Util::filename_friendly_string($this->getTitle());
     }
 
 

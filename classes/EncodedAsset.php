@@ -74,9 +74,9 @@ abstract class EncodedAsset extends WPAttachment {
     public function uploadToS3() {
         $result = self::getS3Client()
             ->putObject([
-                            'Bucket'              => Util::get_theme_option('aws_bucket_name'),
-                            'Key'                 => $this->getAwsName(),
-                            'SourceFile'          => $this->getPath(),
+                            'Bucket'             => Util::get_theme_option('aws_bucket_name'),
+                            'Key'                => $this->getAwsName(),
+                            'SourceFile'         => $this->getPath(),
                             'ContentDisposition' => 'attachment'
                             //'ACL'   =>  'public-read' // Set permissions through bucket policy for referrals from joco.fetchapp.com
                         ]);
@@ -108,11 +108,17 @@ abstract class EncodedAsset extends WPAttachment {
         return [["url" => $this->getS3Url(), "name" => $this->getFetchAppName(true)]];
     }
 
+    /**
+     * @param $tempFilePath
+     * @param EncodedAssetConfig $encodedAssetConfig
+     * @return static
+     * @throws JCTException
+     */
     public static function createFromTempFile($tempFilePath, EncodedAssetConfig $encodedAssetConfig) {
         /** @noinspection PhpUndefinedFunctionInspection */
         $wpUploadDir = wp_upload_dir();
         $fullStoragePath =
-            $wpUploadDir['basedir'] . '/' .
+            $wpUploadDir['path'] . '/' .
             $encodedAssetConfig->getUploadRelativeStorageDirectory() . '/' .
             $encodedAssetConfig->getConfigUniqueFilename();
 
@@ -143,7 +149,7 @@ abstract class EncodedAsset extends WPAttachment {
         /** @noinspection PhpUndefinedFunctionInspection */
         $wpFileType = wp_check_filetype(basename($tempFilePath), null);
 
-        $attachment = [
+        $completedAttachment = [
             // guid must be the filepath!
             'guid'           => $fullStoragePath,
             'post_name'      => $encodedAssetConfig->getUniqueKey(),
@@ -155,14 +161,16 @@ abstract class EncodedAsset extends WPAttachment {
 
         /** @noinspection PhpUndefinedFunctionInspection */
         $attach_id =
-            wp_insert_attachment($attachment, $fullStoragePath, $encodedAssetConfig->getParentPost()->getPostID());
+            wp_insert_attachment($completedAttachment, $fullStoragePath, $encodedAssetConfig->getParentPost()->getPostID());
 
-        $attachment = static::getByID($attach_id);
-        $attachment->setCanonicalContentHash();
-        $attachment->setAttachmentClassMetaVariables();
-        $attachment->setConfigPayloadArray($encodedAssetConfig->toPersistableArray());
+        $completedAttachment = static::getByID($attach_id);
+        $completedAttachment->setCanonicalContentHash();
+        $completedAttachment->setAttachmentClassMetaVariables();
+        $completedAttachment->setConfigPayloadArray($encodedAssetConfig->toPersistableArray());
 
-        return $attachment;
+        // update the cache so we pull the freshened version on this request
+        static::findByUniqueKey($completedAttachment->getUniqueKey(), $completedAttachment);
+        return $completedAttachment;
     }
 
     /**
