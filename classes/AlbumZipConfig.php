@@ -72,7 +72,7 @@ class AlbumZipConfig extends EncodedAssetConfig {
     }
 
     public function getUploadRelativeStorageDirectory() {
-        return $this->getParentAlbum()->getFilenameFriendlyTitle();
+        return self::BASE_UPLOADS_FOLDER . '/' . $this->getParentAlbum()->getFilenameFriendlyTitle();
     }
 
 

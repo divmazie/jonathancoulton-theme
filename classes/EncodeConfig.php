@@ -42,7 +42,7 @@ class EncodeConfig extends EncodedAssetConfig {
     }
 
     public function getUploadRelativeStorageDirectory() {
-        return sprintf('%s/%s',
+        return sprintf('%s/%s/%s', static::BASE_UPLOADS_FOLDER,
                        $this->getParentTrack()->getAlbum()->getFilenameFriendlyTitle(),
                        $this->getEncodeFormat());
     }

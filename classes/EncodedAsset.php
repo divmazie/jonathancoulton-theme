@@ -118,7 +118,7 @@ abstract class EncodedAsset extends WPAttachment {
         /** @noinspection PhpUndefinedFunctionInspection */
         $wpUploadDir = wp_upload_dir();
         $fullStoragePath =
-            $wpUploadDir['path'] . '/' .
+            $wpUploadDir['basedir'] . '/' .
             $encodedAssetConfig->getUploadRelativeStorageDirectory() . '/' .
             $encodedAssetConfig->getConfigUniqueFilename();
 
@@ -143,7 +143,10 @@ abstract class EncodedAsset extends WPAttachment {
             throw new JCTException('Could not rename file');
         }
 
-        @chmod($fullStoragePath, 644);
+        // http://php.net/manual/en/function.chmod.php
+        // Note that mode is not automatically assumed to be an octal value, so to ensure the expected operation, you need to prefix mode with a zero (0). Strings such as "g+w" will not work properly.
+        // 0664 is default wp engine perms for the upload dir
+        @chmod($fullStoragePath, 0664);
 
 
         /** @noinspection PhpUndefinedFunctionInspection */

@@ -75,10 +75,7 @@
             ({{ sync_man.uploadable_assets|length }} total))
             <p>Once all tracks and albums are created, they need to be uploaded to s3</p>
 
-            {{ m.pipeline_button('s3', "Upload all the stuff we got",
-            not (sync_man.pending_encodes or sync_man.pending_zips)
-            and sync_man.unuploaded_assets
-            ) }}
+            {{ m.pipeline_button('s3', "Upload all the stuff we got", sync_man.unuploaded_assets ) }}
 
         </li>
         {% if not sync_man.can_sync_remote %}
