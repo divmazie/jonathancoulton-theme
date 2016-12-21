@@ -16,7 +16,7 @@ class SynchronousAPIClient extends Client {
     const CALL_LIMIT_HEADER = 'X-Shopify-Shop-Api-Call-Limit';
     const MINIMUM_CALL_LIMIT_HEAD_ROOM = 4;
     // https://ecommerce.shopify.com/c/api-announcements/t/upcoming-change-in-api-limit-calculations-159710
-    const RATE_LIMIT_SLEEP_MICROSECONDS = 505 * 1000;
+    const RATE_LIMIT_SLEEP_MICROSECONDS = 505000;
 
     private $apiKey, $apiPassword, $storeHandle, $lastCallLimitResponse;
 

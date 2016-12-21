@@ -14,7 +14,7 @@ style.css
 docker/docker-compose.yml
 
 #don't track cache files
-/cache/*
+/tmp/*
 
 # only track php in html dir, don't track dest files
 docker/encodebot/www/html/*

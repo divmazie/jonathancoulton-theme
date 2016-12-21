@@ -99,9 +99,11 @@ abstract class Struct {
 
     /** @return static[] */
     public static function instancesFromArray($array, Struct $parent = null) {
-        return array_map(function ($childArray) use ($parent) {
-            return self::instanceFromArray($childArray, $parent);
-        }, $array);
+        $instances = [];
+        foreach($array as $instanceRow) {
+            $instances[] = static::instanceFromArray($instanceRow, $parent);
+        }
+        return $instances;
     }
 }
 

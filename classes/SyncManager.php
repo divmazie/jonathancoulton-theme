@@ -15,7 +15,6 @@ class SyncManager {
     const SHOPIFY_REMOTE_COLLECTION_CACHE_PREFIX = 'shopify_remote_collections_cache';
     const FETCH_CACHE_PREFIX = 'fetch_remote_products_cache';
     const FETCH_PAGE_SIZE = 10000;
-    const MUSIC_STORE_LOCK_FILE_LOCATION = __DIR__ . '/../cache/store_lock_file.json';
 
     private $shopifyApiClient, $fetchAppApiClient;
 
@@ -577,7 +576,7 @@ class SyncManager {
 
     public function createMusicStoreLockFile() {
 
-        file_put_contents(self::MUSIC_STORE_LOCK_FILE_LOCATION,
+        file_put_contents(Util::music_lock_file_path(),
                           json_encode($this->buildMusicStoreLockArray(), JSON_PRETTY_PRINT |
                                                                          JSON_OBJECT_AS_ARRAY));
 
@@ -622,7 +621,7 @@ class SyncManager {
     }
 
     private static function getTempBaseDir() {
-        return sys_get_temp_dir();
+        return Util::cache_dir_path();
     }
 
     private static function clearCaches() {
@@ -638,6 +637,4 @@ class SyncManager {
             }
         }
     }
-
-
 }

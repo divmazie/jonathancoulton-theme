@@ -66,9 +66,11 @@ module.exports = function(grunt) {
                     authKey: 'staging'
                 },
                 cache: 'sftpcache.json',
-                src: '../jonathancoulton-theme/',
+                src: './',
                 dest: 'wp-content/themes/jonathancoulton-theme/',
-                exclusions: ['.ftppass', '.git', '.gitignore', '.idea', 'Gruntfile.js', 'node_modules', 'docker', 'docs', '.DS_Store', '.sftpcache.json'],
+                exclusions: ['./.ftppass', './.git', './.gitignore', './.idea', './Gruntfile.js', './node_modules',
+                    './docker', './docs', './.DS_Store', './sftpcache.json', './tmp/*', './bower.json',
+                './package.json', './README.md', './custom_bootstrap', './tests' ],
                 serverSep: '/',
                 concurrency: 4,
                 progress: true

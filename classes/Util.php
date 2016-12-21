@@ -225,4 +225,12 @@ class Util {
         ]);
     }
 
+    public static function music_lock_file_path() {
+        return self::cache_dir_path() . '/' . 'store_lock_file.json';
+    }
+
+    public static function cache_dir_path() {
+        return dirname(__DIR__) . '/tmp';
+    }
+
 }

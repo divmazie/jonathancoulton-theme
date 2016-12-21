@@ -7,8 +7,8 @@ use GuzzleHttp\Client;
 class EncodeConfig extends EncodedAssetConfig {
     const RECEIVE_ENCODE_ROOT_REL_PATH = 'receive_encode';
     const ENCODE_AUTH_CODE_TRANSIENT_NAME = 'jct_encode_secret';
-    // 1 day duration for transient
-    const ENCODE_AUTH_CODE_TRANSIENT_DURATION_SECONDS = 60 * 60 * 24;
+    // 1 day duration for transient (60*60*24)
+    const ENCODE_AUTH_CODE_TRANSIENT_DURATION_SECONDS = 86400;
     const PARENT_POST_CLASS = Track::class;
 
     public function __construct(Track $parentTrack, $encodeFormat, $ffmpegFlags, $configName) {

@@ -20,7 +20,7 @@ abstract class MusicStoreProduct extends JCTPost {
     const META_SHOPIFY_SYNC_METADATA = 'shopify_sync_metadata';
     const META_WIKI_LINK = 'wiki_link';
 
-    const DEFAULT_SHOPIFY_PRODUCT_TYPE = 'Parallel Testing';
+    const DEFAULT_SHOPIFY_PRODUCT_TYPE = 'Download Store';
     const DEFAULT_SHOPIFY_PRODUCT_VENDOR = 'Jonathan Coulton';
 
 

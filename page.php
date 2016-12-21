@@ -38,8 +38,8 @@ if($post->slug == "store") {
     $syncMan = new SyncManager(Util::get_shopify_api_client(), Util::get_fetch_api_client());
 
     //$context['store'] = include(__DIR__ . '/cache/cached_store_context.php');
-    $context['store'] = file_exists(SyncManager::MUSIC_STORE_LOCK_FILE_LOCATION) ?
-        json_decode(file_get_contents(SyncManager::MUSIC_STORE_LOCK_FILE_LOCATION), true) :
+    $context['store'] = file_exists(Util::music_lock_file_path()) ?
+        json_decode(file_get_contents(Util::music_lock_file_path()), true) :
         false;
 
 
