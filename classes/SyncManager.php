@@ -15,12 +15,22 @@ class SyncManager {
     const SHOPIFY_REMOTE_COLLECTION_CACHE_PREFIX = 'shopify_remote_collections_cache';
     const FETCH_CACHE_PREFIX = 'fetch_remote_products_cache';
     const FETCH_PAGE_SIZE = 10000;
+    const SHOPIFY_COLLECTION_CUSTOM_SUFFIX = 'jct_collection';
+
+    const DEFAULT_SHOPIFY_PRODUCT_TYPE = 'Download Store';
+    const DEFAULT_SHOPIFY_PRODUCT_TYPE_TESTING = 'Download Store Testing';
+    const DEFAULT_SHOPIFY_PRODUCT_VENDOR = 'Jonathan Coulton';
+    const MAX_NUMBER_FEATURED_PRODUCTS = 4;
 
     private $shopifyApiClient, $fetchAppApiClient;
 
     public
-        $all_albums,
+        /**
+         * @var MusicStoreCollection[]
+         */
+        $collection_products,
         $all_tracks,
+        $everything_product,
         $all_encodes,
         $pending_encodes,
         $all_zips,
@@ -41,6 +51,7 @@ class SyncManager {
         $fetch_remote_products_filename,
         $fetch_remote_products_mtime,
         $fetch_remote_products,
+        $local_fetch_syncables,
         $local_fetch_create_products,
         $local_fetch_update_products,
         // currently unused... no good way to sort
@@ -68,7 +79,9 @@ class SyncManager {
 
         self::optimizeQueries();
 
-        $this->all_albums = Album::getAll();
+        $this->everything_product = EverythingProduct::getInstance();
+        $this->collection_products = Album::getAll();
+        $this->collection_products[] = $this->everything_product;
         $this->all_tracks = Track::getAll();
 
         $this->all_encodes = EncodeConfig::getAll();
@@ -89,10 +102,14 @@ class SyncManager {
             }
         }
 
+        $this->local_fetch_syncables =
+            array_merge($this->everything_product->getFetchSyncables(), $this->uploadable_assets);
+
         $this->garbage_attachments =
             array_diff_key($this->uploadable_assets, array_merge($this->all_zips, $this->all_encodes));
 
-        $this->local_music_store_products = array_merge($this->all_albums, $this->all_tracks);
+        $this->local_music_store_products =
+            array_merge($this->collection_products, $this->all_tracks);
 
         if($this->can_sync_remote()) {
             $this->loadShopifyProductCache();
@@ -213,7 +230,7 @@ class SyncManager {
 
     public function cacheRemoteShopifyProducts() {
         $this->remote_shopify_products =
-            $this->shopifyApiClient->getAllProducts(['product_type' => MusicStoreProduct::getShopifyProductType()]);
+            $this->shopifyApiClient->getAllProducts(['product_type' => self::getShopifyProductType()]);
         // key remote products by id
         $this->remote_shopify_products = array_combine(array_map(function (Product $product) {
             return $product->id;
@@ -279,7 +296,7 @@ class SyncManager {
     }
 
     public function recordReturnedCollection(Album $album, CustomCollection $customCollection) {
-        $album->getShopifySyncMetadata()->processAlbumCollectionReturn($album, $customCollection);
+        $album->getShopifySyncMetadata()->processCollectionReturn($album, $customCollection);
     }
 
     public function doShopifyProductCreates($finishedUrl) {
@@ -318,7 +335,7 @@ class SyncManager {
         // we only want ones with the custom suffix we are targetting
         $this->remote_shopify_collections =
             array_filter($this->remote_shopify_collections, function (CustomCollection $collection) {
-                return $collection->template_suffix === Album::ALBUM_SHOPIFY_COLLECTION_CUSTOM_SUFFIX;
+                return $collection->template_suffix === SyncManager::SHOPIFY_COLLECTION_CUSTOM_SUFFIX;
             });
 
         // key by id
@@ -349,12 +366,12 @@ class SyncManager {
         // we'll unset the ones that have matches from here soon
         $deleteCollection = $this->remote_shopify_collections;
 
-        foreach($this->all_albums as $album) {
+        foreach($this->collection_products as $album) {
             /** @var Album $album */
             $collection = $album->getShopifyCustomCollection();
             if($collection->id && isset($this->remote_shopify_collections[$collection->id])) {
                 // if it has an id it has been synced before
-                if($album->getShopifySyncMetadata()->albumCollectionHasChanged($album)) {
+                if($album->getShopifySyncMetadata()->customCollectionHasChanged($album)) {
                     $this->local_shopify_recreate_collections[] = $album;
                 } else {
                     $this->local_shopify_skip_collections[] = $album;
@@ -438,7 +455,7 @@ class SyncManager {
         if($this->fetch_remote_products_filename) {
             $local_skus = [];
             foreach($this->uploadable_assets as $uploadable_asset) {
-                /** @var EncodedAsset $uploadable_asset */
+                /** @var FetchSyncable $uploadable_asset */
                 $sku = $uploadable_asset->getShopifyAndFetchSKU();
                 $local_skus[] = $sku;
                 if(isset($this->fetch_remote_products[$sku])) {
@@ -456,7 +473,7 @@ class SyncManager {
     }
 
     public function doFetchCreates($finishedUrl) {
-        $this->loopTilDone(function (EncodedAsset $encodedAsset) {
+        $this->loopTilDone(function (FetchSyncable $encodedAsset) {
             $fetch_product = $encodedAsset->getFetchAppProduct();
             $rv = $fetch_product->create([], $encodedAsset->getFetchAppUrlsArray());
             if($rv === true) {
@@ -470,7 +487,7 @@ class SyncManager {
     }
 
     public function doFetchUpdates($finishedUrl) {
-        $this->loopTilDoneStaticArray(function (EncodedAsset $encodedAsset) {
+        $this->loopTilDoneStaticArray(function (FetchSyncable $encodedAsset) {
             $fetch_product = $encodedAsset->getFetchAppProduct();
             //var_dump($fetch_product);
             //var_dump($this->fetch_remote_products[$fetch_product->getSKU()]);
@@ -554,7 +571,7 @@ class SyncManager {
 
         $lockArray['download_store']['playlist'] = [];
         $playlist = &$lockArray['download_store']['playlist'];
-        foreach($this->all_albums as $album) {
+        foreach($this->collection_products as $album) {
             $thisCollection = $lockArray['download_store']['collections'][] = [
                 'collection' => $album->getShopifyCustomCollection()->putArray(),
                 'products'   => array_map(function (Product $product) {
@@ -586,7 +603,7 @@ class SyncManager {
 
         // kill any still null albums if somehow those have come to be here
         $featuredAlbumArray =
-            array_slice(array_filter($featuredAlbumArray), 0, MusicStoreProduct::MAX_NUMBER_FEATURED_PRODUCTS);
+            array_slice(array_filter($featuredAlbumArray), 0, SyncManager::MAX_NUMBER_FEATURED_PRODUCTS);
 
         for($i = 1; $i < count($this->store_headers_to_display); $i++) {
             $header = $this->store_headers_to_display[$i];
@@ -696,5 +713,10 @@ class SyncManager {
             json_decode(file_get_contents(self::featured_albums_lock_file_path()), true) :
             false;
     }
+
+    public static function getShopifyProductType() {
+        return Util::is_dev() ? self::DEFAULT_SHOPIFY_PRODUCT_TYPE_TESTING : self::DEFAULT_SHOPIFY_PRODUCT_TYPE;
+    }
+
 
 }

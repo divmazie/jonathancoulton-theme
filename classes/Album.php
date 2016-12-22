@@ -3,14 +3,10 @@
 namespace jct;
 
 use jct\Shopify\CustomCollection;
-use jct\Shopify\Exception\Exception;
-use jct\Shopify\Image;
 use jct\Shopify\Metafield;
 use jct\Shopify\Product;
 
-class Album extends MusicStoreProduct {
-
-    const ALBUM_SHOPIFY_COLLECTION_CUSTOM_SUFFIX = 'album_collection';
+class Album extends MusicStoreProductPost implements MusicStoreCollection {
 
     // meta fields acf will load (here for autocomplete purposes)
     public $album_artist, $album_price, $album_year, $album_genre, $album_art, $album_comment, $album_sort_order, $album_description, $shopify_collection_id, $bonus_assets, $show_album_in_store;
@@ -122,7 +118,7 @@ class Album extends MusicStoreProduct {
         $collection->id = $this->getShopifySyncMetadata()->getCustomCollectionID();
         $collection->title = $this->getTitle();
         $collection->body_html = $this->getAlbumDescription();
-        $collection->template_suffix = self::ALBUM_SHOPIFY_COLLECTION_CUSTOM_SUFFIX;
+        $collection->template_suffix = SyncManager::SHOPIFY_COLLECTION_CUSTOM_SUFFIX;
 
         $collection->image = $this->getCoverArt()->getShopifyImage();
         $collection->sort_order = 'manual';

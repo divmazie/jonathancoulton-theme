@@ -26,7 +26,7 @@ function new_section($header) {
 }
 
 if($prod){
-    /** @var MusicStoreProduct $post */
+    /** @var MusicStoreProductPost $post */
 
     echo <<<'EOT'
 <form method=post>

@@ -4,7 +4,7 @@ namespace jct;
 
 use jct\Shopify\Metafield;
 
-class Track extends MusicStoreProduct {
+class Track extends MusicStoreProductPost {
 
     const PLAYER_ENCODE_CONFIG_NAME = 'MP3';
 

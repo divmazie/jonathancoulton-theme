@@ -7,7 +7,7 @@ use Aws\S3\S3Client;
 use FetchApp\API\Currency;
 use FetchApp\API\Product as FetchProduct;
 
-abstract class EncodedAsset extends WPAttachment {
+abstract class EncodedAsset extends WPAttachment implements FetchSyncable {
     const META_CONFIG_PAYLOAD = 'jct_asset_config_payload';
     const META_S3_URL = 'jct_s3_url';
     const META_S3_HASH = 'jct_s3_hash';
@@ -31,7 +31,7 @@ abstract class EncodedAsset extends WPAttachment {
 
     abstract public function getShopifyProductVariantTitle();
 
-    /** @return MusicStoreProduct */
+    /** @return MusicStoreProductPost */
     abstract public function getParentMusicStoreProduct();
 
     public function getConfigPayloadArray() {
@@ -58,7 +58,7 @@ abstract class EncodedAsset extends WPAttachment {
         $this->update(self::META_S3_HASH, $hash);
     }
 
-    /** @return MusicStoreProduct */
+    /** @return MusicStoreProductPost */
     public function getParentPost($parentPostClass = JCTPost::class) {
         return Util::get_posts_cached($this->post_parent, $parentPostClass);
     }

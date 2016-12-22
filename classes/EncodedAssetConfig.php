@@ -13,7 +13,7 @@ abstract class EncodedAssetConfig {
 
     private $parentPost, $encodeFormat, $ffmpegFlags, $configName;
 
-    public function __construct(MusicStoreProduct $parentPost, $encodeFormat, $ffmpegFlags, $configName) {
+    public function __construct(MusicStoreProductPost $parentPost, $encodeFormat, $ffmpegFlags, $configName) {
         $this->parentPost = $parentPost;
         $this->encodeFormat = $encodeFormat;
         $this->ffmpegFlags = $ffmpegFlags;
@@ -21,7 +21,7 @@ abstract class EncodedAssetConfig {
     }
 
     /**
-     * @return MusicStoreProduct
+     * @return MusicStoreProductPost
      */
     public function getParentPost() {
         return $this->parentPost;
@@ -61,7 +61,7 @@ abstract class EncodedAssetConfig {
     }
 
 
-    public static function getConfigsForPost(MusicStoreProduct $JCTPost, $keyByName = false) {
+    public static function getConfigsForPost(MusicStoreProductPost $JCTPost, $keyByName = false) {
         $encTypes = Util::get_encode_types();
         $configs = [];
 
@@ -74,7 +74,7 @@ abstract class EncodedAssetConfig {
     /**
      * @return static
      */
-    public static function getConfigForPostByConfigName(MusicStoreProduct $JCTPost, $configName) {
+    public static function getConfigForPostByConfigName(MusicStoreProductPost $JCTPost, $configName) {
         return static::getConfigsForPost($JCTPost, true)[$configName];
     }
 
