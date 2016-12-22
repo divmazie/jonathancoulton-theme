@@ -213,7 +213,7 @@ class SyncManager {
 
     public function cacheRemoteShopifyProducts() {
         $this->remote_shopify_products =
-            $this->shopifyApiClient->getAllProducts(['product_type' => MusicStoreProduct::DEFAULT_SHOPIFY_PRODUCT_TYPE]);
+            $this->shopifyApiClient->getAllProducts(['product_type' => MusicStoreProduct::getShopifyProductType()]);
         // key remote products by id
         $this->remote_shopify_products = array_combine(array_map(function (Product $product) {
             return $product->id;
@@ -530,7 +530,12 @@ class SyncManager {
         $this->store_category_freshness_indicator = md5(serialize($store_types_to_fetch));
     }
 
-    public function buildMusicStoreLockArray() {
+    public function buildMusicStoreLockArrays(&$lockArray, &$featuredAlbumArray) {
+        $featuredAlbumArray = array_map(function ($acfArray) {
+            return $acfArray['spotlight_album'];
+        }, Util::get_theme_option('spotlight_albums'));
+        $featuredAlbumArray = array_combine($featuredAlbumArray, array_fill(0, count($featuredAlbumArray), null));
+
         $lockArray = [];
         $lockArray['category_freshness'] = $this->store_category_freshness_indicator;
         $lockArray['store_headers'] = $this->store_headers_to_display;
@@ -545,8 +550,12 @@ class SyncManager {
                 'title' => $product->title,
             ];
         }, $this->all_tracks);
-        $lockArray['download_store']['collections'] = array_map(function (Album $album) {
-            return [
+
+
+        $lockArray['download_store']['playlist'] = [];
+        $playlist = &$lockArray['download_store']['playlist'];
+        foreach($this->all_albums as $album) {
+            $thisCollection = $lockArray['download_store']['collections'][] = [
                 'collection' => $album->getShopifyCustomCollection()->putArray(),
                 'products'   => array_map(function (Product $product) {
                     // key these by metafield key
@@ -558,7 +567,26 @@ class SyncManager {
                     return $product->putArray();
                 }, $album->getShopifyCollectionProducts()),
             ];
-        }, $this->all_albums);
+
+            $playlist[] = array_map(function (Track $track) {
+                $product = $track->getShopifyProduct();
+                return [
+                    'id'    => $product->id,
+                    'url'   => $track->getEncodeConfigByName(Track::PLAYER_ENCODE_CONFIG_NAME)->getEncode()->getURL(),
+                    'title' => $product->title,
+                ];
+            }, $album->getAlbumTracks());
+
+            if(array_key_exists($album->getPostID(), $featuredAlbumArray)) {
+                $featuredAlbumArray[$album->getPostID()] = $thisCollection;
+            }
+        }
+
+        $playlist = Util::array_merge_flatten_1L($playlist);
+
+        // kill any still null albums if somehow those have come to be here
+        $featuredAlbumArray =
+            array_slice(array_filter($featuredAlbumArray), 0, MusicStoreProduct::MAX_NUMBER_FEATURED_PRODUCTS);
 
         for($i = 1; $i < count($this->store_headers_to_display); $i++) {
             $header = $this->store_headers_to_display[$i];
@@ -569,16 +597,26 @@ class SyncManager {
                 }, $this->shopifyApiClient->getAllProducts(['product_type' => $header['shopify_type']])),
             ];
         }
-        return $lockArray;
+
+        return;
 
         //die();
     }
 
     public function createMusicStoreLockFile() {
 
-        file_put_contents(Util::music_lock_file_path(),
-                          json_encode($this->buildMusicStoreLockArray(), JSON_PRETTY_PRINT |
-                                                                         JSON_OBJECT_AS_ARRAY));
+        $lockArray = null;
+        $featuredAlbumArray = null;
+
+        $this->buildMusicStoreLockArrays($lockArray, $featuredAlbumArray);
+
+        file_put_contents(self::music_lock_file_path(),
+                          json_encode($lockArray, JSON_PRETTY_PRINT |
+                                                  JSON_OBJECT_AS_ARRAY));
+
+        file_put_contents(self::featured_albums_lock_file_path(),
+                          json_encode($featuredAlbumArray, JSON_PRETTY_PRINT |
+                                                           JSON_OBJECT_AS_ARRAY));
 
     }
 
@@ -638,4 +676,25 @@ class SyncManager {
             }
         }
     }
+
+    public static function music_lock_file_path() {
+        return Util::cache_dir_path() . '/' . 'store_lock_file.json';
+    }
+
+    public static function featured_albums_lock_file_path() {
+        return Util::cache_dir_path() . '/' . 'featured_albums_lock_file.json';
+    }
+
+    public static function get_store() {
+        return file_exists(self::music_lock_file_path()) ?
+            json_decode(file_get_contents(self::music_lock_file_path()), true) :
+            false;
+    }
+
+    public static function get_featured_albums() {
+        return file_exists(self::featured_albums_lock_file_path()) ?
+            json_decode(file_get_contents(self::featured_albums_lock_file_path()), true) :
+            false;
+    }
+
 }

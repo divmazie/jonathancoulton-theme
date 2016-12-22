@@ -21,7 +21,9 @@ abstract class MusicStoreProduct extends JCTPost {
     const META_WIKI_LINK = 'wiki_link';
 
     const DEFAULT_SHOPIFY_PRODUCT_TYPE = 'Download Store';
+    const DEFAULT_SHOPIFY_PRODUCT_TYPE_TESTING = 'Download Store Testing';
     const DEFAULT_SHOPIFY_PRODUCT_VENDOR = 'Jonathan Coulton';
+    const MAX_NUMBER_FEATURED_PRODUCTS = 4;
 
 
     abstract public function getPrice();
@@ -74,7 +76,8 @@ abstract class MusicStoreProduct extends JCTPost {
         $product->id = $syncMeta->getProductID();
         $product->title = $this->getDownloadStoreTitle();
         $product->body_html = $this->getDownloadStoreBodyHtml();
-        $product->product_type = self::DEFAULT_SHOPIFY_PRODUCT_TYPE;
+        $product->product_type = self::getShopifyProductType();
+
         $product->vendor = self::DEFAULT_SHOPIFY_PRODUCT_VENDOR;
         $product->variants = array_map(function (EncodedAsset $assetConfig) use ($syncMeta) {
             $variant = new ProductVariant();
@@ -101,6 +104,10 @@ abstract class MusicStoreProduct extends JCTPost {
         }, $this->getShopifyMetafields());
 
         return $product;
+    }
+
+    public static function getShopifyProductType() {
+        return Util::is_dev() ? self::DEFAULT_SHOPIFY_PRODUCT_TYPE_TESTING : self::DEFAULT_SHOPIFY_PRODUCT_TYPE;
     }
 
     public function getWikiLink() {

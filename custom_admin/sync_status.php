@@ -91,7 +91,7 @@ switch(@$_GET['pipeline_stage']) {
         break;
 
     case 'fetch_create':
-        $syncMan->doFetchCreates(status_message_loc("We created those fetch products!"));
+        $syncMan->doFetchCreates(status_message_loc("We created those fetch dproducts!"));
         break;
 
     case 'fetch_update':
@@ -104,7 +104,7 @@ switch(@$_GET['pipeline_stage']) {
 
     case 'lock_files':
         echo "<pre>";
-        var_dump(json_decode($syncMan->buildMusicStoreLockArray(), true));
+        var_dump(json_decode($syncMan->buildMusicStoreLockArrays(), true));
         die();
         break;
 

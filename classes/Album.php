@@ -167,8 +167,8 @@ class Album extends MusicStoreProduct {
         $all = parent::getAll();
 
         usort($all, function (Album $left, Album $right) {
-            $leftSortOrder = $left->getAlbumSortOrder();
-            $rightSortOrder = $right->getAlbumSortOrder();
+            $leftSortOrder = $left->menu_order;
+            $rightSortOrder = $right->menu_order;
 
             return $leftSortOrder == $rightSortOrder ? 0 : ($leftSortOrder < $rightSortOrder ? -1 : 1);
         });

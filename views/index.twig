@@ -58,20 +58,16 @@
 		<div class="container">
 			<h2 class="section_header">Recent releases</h2>
 			<p class="featured-p">
-				{% set album_count = 0 %}
-				{% for album in albums %}
-					{% if (album.collection.image.src and album_count < 4) and (album.collection.title != 'Everything') %}
-						<div class="col-sm-3 col-xs-6 product">
-							<a href="{{ site.url }}/store/#downloads-album{{ album.collection.id }}" class="no_underline">
-								<div class="album_square" style="background-image: url('{{ album.collection.image.src }}')"></div>
-								<div class="product_text">
-									<div class="product_title">{{ album.collection.title }}</div>
-									<div class="product_description">{{ album.collection.body_html }}</div>
-								</div>
-							</a>
-						</div>
-						{% set album_count = album_count + 1 %}
-					{% endif %}
+				{% for album in featured_albums %}
+                    <div class="col-sm-3 col-xs-6 product">
+                        <a href="{{ site.url }}/store/#downloads-album{{ album.collection.id }}" class="no_underline">
+                            <div class="album_square" style="background-image: url('{{ album.collection.image.src }}')"></div>
+                            <div class="product_text">
+                                <div class="product_title">{{ album.collection.title }}</div>
+                                <div class="product_description">{{ album.collection.body_html }}</div>
+                            </div>
+                        </a>
+                    </div>
 				{% endfor %}
 			</p>
 		</div>

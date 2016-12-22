@@ -27,6 +27,7 @@ $context['post'] = new Post();
 $context['showcase_tiles'] = Timber::get_posts('post_type=showcase_tile');
 $context['blurb_header'] = Util::get_theme_option('front_page_blurb_header');
 $context['blurb_content'] = Util::get_theme_option('front_page_blurb_content');
+$context['featured_albums'] = SyncManager::get_featured_albums();
 
 $bandsintown = get_site_transient('bandsintown');
 if(!$bandsintown) {

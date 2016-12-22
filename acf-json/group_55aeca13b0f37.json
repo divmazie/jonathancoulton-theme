@@ -248,7 +248,8 @@
                 "id": ""
             },
             "message": "After creating or editing albums or tracks, visit the <a href='\/custom_admin\/music_admin'>music admin page<\/a> to create the files that will be sold to customers and sync them to the store.\r\n\r\nClick this button after making any change to the store, including changing the categories below!\r\n\r\n<button onclick=\"window.location='\/custom_admin\/refresh_store'\">Refresh store!<\/button>",
-            "esc_html": 0
+            "esc_html": 0,
+            "new_lines": "wpautop"
         },
         {
             "key": "field_564cf548fe4c2",
@@ -364,6 +365,50 @@
                     },
                     "message": "",
                     "default_value": 0
+                }
+            ]
+        },
+        {
+            "key": "field_585acc3e3ab56",
+            "label": "Spotlight Products",
+            "name": "spotlight_albums",
+            "type": "repeater",
+            "instructions": "These determine the tabs within the store part of the site and what Shopify product types they should display. The first category is the download store (only the display name is used, the rest is hardcoded).",
+            "required": 0,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "",
+                "class": "",
+                "id": ""
+            },
+            "min": "",
+            "max": "",
+            "layout": "table",
+            "button_label": "Add Spotlight Album",
+            "sub_fields": [
+                {
+                    "key": "field_585acc5d3ab5c",
+                    "label": "Spotlight Album",
+                    "name": "spotlight_album",
+                    "type": "post_object",
+                    "instructions": "The first few of these will be displayed as spotlight albums on the home page.",
+                    "required": 0,
+                    "conditional_logic": 0,
+                    "wrapper": {
+                        "width": "",
+                        "class": "",
+                        "id": ""
+                    },
+                    "post_type": [
+                        "album"
+                    ],
+                    "taxonomy": [
+
+                    ],
+                    "allow_null": 0,
+                    "multiple": 0,
+                    "return_format": "id",
+                    "ui": 1
                 }
             ]
         },
@@ -627,5 +672,5 @@
     "hide_on_screen": "",
     "active": 1,
     "description": "",
-    "modified": 1466024715
+    "modified": 1482348004
 }
