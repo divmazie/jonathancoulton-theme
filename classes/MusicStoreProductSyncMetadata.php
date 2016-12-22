@@ -22,14 +22,18 @@ class MusicStoreProductSyncMetadata {
     // a hierarchical map of the various quantities we need to track...
     private $trackingArray = [];
 
-    public function processAPIProductReturn(MusicStoreProduct $localMusicStoreProduct, Product $returnedProduct) {
-        $locallyGeneratedShopifyProductObject = $localMusicStoreProduct->getShopifyProduct();
+    public function processMusicStoreProductReturn(MusicStoreProduct $localMusicStoreProduct, Product $returnedProduct) {
+        $localProduct = $localMusicStoreProduct->getShopifyProduct();
+        $this->processGenericProductReturn($localProduct, $returnedProduct);
+        $localMusicStoreProduct->setShopifySyncMetadata($this);
+    }
 
+    public function processGenericProductReturn(Product $localProduct, Product $returnedProduct) {
         $this->trackingArray[self::PRODUCT][self::OBJECT_ID] = $returnedProduct->id;
         // we hash on this--there will always be unpredictable differences due to how shopify interprets our response
         // (due to image urls, etc)
         $this->trackingArray[self::PRODUCT][self::VERSION_HASH] =
-            self::versionHash($locallyGeneratedShopifyProductObject);
+            self::versionHash($localProduct);
 
         foreach($returnedProduct->metafields as $metafield) {
             $this->trackingArray[self::PRODUCT][self::METAFIELDS][$metafield->namespace][$metafield->key][self::OBJECT_ID] =
@@ -41,25 +45,25 @@ class MusicStoreProductSyncMetadata {
             $this->trackingArray[self::PRODUCT][self::VARIANTS][$variant->sku][self::OBJECT_ID] =
                 $variant->id;
         }
-
-        $localMusicStoreProduct->setShopifySyncMetadata($this);
     }
 
-    public function processAPICollectionReturn(Album $musicStoreAlbum, CustomCollection $returnedCollection) {
+    public function processAlbumCollectionReturn(Album $musicStoreAlbum, CustomCollection $returnedCollection) {
+        $this->processGenericCollectionReturn($musicStoreAlbum->getShopifyCustomCollection(), $returnedCollection);
+        $musicStoreAlbum->setShopifySyncMetadata($this);
+    }
+
+    public function processGenericCollectionReturn(CustomCollection $localCollection, CustomCollection $returnedCollection) {
         $this->trackingArray[self::COLLECTION][self::OBJECT_ID] = $returnedCollection->id;
         $this->trackingArray[self::COLLECTION][self::VERSION_HASH] =
-            $this->versionHash($musicStoreAlbum->getShopifyCustomCollection());
-
-        $musicStoreAlbum->setShopifySyncMetadata($this);
+            $this->versionHash($localCollection);
     }
 
     public function getCustomCollectionID() {
         return @$this->trackingArray[self::COLLECTION][self::OBJECT_ID];
     }
 
-    public function customCollectionHasChanged(Album $forAlbum) {
-        return $this->versionHash($forAlbum->getShopifyCustomCollection()) !==
-               @$this->trackingArray[self::COLLECTION][self::VERSION_HASH];
+    public function albumCollectionHasChanged(Album $forAlbum) {
+        return $this->collectionNeedsUpdate($forAlbum->getShopifyCustomCollection());
     }
 
     public function getProductID() {
@@ -69,6 +73,11 @@ class MusicStoreProductSyncMetadata {
     public function productNeedsUpdate(Product $product) {
         return $this->versionHash($product) !==
                @$this->trackingArray[self::PRODUCT][self::VERSION_HASH];
+    }
+
+    public function collectionNeedsUpdate(CustomCollection $customCollection) {
+        return $this->versionHash($customCollection) !==
+               @$this->trackingArray[self::COLLECTION][self::VERSION_HASH];
     }
 
     public function getIDForMetafield(Metafield $metafield) {

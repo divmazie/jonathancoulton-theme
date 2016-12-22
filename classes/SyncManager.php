@@ -275,11 +275,11 @@ class SyncManager {
     }
 
     public function recordReturnedProduct(MusicStoreProduct $musicStoreProduct, Product $returnedProduct) {
-        $musicStoreProduct->getShopifySyncMetadata()->processAPIProductReturn($musicStoreProduct, $returnedProduct);
+        $musicStoreProduct->getShopifySyncMetadata()->processMusicStoreProductReturn($musicStoreProduct, $returnedProduct);
     }
 
     public function recordReturnedCollection(Album $album, CustomCollection $customCollection) {
-        $album->getShopifySyncMetadata()->processAPICollectionReturn($album, $customCollection);
+        $album->getShopifySyncMetadata()->processAlbumCollectionReturn($album, $customCollection);
     }
 
     public function doShopifyProductCreates($finishedUrl) {
@@ -354,7 +354,7 @@ class SyncManager {
             $collection = $album->getShopifyCustomCollection();
             if($collection->id && isset($this->remote_shopify_collections[$collection->id])) {
                 // if it has an id it has been synced before
-                if($album->getShopifySyncMetadata()->customCollectionHasChanged($album)) {
+                if($album->getShopifySyncMetadata()->albumCollectionHasChanged($album)) {
                     $this->local_shopify_recreate_collections[] = $album;
                 } else {
                     $this->local_shopify_skip_collections[] = $album;

@@ -47,7 +47,7 @@ class Album extends MusicStoreProduct {
         return $this->album_description;
     }
 
-    public function getAlbumShow() {
+    public function shouldShowAlbum() {
         return $this->show_album_in_store;
     }
 
@@ -66,7 +66,7 @@ class Album extends MusicStoreProduct {
     }
 
     public function isFilledOut() {
-        return ($this->getAlbumShow() && $this->getTitle() && $this->getAlbumArtist() &&
+        return ($this->shouldShowAlbum() && $this->getTitle() && $this->getAlbumArtist() &&
                 $this->getCoverArt() && $this->getCoverArt()->fileAssetExists());
     }
 
