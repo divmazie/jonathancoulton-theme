@@ -41,7 +41,7 @@ class EverythingFetchSyncable implements FetchSyncable {
     public function getFetchAppUrlsArray() {
         return Util::array_merge_flatten_1L(array_map(function (Album $album) {
             return $album->getAlbumZipConfigByName($this->configName)->getAlbumZip()->getFetchAppUrlsArray();
-        }, AlbumZip::getAll()));
+        }, Album::getAll()));
     }
 
 

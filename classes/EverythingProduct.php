@@ -8,7 +8,7 @@ use jct\Shopify\Product;
 use jct\Shopify\ProductOption;
 use jct\Shopify\ProductVariant;
 
-class EverythingProduct implements MusicStoreProduct {
+class EverythingProduct implements MusicStoreProduct, MusicStoreCollection {
 
     const EVERYTHING_SYNC_STORE = 'jct_everything_sync';
 
@@ -34,12 +34,19 @@ class EverythingProduct implements MusicStoreProduct {
     }
 
     public function getTitle($withConfigName = null) {
-        return Util::get_theme_option('everything_title') .
-               ($withConfigName ? sprintf(' (%s)', $withConfigName) : '');
+        $themeOpt = Util::get_theme_option('everything_title');
+        if(!$themeOpt) {
+            $themeOpt = 'Everything';
+        }
+        return $themeOpt . ($withConfigName ? sprintf(' (%s)', $withConfigName) : '');
     }
 
     public function getCopy() {
-        return Util::get_theme_option('everything_copy');
+        $copy = Util::get_theme_option('everything_copy');
+        if(!$copy) {
+            return 'Everything listed below';
+        }
+        return $copy;
     }
 
     public function getPrice() {
@@ -62,8 +69,8 @@ class EverythingProduct implements MusicStoreProduct {
         $id = $syncMeta->getProductID();
 
         $product->id = $id;
-        $product->title = self::getTitle();
-        $product->body_html = self::getCopy();
+        $product->title = $this->getTitle();
+        $product->body_html = $this->getCopy();
         $product->product_type = SyncManager::getShopifyProductType();
         $product->vendor = SyncManager::DEFAULT_SHOPIFY_PRODUCT_VENDOR;
 
@@ -72,7 +79,7 @@ class EverythingProduct implements MusicStoreProduct {
             $variant = new ProductVariant();
             $variant->title = $fetchSyncable->getConfigName();
             $variant->sku = $fetchSyncable->getShopifyAndFetchSKU();
-            $variant->price = self::getPrice();
+            $variant->price = $this->getPrice();
             $variant->option1 = $fetchSyncable->getConfigName();
             $variant->id = $syncMeta->getIDForVariant($variant);
 
@@ -87,31 +94,35 @@ class EverythingProduct implements MusicStoreProduct {
         $wikiLink->key = 'wiki_link';
         $wikiLink->value = Util::get_theme_option('joco_wiki_base_url') . '/Discography';
         $wikiLink->useInferredValueType();
+        // if we have it...
+        $wikiLink->id = $syncMeta->getIDForMetafield($wikiLink);
 
         $product->metafields = [$wikiLink];
 
         return $product;
     }
 
-
-    public function getShopifyCollection() {
+    public function getShopifyCustomCollection() {
         $syncMeta = $this->getShopifySyncMetadata();
-        if(!$syncMeta->getProductID()) {
-            throw new JCTException("Attempt to create collection for everything without product");
-        }
 
         $collection = new CustomCollection();
 
         $collection->id = $syncMeta->getCustomCollectionID();
-        $collection->title = self::getTitle();
-        $collection->body_html = self::getCopy();
+        $collection->title = $this->getTitle();
+        $collection->body_html = $this->getCopy();
         $collection->template_suffix = SyncManager::SHOPIFY_COLLECTION_CUSTOM_SUFFIX;
 
         $collection->image = null;
         $collection->sort_order = 'manual';
 
-        $collection->collects = ['product_id' => $syncMeta->getProductID(), 'sort_value' => 0, 'position' => 0];
+        $collection->collects = [['product_id' => $syncMeta->getProductID(), 'sort_value' => 0, 'position' => 0]];
 
         return $collection;
     }
+
+    public function getShopifyCollectionProducts() {
+        return [$this->getShopifyProduct()];
+    }
+
+
 }

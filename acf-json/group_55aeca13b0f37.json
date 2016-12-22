@@ -280,11 +280,11 @@
             "placeholder": "",
             "prepend": "",
             "append": "",
-            "key": "field_585b2ac517487",
+            "key": "field_585b2ac5174872",
             "label": "Everything Title",
             "name": "everything_title",
             "type": "text",
-            "instructions": "What is the title of the everything product",
+            "instructions": "What is the title of the everything product? (DEFAULT: Everything)",
             "required": 1,
             "conditional_logic": 0,
             "wrapper": {
@@ -303,7 +303,7 @@
             "label": "Everything Copy",
             "name": "everything_copy",
             "type": "wysiwyg",
-            "instructions": "What is the description of the everything product",
+            "instructions": "What is the description of the everything product? (DEFAULT: Everything listed below)",
             "required": 0,
             "conditional_logic": 0,
             "wrapper": {

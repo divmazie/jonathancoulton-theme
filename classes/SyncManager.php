@@ -36,7 +36,6 @@ class SyncManager {
         $all_zips,
         $pending_zips,
         $uploadable_assets,
-        $uploadable_asset_skus,
         $unuploaded_assets,
         $uploaded_assets,
         $garbage_attachments,
@@ -80,8 +79,7 @@ class SyncManager {
         self::optimizeQueries();
 
         $this->everything_product = EverythingProduct::getInstance();
-        $this->collection_products = Album::getAll();
-        $this->collection_products[] = $this->everything_product;
+        $this->collection_products = array_merge([$this->everything_product], Album::getAll());
         $this->all_tracks = Track::getAll();
 
         $this->all_encodes = EncodeConfig::getAll();
@@ -91,10 +89,8 @@ class SyncManager {
         $this->pending_zips = AlbumZipConfig::getPending();
 
         $this->uploadable_assets = array_merge(Encode::getAll(), AlbumZip::getAll());
-        $this->uploadable_asset_skus = [];
         foreach($this->uploadable_assets as $uploadable_asset) {
             /** @var EncodedAsset $uploadable_asset */
-            $this->uploadable_asset_skus[] = $uploadable_asset->getShopifyAndFetchSKU();
             if($uploadable_asset->isUploadedToS3()) {
                 $this->uploaded_assets[] = $uploadable_asset;
             } else {
@@ -104,6 +100,11 @@ class SyncManager {
 
         $this->local_fetch_syncables =
             array_merge($this->everything_product->getFetchSyncables(), $this->uploadable_assets);
+
+        // key by SKU
+        $this->local_fetch_syncables = array_combine(array_map(function (FetchSyncable $syncable) {
+            return $syncable->getShopifyAndFetchSKU();
+        }, $this->local_fetch_syncables), $this->local_fetch_syncables);
 
         $this->garbage_attachments =
             array_diff_key($this->uploadable_assets, array_merge($this->all_zips, $this->all_encodes));
@@ -295,7 +296,7 @@ class SyncManager {
         $musicStoreProduct->getShopifySyncMetadata()->processMusicStoreProductReturn($musicStoreProduct, $returnedProduct);
     }
 
-    public function recordReturnedCollection(Album $album, CustomCollection $customCollection) {
+    public function recordReturnedCollection(MusicStoreCollection $album, CustomCollection $customCollection) {
         $album->getShopifySyncMetadata()->processCollectionReturn($album, $customCollection);
     }
 
@@ -388,13 +389,14 @@ class SyncManager {
     }
 
     public function doCollectionPostAction($finishedUrl, $albumArray, $deleteFirst = false, $staticArray = false) {
-        $callable = function (Album $album) use ($deleteFirst) {
+        $callable = function (MusicStoreCollection $collection) use ($deleteFirst) {
             if($deleteFirst) {
-                $this->shopifyApiClient->deleteCollection($album->getShopifyCustomCollection());
-                unset($this->remote_shopify_collections[$album->getShopifyCustomCollection()->id]);
+                $this->shopifyApiClient->deleteCollection($collection->getShopifyCustomCollection());
+                unset($this->remote_shopify_collections[$collection->getShopifyCustomCollection()->id]);
             }
-            $returnedCollection = $this->shopifyApiClient->postCustomCollection($album->getShopifyCustomCollection());
-            $this->recordReturnedCollection($album, $returnedCollection);
+            $returnedCollection =
+                $this->shopifyApiClient->postCustomCollection($collection->getShopifyCustomCollection());
+            $this->recordReturnedCollection($collection, $returnedCollection);
 
             $this->remote_shopify_collections[$returnedCollection->id] = $returnedCollection;
             $this->updateShopifyCollectionsCache();
@@ -426,7 +428,7 @@ class SyncManager {
         $cacheArray = [];
         foreach($all as &$product) {
             // if this is one of ours, include it
-            if(in_array($product->getSKU(), $this->uploadable_asset_skus)) {
+            if(isset($this->local_fetch_syncables[$product->getSKU()])) {
                 $cacheArray[$product->getSKU()] = $product;
             }
         }
@@ -454,7 +456,7 @@ class SyncManager {
     private function sortFetchProducts() {
         if($this->fetch_remote_products_filename) {
             $local_skus = [];
-            foreach($this->uploadable_assets as $uploadable_asset) {
+            foreach($this->local_fetch_syncables as $uploadable_asset) {
                 /** @var FetchSyncable $uploadable_asset */
                 $sku = $uploadable_asset->getShopifyAndFetchSKU();
                 $local_skus[] = $sku;
@@ -571,9 +573,9 @@ class SyncManager {
 
         $lockArray['download_store']['playlist'] = [];
         $playlist = &$lockArray['download_store']['playlist'];
-        foreach($this->collection_products as $album) {
+        foreach($this->collection_products as $collection_product) {
             $thisCollection = $lockArray['download_store']['collections'][] = [
-                'collection' => $album->getShopifyCustomCollection()->putArray(),
+                'collection' => $collection_product->getShopifyCustomCollection()->putArray(),
                 'products'   => array_map(function (Product $product) {
                     // key these by metafield key
 
@@ -582,21 +584,24 @@ class SyncManager {
                     }, $product->metafields), $product->metafields);
 
                     return $product->putArray();
-                }, $album->getShopifyCollectionProducts()),
+                }, $collection_product->getShopifyCollectionProducts()),
             ];
 
-            $playlist[] = array_map(function (Track $track) {
-                $product = $track->getShopifyProduct();
-                return [
-                    'id'    => $product->id,
-                    'url'   => $track->getEncodeConfigByName(Track::PLAYER_ENCODE_CONFIG_NAME)->getEncode()->getURL(),
-                    'title' => $product->title,
-                ];
-            }, $album->getAlbumTracks());
+            if($collection_product instanceof Album) {
+                $playlist[] = array_map(function (Track $track) {
+                    $product = $track->getShopifyProduct();
+                    return [
+                        'id'    => $product->id,
+                        'url'   => $track->getEncodeConfigByName(Track::PLAYER_ENCODE_CONFIG_NAME)->getEncode()->getURL(),
+                        'title' => $product->title,
+                    ];
+                }, $collection_product->getAlbumTracks());
 
-            if(array_key_exists($album->getPostID(), $featuredAlbumArray)) {
-                $featuredAlbumArray[$album->getPostID()] = $thisCollection;
+                if(array_key_exists($collection_product->getPostID(), $featuredAlbumArray)) {
+                    $featuredAlbumArray[$collection_product->getPostID()] = $thisCollection;
+                }
             }
+
         }
 
         $playlist = Util::array_merge_flatten_1L($playlist);
