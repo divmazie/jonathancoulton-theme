@@ -35,12 +35,7 @@ if($post->slug == "faq") {
 }
 
 if($post->slug == "store") {
-    $syncMan = new SyncManager(Util::get_shopify_api_client(), Util::get_fetch_api_client());
-
-    //$context['store'] = include(__DIR__ . '/cache/cached_store_context.php');
     $context['store'] = SyncManager::get_store();
-
-
     $context['guest_at_store'] = true;
 }
 

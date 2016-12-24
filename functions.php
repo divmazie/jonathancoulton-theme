@@ -42,6 +42,24 @@ add_action('init', function () {
     \jct\Util::register_generic_cpt('Track');
 });
 
+// from https://codex.wordpress.org/Plugin_API/Filter_Reference/wp_get_attachment_url
+// and https://wordimpress.com/image-urls-forcing-ssl-wordpress/
+add_filter('wp_get_attachment_url', function ($url) {
+    list($protocol, $uri) = explode('://', $url, 2);
+
+    if(is_ssl()) {
+        if('http' == $protocol) {
+            $protocol = 'https';
+        }
+    } else {
+        if('https' == $protocol) {
+            $protocol = 'http';
+        }
+    }
+
+    return $protocol . '://' . $uri;
+});
+
 
 include __DIR__ . '/include/routes.php';
 include __DIR__ . '/include/filters.php';
