@@ -718,6 +718,27 @@
             "maxlength": "",
             "readonly": 0,
             "disabled": 0
+        },
+        {
+            "key": "field_56142806b9043",
+            "label": "Bandsintown app ID",
+            "name": "bandsintown_app_id",
+            "type": "text",
+            "instructions": "This doesn't seem to matter",
+            "required": 1,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "",
+                "class": "",
+                "id": ""
+            },
+            "default_value": "joco",
+            "placeholder": "",
+            "prepend": "",
+            "append": "",
+            "maxlength": "",
+            "readonly": 0,
+            "disabled": 0
         }
     ],
     "location": [
