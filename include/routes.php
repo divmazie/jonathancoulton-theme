@@ -8,7 +8,7 @@ Routes::map('custom_admin/:script', function ($params) {
     if(current_user_can('manage_options')) {
         Routes::load('custom_admin/' . $params['script'] . ".php");
     } else {
-        Routes::load("404.php");
+        Util::redirect(wp_login_url('custom_admin/' . $params['script']));
     }
 });
 

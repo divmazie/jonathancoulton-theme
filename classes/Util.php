@@ -136,7 +136,7 @@ class Util {
     }
 
     public static function is_dev() {
-        return filter_var($_SERVER['HTTP_HOST'], FILTER_VALIDATE_IP) !== false;
+        return defined('WP_DEBUG') && WP_DEBUG;
     }
 
     static public function slugify($text) {

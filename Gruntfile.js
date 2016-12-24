@@ -1,60 +1,60 @@
-module.exports = function(grunt) {
+module.exports = function (grunt) {
 
     require('load-grunt-tasks')(grunt);
 
     // Project configuration.
     grunt.initConfig({
-        pkg : grunt.file.readJSON('package.json'),
-        uglify : {
-            bower : {
-                options : {
-                    mangle : true,
-                    compress : true
+        pkg: grunt.file.readJSON('package.json'),
+        uglify: {
+            bower: {
+                options: {
+                    mangle: true,
+                    compress: true
                 },
-                files : {
-                    'js/bower.min.js' : 'js/bower.js'
+                files: {
+                    'js/bower.min.js': 'js/bower.js'
                 }
             },
-            options : {
-                banner : '/*! <%= pkg.name %> <%= grunt.template.today("yyyy-mm-dd") %> */\n'
+            options: {
+                banner: '/*! <%= pkg.name %> <%= grunt.template.today("yyyy-mm-dd") %> */\n'
             },
-            build : {
-                src : 'src/<%= pkg.name %>.js',
-                dest : 'build/<%= pkg.name %>.min.js'
+            build: {
+                src: 'src/<%= pkg.name %>.js',
+                dest: 'build/<%= pkg.name %>.min.js'
             }
         },
-        less : {
-            compile : {
-                options : {
-                    paths : ['custom_bootstrap/']
+        less: {
+            compile: {
+                options: {
+                    paths: ['custom_bootstrap/']
                 },
-                files : {
-                    "style.css" : "custom_bootstrap/custom-bootstrap.less"
+                files: {
+                    "style.css": "custom_bootstrap/custom-bootstrap.less"
                 }
             }
         },
-        bower : {
-            install : {
+        bower: {
+            install: {
                 //just run 'grunt bower:install' and you'll see files from your Bower packages in lib directory
             }
         },
-        watch : {
-            js : {
-                files : ['bower.json'],
-                tasks : 'buildbower'
+        watch: {
+            js: {
+                files: ['bower.json'],
+                tasks: 'buildbower'
             },
-            less : {
-                files : ['custom_bootstrap/**/*.less'],
-                tasks : 'less:compile'
+            less: {
+                files: ['custom_bootstrap/**/*.less'],
+                tasks: 'less:compile'
             },
-            composer : {
-                files : ['composer.json'],
-                tasks : 'composer:update'
+            composer: {
+                files: ['composer.json'],
+                tasks: 'composer:update'
             }
         },
-        bower_concat : {
-            all : {
-                dest : 'js/bower.js'
+        bower_concat: {
+            all: {
+                dest: 'js/bower.js'
                 //cssDest: 'build/_bower.css'
             }
         },
@@ -63,14 +63,14 @@ module.exports = function(grunt) {
                 auth: {
                     host: 'jococom.sftp.wpengine.com',
                     port: 2222,
-                    authKey: 'staging'
+                    authKey: grunt.option('authKey') || 'staging'
                 },
                 cache: 'sftpcache.json',
                 src: './',
                 dest: 'wp-content/themes/jonathancoulton-theme/',
                 exclusions: ['./.ftppass', './.git', './.gitignore', './.idea', './Gruntfile.js', './node_modules',
                     './docker', './docs', './.DS_Store', './sftpcache.json', './tmp/*', './bower.json',
-                './package.json', './README.md', './custom_bootstrap', './tests' ],
+                    './package.json', './README.md', './custom_bootstrap', './tests'],
                 serverSep: '/',
                 concurrency: 4,
                 progress: true
@@ -86,5 +86,6 @@ module.exports = function(grunt) {
 
     grunt.registerTask('builddeps', ['buildbower', 'less:compile', 'composer:install']);
 
-    grunt.registerTask( 'deploy', ['sftp-deploy']);
+
+    grunt.registerTask('deploy', ['sftp-deploy']);
 };

@@ -7,22 +7,22 @@
     {% endfor %}
     {% if variants|length > 1 %}
         <div id="product_modal_{{ id }}" class="modal fade" role="dialog">
-            <div class="modal-dialog">
+            <div class="modal-dialog" style="text-align: center;">
                 <div class="modal-content">
                     <div class="modal-header">
                         <button type="button" class="close" data-dismiss="modal">&times;</button>
                         <h4 class="modal-title">{{ prompt|default('Please select your preferred option.') }}</h4>
                     </div>
                     <div class="modal-body">
-                        <div data-bind="visible: store_view() == 'downloads'">
-                            <label><input type="checkbox" data-bind="checked: remember_format"/> Make this format my
-                                default.</label>
-                        </div>
                         {% for variant in variants %}
                             <button class="option"
                                     onclick='addToCart({{ id }},"{{ name|escape('js') }}",{{ variant.price|number_format }},{{ variants_json|json_encode() }},{{ variant.id }},{{ allow_multiple|json_encode }})'
                                     id="product{{ id }}_{{ variant.title }}">{{ variant.title }}</button>
                         {% endfor %}
+                        <div data-bind="visible: store_view() == 'downloads'">
+                            <label><input type="checkbox" data-bind="checked: remember_format"/> Make this format my
+                                default.</label>
+                        </div>
                         <div class="clearfix"></div>
                     </div>
                 </div>
