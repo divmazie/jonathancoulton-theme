@@ -33,7 +33,9 @@ $bandsintown = get_site_transient('bandsintown');
 if(!$bandsintown) {
     $bandsintown =
         // checkit for lols https://www.bandsintown.com/api/authentication
-        json_decode(file_get_contents("http://api.bandsintown.com/artists/jonathancoulton/events.json?api_version=2.0&app_id=jonathancoulton.com")); // to test w/ old shows
+        json_decode(file_get_contents("http://api.bandsintown.com/artists/jonathancoulton/events.json?api_version=2.0&app_id=" .
+                                      Util::get_theme_option('bandsintown_app_id')));
+
     set_site_transient('bandsintown', $bandsintown, 600);
 }
 $context['bandsintown'] = $bandsintown;
