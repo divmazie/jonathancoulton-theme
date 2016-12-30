@@ -29,6 +29,7 @@ class SyncManager {
          * @var MusicStoreCollection[]
          */
         $collection_products,
+        $all_albums,
         $all_tracks,
         $everything_product,
         $all_encodes,
@@ -79,7 +80,8 @@ class SyncManager {
         self::optimizeQueries();
 
         $this->everything_product = EverythingProduct::getInstance();
-        $this->collection_products = array_merge([$this->everything_product], Album::getAll());
+        $this->all_albums = Album::getAll();
+        $this->collection_products = array_merge([$this->everything_product], $this->all_albums);
         $this->all_tracks = Track::getAll();
 
         $this->all_encodes = EncodeConfig::getAll();
