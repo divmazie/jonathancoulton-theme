@@ -46,18 +46,7 @@ add_action('init', function () {
 // and https://wordimpress.com/image-urls-forcing-ssl-wordpress/
 add_filter('wp_get_attachment_url', function ($url) {
     list($protocol, $uri) = explode('://', $url, 2);
-
-    if(is_ssl()) {
-        if('http' == $protocol) {
-            $protocol = 'https';
-        }
-    } else {
-        if('https' == $protocol) {
-            $protocol = 'http';
-        }
-    }
-
-    return $protocol . '://' . $uri;
+    return sprintf('http%s://%s', is_ssl() ? 's' : '', $uri);
 });
 
 
