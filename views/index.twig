@@ -1,99 +1,140 @@
 {% extends "base.twig" %}
 
 {% macro showcase(showcase_tiles) %}
-	{% for tile in showcase_tiles %}
-		<div class="showcase_tile">
-			{% if tile.tile_link %}<a href="{{ tile.tile_link }}">{% endif %}
-				<div class="joco-promo" style="
-				{% if tile.background_color %}background-color: {{ tile.background_color }};{% endif %}
+    {% for tile in showcase_tiles %}
+        <div class="showcase_tile">
+            {% if tile.tile_link %}<a href="{{ tile.tile_link }}">{% endif %}
+                <div class="joco-promo" style="
+                {% if tile.background_color %}background-color: {{ tile.background_color }};{% endif %}
 									{% if tile.bottom_border_color %}border-bottom: solid 10px {{ tile.bottom_border_color }};{% endif %}
-						">
-					{% if tile.thumbnail %}
-						<img src="{{ tile.thumbnail.src }}" class="promo-image" />
-					{% else %}
-						<div class="promo-text">
-							<h2 class="{{ tile.header_font }}"{% if tile.header_color %} style="color: {{ tile.header_color }}"{% endif %}>{{ tile.title }}</h2>
-							<p class="{{ tile.body_font }}"{% if tile.body_color %} style="color: {{ tile.body_color }}"{% endif %}>{{ tile.post_content }}</p>
-						</div>
-					{% endif %}
-				</div>
-				{% if tile.tile_link %}</a>{% endif %}
-		</div>
-	{% endfor %}
+                        ">
+                    {% if tile.thumbnail %}
+                        <img src="{{ tile.thumbnail.src }}" class="promo-image"/>
+                    {% else %}
+                        <div class="promo-text">
+                            <h2 class="{{ tile.header_font }}"{% if tile.header_color %} style="color: {{ tile.header_color }}"{% endif %}>{{ tile.title }}</h2>
+
+                            <p class="{{ tile.body_font }}"{% if tile.body_color %} style="color: {{ tile.body_color }}"{% endif %}>{{ tile.post_content }}</p>
+                        </div>
+                    {% endif %}
+                </div>
+                {% if tile.tile_link %}</a>{% endif %}
+        </div>
+    {% endfor %}
 {% endmacro %}
 {% import _self as macros %}
 
 {% block content %}
-	<div class="container" style="margin-bottom: 30px;">
-		<div class="col-xs-12">
-			<h1 class="hdr-logo col-xs-12 col-md-10 col-md-offset-1 col-lg-8 col-lg-offset-2" role="banner">
-				<a class="hdr-logo-link" href="{{ site.url }}" rel="home"><img src="{{ theme.link }}/images/JoCoLogo.svg" style="width: 100%" /></a>
-			</h1>
-			<div class="clearfix"></div>
-			<div data-slick='{"slidesToShow": 4, "slidesToScroll": 1}' class="slick-element showcase_tiles hidden-xs">
-				{{ macros.showcase(showcase_tiles) }}
-			</div>
-			<div data-slick='{"slidesToShow": 1, "slidesToScroll": 1}' class="slick-element showcase_tiles visible-xs">
-				{{ macros.showcase(showcase_tiles) }}
-			</div>
-		</div>
-		<div class="col-xs-12 col-sm-8">
-			{% include ['tease-'~post.post_type~'.twig', 'tease.twig'] %}
-		</div>
-		<div class="col-xs-12 col-sm-4">
-			{% include "sidebar.twig" %}
-		</div>
-		<div class="clearfix"></div>
-	</div>
-	<div class="light_content">
-		<div class="container">
-			<div class="col-lg-10 col-lg-offset-1 col-xs-12">
-				<h1 class="section_header">{{ blurb_header }}</h1>
-				<p class="featured-p">{{ blurb_content|striptags }}</p>
-				<a href="{{ site.url }}/store/#downloads" class="no_underline"><div class="blue_arrow_right center-block">Click for more music</div></a>
-			</div>
-		</div>
-	</div>
-	<div class="dark_content">
-		<div class="container">
-			<h2 class="section_header">Recent releases</h2>
-			<p class="featured-p">
-				{% for album in featured_albums %}
-                    <div class="col-sm-3 col-xs-6 product">
-                        <a href="{{ site.url }}/store/#downloads-album{{ album.collection.id }}" class="no_underline">
-                            <div class="album_square" style="background-image: url('{{ album.collection.image.src }}')"></div>
-                            <div class="product_text">
-                                <div class="product_title">{{ album.collection.title }}</div>
-                                <div class="product_description">{{ album.collection.body_html }}</div>
-                            </div>
+    <div class="container" style="margin-bottom: 30px;">
+        <div class="col-xs-12">
+            <h1 class="hdr-logo col-xs-12 col-md-10 col-md-offset-1 col-lg-8 col-lg-offset-2" role="banner">
+                <a class="hdr-logo-link" href="{{ site.url }}" rel="home"><img
+                            src="{{ theme.link }}/images/JoCoLogo.svg" style="width: 100%"/></a>
+            </h1>
+
+            <div class="clearfix"></div>
+            <div data-slick='{"slidesToShow": 4, "slidesToScroll": 1}' class="slick-element showcase_tiles hidden-xs">
+                {{ macros.showcase(showcase_tiles) }}
+            </div>
+            <div data-slick='{"slidesToShow": 1, "slidesToScroll": 1}' class="slick-element showcase_tiles visible-xs">
+                {{ macros.showcase(showcase_tiles) }}
+            </div>
+        </div>
+        <div class="col-xs-12 col-sm-8">
+            {% include ['tease-'~post.post_type~'.twig', 'tease.twig'] %}
+        </div>
+        <div class="col-xs-12 col-sm-4">
+            {% include "sidebar.twig" %}
+        </div>
+        <div class="clearfix"></div>
+    </div>
+    <div class="light_content">
+        <div class="container">
+            <div class="col-lg-10 col-lg-offset-1 col-xs-12">
+                <h1 class="section_header">{{ blurb_header }}</h1>
+
+                <p class="featured-p">{{ blurb_content|striptags }}</p>
+                <a href="{{ site.url }}/store/#downloads" class="no_underline">
+                    <div class="blue_arrow_right center-block">Click for more music</div>
+                </a>
+            </div>
+        </div>
+    </div>
+    <div class="dark_content">
+        <div class="container">
+            <h2 class="section_header">Recent releases</h2>
+
+            <p class="featured-p">
+                {% for album in featured_albums %}
+
+            <div class="col-sm-3 col-xs-6 product">
+                <a href="{{ site.url }}/store/#downloads-album{{ album.collection.id }}" class="no_underline">
+                    <div class="album_square" style="background-image: url('{{ album.collection.image.src }}')"></div>
+                    <div class="product_text">
+                        <div class="product_title">{{ album.collection.title }}</div>
+                        <div class="product_description">{{ album.collection.body_html }}</div>
+                    </div>
+                </a>
+            </div>
+            {% endfor %}
+            </p>
+        </div>
+    </div>
+    <div id="shows" class="light_content">
+        <div class="container">
+            <h2 class="section_header">Upcoming shows</h2>
+
+            {% if bandsintown|length < 1 %}
+                <p class="featured-p">
+                    Sorry, nothing to list right now!
+                </p>
+            {% else %}
+
+                {% set default_len=6 %}
+                {% for show in bandsintown %}
+                <div class="show_row col-xs-12 col-sm-10 col-sm-offset-1 col-md-8 col-md-offset-2">
+                    <div class="col-xs-2"><a href="{{ show.url }}">{{ show.datetime|date("M j") }}</a></div>
+                    <div class="col-xs-6 col-sm-8"><a href="{{ show.url }}">
+                            <!--Cute way of adding an "I'm feeling lucky" link for the venue: <a href="http://www.google.com/search?q={{ show.venue.name|url_encode }}+{{ show.venue.city|url_encode }}+{{ show.venue.region|url_encode }}&btnI=1">-->
+                            <span class="venue_name">{{ show.venue.name }}</span><br/>{{ show.venue.city }}
+                            , {{ show.venue.region }}</a></div>
+                    <div class="col-xs-4 col-sm-2" style="padding-top:8px;">
+                        <a href="{{ show.ticket_url|default(show.url) }}" class="no_underline">
+                            {% if show.ticket_status=="available" %}
+                                <div class="tickets">Tickets</div>{% else %}
+                                <div class="details">Details</div>{% endif %}
                         </a>
                     </div>
-				{% endfor %}
-			</p>
-		</div>
-	</div>
-	<div class="light_content">
-		<div class="container">
-			<h2 class="section_header">Upcoming shows</h2>
-			<p class="featured-p">
-			{% if bandsintown|length < 1 %}
-				Sorry, nothing to list right now!
-			{% endif %}
-			{% for show in bandsintown|slice(0,6) %}
-				<div class="show_row col-xs-12 col-sm-10 col-sm-offset-1 col-md-8 col-md-offset-2">
-					<div class="col-xs-2"><a href="{{ show.url }}">{{ show.datetime|date("M j") }}</a></div>
-					<div class="col-xs-6 col-sm-8"><a href="{{ show.url }}">
-						<!--Cute way of adding an "I'm feeling lucky" link for the venue: <a href="http://www.google.com/search?q={{ show.venue.name|url_encode }}+{{ show.venue.city|url_encode }}+{{ show.venue.region|url_encode }}&btnI=1">-->
-							<span class="venue_name">{{ show.venue.name }}</span><br />{{ show.venue.city }}, {{ show.venue.region }}</a></div>
-					<div class="col-xs-4 col-sm-2">
-						<a href="{{ show.ticket_url|default(show.url) }}" class="no_underline">
-							{% if show.ticket_status=="available" %}<div class="tickets">Tickets</div>{% else %}<div class="details">Details</div>{% endif %}
-						</a>
-					</div>
-					<div class="clearfix"></div>
-				</div>
-			{% endfor %}
-			</p>
-		</div>
-	</div>
+                    <div class="clearfix"></div>
+                </div>
+                {% endfor %}
+            {% if bandsintown|length>(default_len+2) %}
+                {# we do default len + a couple because if there are only a few extra, we show them all  #}
+                <div class="col-xs-12 col-sm-10 col-sm-offset-1 col-md-8 col-md-offset-2">
+                    <p style="margin-top:11px;font-size:120%;">
+                        <a href="#" id="more_shows"
+                           data-inverse="Hide {{ bandsintown|length-default_len }} Shows..."
+                           onclick="toggleMoreShows(); return false;">Show {{ bandsintown|length-default_len }} More
+                            Shows...</a>
+                    </p>
+                </div>
+                <div class="clearfix"></div>
+
+                <script type="text/javascript">
+                    var more_shows = $('#shows div .show_row').slice({{ default_len }});
+                    more_shows.hide();
+
+                    function toggleMoreShows() {
+                        var link = $('#more_shows');
+                        var curText = link.text();
+                        var toggleText = link.data('inverse');
+                        link.data('inverse', curText);
+                        link.text(toggleText);
+                        more_shows.toggle();
+                    }
+                </script>
+            {% endif %}
+            {% endif %}
+        </div>
+    </div>
 {% endblock %}

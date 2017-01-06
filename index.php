@@ -29,16 +29,18 @@ $context['blurb_header'] = Util::get_theme_option('front_page_blurb_header');
 $context['blurb_content'] = Util::get_theme_option('front_page_blurb_content');
 $context['featured_albums'] = SyncManager::get_featured_albums();
 
-$bandsintown = get_site_transient('bandsintown');
-if(!$bandsintown) {
-    $bandsintown =
+$bandsInTown = get_site_transient('bandsintown');
+if(!$bandsInTown) {
+    // if we have nothing worthwhile stored there, delete it
+    delete_site_transient('bandsintown');
         // checkit for lols https://www.bandsintown.com/api/authentication
-        json_decode(file_get_contents("http://api.bandsintown.com/artists/jonathancoulton/events.json?api_version=2.0&app_id=" .
-                                      Util::get_theme_option('bandsintown_app_id')));
+    $url = sprintf("http://api.bandsintown.com/artists/jonathancoulton/events.json?api_version=2.0&app_id=%s",
+                   Util::get_theme_option('bandsintown_app_id'));
+    $bandsInTown = json_decode(file_get_contents($url));
 
-    set_site_transient('bandsintown', $bandsintown, 600);
+    set_site_transient('bandsintown', $bandsInTown, 600);
 }
-$context['bandsintown'] = $bandsintown;
+$context['bandsintown'] = $bandsInTown;
 
 $templates = ['index.twig'];
 if(is_home()) {
