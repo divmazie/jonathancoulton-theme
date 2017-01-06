@@ -49,8 +49,10 @@ add_filter('wp_get_attachment_url', function ($url) {
     return sprintf('http%s://%s', is_ssl() ? 's' : '', $uri);
 });
 
+if(class_exists('\Routes')) {
+    include __DIR__ . '/include/routes.php';
+};
 
-include __DIR__ . '/include/routes.php';
 include __DIR__ . '/include/filters.php';
 
 // only include our prepop code, which does queries, if we need to
