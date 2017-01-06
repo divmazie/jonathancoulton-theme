@@ -1,21 +1,85 @@
 {
-    "key": "group_55b27a81770e7",
-    "title": "Album",
+    "key": "group_jct_track",
+    "title": "Tracks",
     "fields": [
         {
-            "key": "field_55d784dacfb6d",
-            "label": "Album price",
-            "name": "album_price",
-            "type": "number",
+            "key": "field_55b28278b84e1",
+            "label": "Track album",
+            "name": "track_album",
+            "type": "post_object",
             "instructions": "",
-            "required": 0,
+            "required": 1,
             "conditional_logic": 0,
             "wrapper": {
                 "width": "",
                 "class": "",
                 "id": ""
             },
-            "default_value": 10,
+            "post_type": [
+                "album"
+            ],
+            "taxonomy": [],
+            "allow_null": 0,
+            "multiple": 0,
+            "return_format": "object",
+            "ui": 1
+        },
+        {
+            "key": "field_55b28ccd90218",
+            "label": "Track source",
+            "name": "track_source",
+            "type": "file",
+            "instructions": "Must be FLAC or WAV.",
+            "required": 1,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "",
+                "class": "",
+                "id": ""
+            },
+            "return_format": "array",
+            "library": "uploadedTo",
+            "min_size": "",
+            "max_size": "",
+            "mime_types": ".flac,.wav"
+        },
+        {
+            "key": "field_55b953b0bd654",
+            "label": "Track number",
+            "name": "track_number",
+            "type": "number",
+            "instructions": "Determines ordering of tracks on album.",
+            "required": 1,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "",
+                "class": "",
+                "id": ""
+            },
+            "default_value": "",
+            "placeholder": "",
+            "prepend": "",
+            "append": "",
+            "min": "",
+            "max": "",
+            "step": "",
+            "readonly": 0,
+            "disabled": 0
+        },
+        {
+            "key": "field_55d7846ae775a",
+            "label": "Track price",
+            "name": "track_price",
+            "type": "number",
+            "instructions": "",
+            "required": 1,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "",
+                "class": "",
+                "id": ""
+            },
+            "default_value": 1,
             "placeholder": "",
             "prepend": "$",
             "append": "",
@@ -26,12 +90,12 @@
             "disabled": 0
         },
         {
-            "key": "field_55b27a8ab7b2b",
-            "label": "Album artist",
-            "name": "album_artist",
+            "key": "field_55b2823eb84e0",
+            "label": "Track artist",
+            "name": "track_artist",
             "type": "text",
-            "instructions": "",
-            "required": 1,
+            "instructions": "Blank defaults to album artist",
+            "required": 0,
             "conditional_logic": 0,
             "wrapper": {
                 "width": "",
@@ -47,11 +111,11 @@
             "disabled": 0
         },
         {
-            "key": "field_55b27ad41580f",
-            "label": "Album year",
-            "name": "album_year",
+            "key": "field_55b2900974e38",
+            "label": "Track year",
+            "name": "track_year",
             "type": "number",
-            "instructions": "",
+            "instructions": "Blank defaults to album year",
             "required": 0,
             "conditional_logic": 0,
             "wrapper": {
@@ -70,11 +134,11 @@
             "disabled": 0
         },
         {
-            "key": "field_55b27eb7d0688",
-            "label": "Album description",
-            "name": "album_description",
+            "key": "field_55b2902d74e39",
+            "label": "Track genre",
+            "name": "track_genre",
             "type": "text",
-            "instructions": "Appears underneath album art",
+            "instructions": "Blank defaults to album genre",
             "required": 0,
             "conditional_logic": 0,
             "wrapper": {
@@ -91,32 +155,11 @@
             "disabled": 0
         },
         {
-            "key": "field_55b27b3915810",
-            "label": "Album genre",
-            "name": "album_genre",
-            "type": "text",
-            "instructions": "",
-            "required": 0,
-            "conditional_logic": 0,
-            "wrapper": {
-                "width": "",
-                "class": "",
-                "id": ""
-            },
-            "default_value": "",
-            "placeholder": "",
-            "prepend": "",
-            "append": "",
-            "maxlength": "",
-            "readonly": 0,
-            "disabled": 0
-        },
-        {
-            "key": "field_55b27b4715811",
-            "label": "Album art",
-            "name": "album_art",
+            "key": "field_55b2904874e3a",
+            "label": "Track art",
+            "name": "track_art",
             "type": "image",
-            "instructions": "",
+            "instructions": "Blank defaults to album art",
             "required": 0,
             "conditional_logic": 0,
             "wrapper": {
@@ -136,11 +179,11 @@
             "mime_types": ""
         },
         {
-            "key": "field_55b27eb7d0687",
-            "label": "Album comment",
-            "name": "album_comment",
+            "key": "field_55b2910c177d4",
+            "label": "Track comment",
+            "name": "track_comment",
             "type": "text",
-            "instructions": "",
+            "instructions": "Blank defaults to album comment",
             "required": 0,
             "conditional_logic": 0,
             "wrapper": {
@@ -157,27 +200,11 @@
             "disabled": 0
         },
         {
-            "key": "field_55b2b535a86b3",
-            "label": "Show album in store",
-            "name": "show_album_in_store",
-            "type": "true_false",
-            "instructions": "Don't check until all songs posted",
-            "required": 0,
-            "conditional_logic": 0,
-            "wrapper": {
-                "width": "",
-                "class": "",
-                "id": ""
-            },
-            "message": "",
-            "default_value": 0
-        },
-        {
-            "key": "field_570d4d2b24c33",
-            "label": "Album sort order",
-            "name": "album_sort_order",
+            "key": "field_55d7846ae775a",
+            "label": "Track price",
+            "name": "track_price",
             "type": "number",
-            "instructions": "Use the convention of year of release plus two digits to sort within that year.\r\nIf two albums are released in 2016, enter 201610 for the first one and 201620 for the second one.\r\nIf you want the album to display in an order other than when it was released, you can use this convention to slot an album between other albums.\r\nThe largest numbers will appear at the top of the store. Numbers must be unique.",
+            "instructions": "",
             "required": 1,
             "conditional_logic": 0,
             "wrapper": {
@@ -185,7 +212,7 @@
                 "class": "",
                 "id": ""
             },
-            "default_value": "",
+            "default_value": 1,
             "placeholder": "",
             "prepend": "",
             "append": "",
@@ -196,50 +223,11 @@
             "disabled": 0
         },
         {
-            "key": "field_55c0db03e8bb9",
-            "label": "Bonus assets",
-            "name": "bonus_assets",
-            "type": "repeater",
-            "instructions": "Files to include in a zip of the entire album, but not offered for individual sale.",
-            "required": 0,
-            "conditional_logic": 0,
-            "wrapper": {
-                "width": "",
-                "class": "",
-                "id": ""
-            },
-            "min": "",
-            "max": "",
-            "layout": "table",
-            "button_label": "Add File",
-            "sub_fields": [
-                {
-                    "key": "field_55cbc7f950b34",
-                    "label": "Bonus asset",
-                    "name": "bonus_asset",
-                    "type": "file",
-                    "instructions": "Click \"add file\" and attach as many full album exclusive assets as you want.",
-                    "required": 0,
-                    "conditional_logic": 0,
-                    "wrapper": {
-                        "width": "",
-                        "class": "",
-                        "id": ""
-                    },
-                    "return_format": "array",
-                    "library": "all",
-                    "min_size": "",
-                    "max_size": "",
-                    "mime_types": ""
-                }
-            ]
-        },
-        {
-            "key": "field_56142c57611fd",
+            "key": "field_56142c05edb9b",
             "label": "Wiki Link",
             "name": "wiki_link",
             "type": "url",
-            "instructions": "If left blank, defaults to [JoCo Wiki Base Link] \/ [album name with underscores and urlencoded]",
+            "instructions": "If left blank, defaults to [JoCo Wiki Base Link] \/ [track name with underscores and urlencoded]",
             "required": 0,
             "conditional_logic": 0,
             "wrapper": {
@@ -256,7 +244,7 @@
             {
                 "param": "post_type",
                 "operator": "==",
-                "value": "album"
+                "value": "track"
             }
         ]
     ],
@@ -284,5 +272,5 @@
     ],
     "active": 1,
     "description": "",
-    "modified": 1460490003
+    "modified": 1444162639
 }
