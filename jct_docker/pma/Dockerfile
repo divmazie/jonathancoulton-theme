@@ -14,4 +14,4 @@ RUN rm -rf $PHPMYADMIN_DOCUMENT_ROOT && mkdir -p $PHPMYADMIN_DOCUMENT_ROOT
 RUN curl -SL https://files.phpmyadmin.net/phpMyAdmin/${PHPMYADMIN_VERSION}/phpMyAdmin-${PHPMYADMIN_VERSION}-english.tar.bz2 | \
     tar xjv --strip-components 1 -C $PHPMYADMIN_DOCUMENT_ROOT
 
-ADD ./config.inc.php $PHPMYADMIN_CONFIG_FILE_PATH
+COPY ./config.inc.php $PHPMYADMIN_CONFIG_FILE_PATH

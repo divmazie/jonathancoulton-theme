@@ -14,9 +14,9 @@ $i++;
 /* Authentication type */
 $cfg['Servers'][$i]['auth_type'] = 'cookie';
 /* Server parameters */
-$cfg['Servers'][$i]['host'] = getenv('MYSQL_PORT_3306_TCP_ADDR');
-$cfg['Servers'][$i]['port'] = getenv('MYSQL_PORT_3306_TCP_PORT');
-$cfg['Servers'][$i]['connect_type'] = getenv('MYSQL_PORT_3306_TCP_PROTO');
+$cfg['Servers'][$i]['host'] = getenv('PMA_HOST');
+$cfg['Servers'][$i]['port'] = getenv('PMA_PORT');
+$cfg['Servers'][$i]['connect_type'] = getenv('PMA_PROTO');
 $cfg['Servers'][$i]['compress'] = false;
 $cfg['Servers'][$i]['AllowNoPassword'] = false;
 $cfg['Servers'][$i]['AllowRoot'] = true;

@@ -1,0 +1,52 @@
+version: '2'
+
+services:
+  encodebot:
+    hostname: encodebot
+    build: ./encodebot
+    ports:
+    - 81:80
+    volumes:
+      - "./encodebot/www/:/var/www/"
+      - "./encodebot/lighttpd/:/etc/lighttpd/"
+    environment:
+      ENCODE_ACCESS_KEY: testingtesting
+
+  wordpress:
+    build: ./wordpress
+    ports:
+      - 83:80
+    environment:
+      WORDPRESS_DEBUG: 1
+      WORDPRESS_DB_HOST:
+      WORDPRESS_DB_USER:
+      WORDPRESS_DB_PASSWORD:
+      WORDPRESS_DB_NAME:
+      WORDPRESS_TABLE_PREFIX:
+    extra_hosts:
+      - "dh:10.0.2.2"
+    volumes:
+    - "../../jonathancoulton-theme:/var/www/html/wp-content/themes/jonathancoulton-theme"
+    - "./wordpress/wp-content/uploads:/var/www/html/wp-content/uploads"
+    - "./uploads.ini:/usr/local/etc/php/conf.d/uploads.ini"
+
+  #### quit it with the container... use a local db
+  #db:
+  #  image: mariadb
+  #  environment:
+  #    MYSQL_ROOT_PASSWORD: 1234
+
+
+  pma:
+    build: ./pma
+    ports:
+      - 82:80
+    environment:
+      BLOWFISH_SECRET:
+      PMA_HOST:
+      PMA_PORT:
+      PMA_PROTO:
+    extra_hosts:
+      - "dh:10.0.2.2"
+    volumes:
+      - "./uploads.ini:/usr/local/etc/php/conf.d/uploads.ini"
