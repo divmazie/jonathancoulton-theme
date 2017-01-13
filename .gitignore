@@ -11,15 +11,18 @@ style.css
 
 # docker stuff
 # don't track compose.yml, this is user supplied
-docker/docker-compose.yml
+jct_docker/docker-compose.yml
+.env
+
+# only track php in html dir, don't track dest files
+jct_docker/encodebot/www/html/*
+!jct_docker/encodebot/www/html/*.php
+jct_docker/encodebot/www/dest/*
+jct_docker/wordpress/wp-content/*
+
 
 #don't track cache files
 /tmp/*
-
-# only track php in html dir, don't track dest files
-docker/encodebot/www/html/*
-!docker/encodebot/www/html/*.php
-docker/encodebot/www/dest/*
 
 # don't track wordpress assets
 docker/wordpress/wp-content/*
