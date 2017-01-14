@@ -22,6 +22,14 @@ add_action('wp_enqueue_scripts', function () {
     }
 });
 
+add_action('init', function () {
+    // register CPT not assoc with a class...
+    \jct\Util::register_generic_cpt("Showcase Tile");
+    \jct\Util::register_generic_cpt("FAQ");
+    \jct\Util::register_generic_cpt('Album');
+    \jct\Util::register_generic_cpt('Track');
+});
+
 if(function_exists('acf_add_options_page')) {
     acf_add_options_page([
                              'page_title' => 'Theme General Settings',
@@ -33,22 +41,6 @@ if(function_exists('acf_add_options_page')) {
 
                          ]);
 }
-
-add_action('init', function () {
-    // register CPT not assoc with a class...
-    \jct\Util::register_generic_cpt("Showcase Tile");
-    \jct\Util::register_generic_cpt("FAQ");
-    \jct\Util::register_generic_cpt('Album');
-    \jct\Util::register_generic_cpt('Track');
-});
-
-// from https://codex.wordpress.org/Plugin_API/Filter_Reference/wp_get_attachment_url
-// and https://wordimpress.com/image-urls-forcing-ssl-wordpress/
-add_filter('wp_get_attachment_url', function ($url) {
-    list($protocol, $uri) = explode('://', $url, 2);
-    return sprintf('http%s://%s', is_ssl() ? 's' : '', $uri);
-});
-
 if(class_exists('\Routes')) {
     include __DIR__ . '/include/routes.php';
 };
