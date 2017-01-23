@@ -676,6 +676,9 @@ class SyncManager {
         }
 
         if($create && !$chosenFile) {
+            if(!file_exists(static::getTempBaseDir())){
+                wp_mkdir_p(static::getTempBaseDir());
+            }
             $chosenFile = tempnam(static::getTempBaseDir(), $uniqueFilePrefix);
         }
 
