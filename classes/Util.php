@@ -226,9 +226,6 @@ class Util {
     }
 
     public static function cache_dir_path() {
-        if(self::is_dev()) {
-            return sys_get_temp_dir();
-        }
         return dirname(__DIR__) . '/tmp';
     }
 
