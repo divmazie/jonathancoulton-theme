@@ -46,7 +46,7 @@ $context['bandsintown'] = $bandsInTown;
 
 $templates = ['index.twig'];
 
-if(is_home()) {
+if(is_home() || is_front_page()) {
     array_unshift($templates, 'home.twig');
 }
 Timber::render($templates, $context);
