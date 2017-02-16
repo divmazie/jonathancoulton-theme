@@ -232,7 +232,7 @@
 
 
 <ol>
-    {% for album in sync_man.all_albums if album.isFilledOut %}
+    {% for album in sync_man.all_albums %}
         <li>
             <span style="color:{{ album.isFilledOut?'green':'red' }}">{{ album.title }}</span>
             ({{ album.numTracks }} tracks)
