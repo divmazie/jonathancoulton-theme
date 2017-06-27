@@ -94,7 +94,7 @@ class AlbumZipConfig extends EncodedAssetConfig {
         if($zipArchive->open($zipFileName, \ZipArchive::CREATE) !== true) {
             throw new JCTException("Cannot open zip file: <$zipFileName>!");
         }
-        $zipInnerDirectoryPath = $this->getParentAlbum()->getTitle();
+        $zipInnerDirectoryPath = $this->getParentAlbum()->getFilenameFriendlyTitle();
 
         // populate targetFiles with $filePath=>$zipPath
         $targetFiles = [];
