@@ -1,5 +1,9 @@
 <?php
 /**
+ *
+ * Template Name: Front Page Template
+ * Template Post Type: page
+ *
  * The main template file
  * This is the most generic template file in a WordPress theme
  * and one of the two required files for a theme (the other being style.css).
@@ -23,7 +27,8 @@ use Timber\Post;
 use Timber\Timber;
 
 $context = Timber::get_context();
-$context['post'] = new Post();
+$context['posts'] = $posts = Timber::get_posts(['posts_per_page' => 1, 'post_type' => 'post']);
+$context['post'] = $posts[0];
 $context['showcase_tiles'] = Timber::get_posts('post_type=showcase_tile');
 $context['blurb_header'] = Util::get_theme_option('front_page_blurb_header');
 $context['blurb_content'] = Util::get_theme_option('front_page_blurb_content');

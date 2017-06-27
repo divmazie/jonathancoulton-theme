@@ -50,6 +50,5 @@ if($post->slug == 'news') {
                                                    'paged'          => $paged,
                                                ], JCTPost::class);
     $context['pagination'] = Timber::get_pagination();
-
 }
 Timber::render(['page-' . $post->post_name . '.twig', 'page.twig'], $context);

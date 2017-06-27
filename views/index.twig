@@ -99,16 +99,14 @@
                     </div>
                     <div class="col-xs-6 col-sm-8 visible-xs-block"><a href="{{ show.ticket_url }}">
                             <!--Cute way of adding an "I'm feeling lucky" link for the venue: <a href="http://www.google.com/search?q={{ show.venue.name|url_encode }}+{{ show.venue.city|url_encode }}+{{ show.venue.region|url_encode }}&btnI=1">-->
-                            <span class="venue_name">{{ show.venue.name }}</span><br/>{{ show.venue.city }}
-                            , {{ show.venue.region }}</a>
+                            <span class="venue_name">{{ show.venue.name }}</span><br/>{{ show.formatted_location }}</a>
                     </div>
                     <div class="col-xs-2 hidden-xs">
                         <a href="{{ show.facebook_rsvp_url }}">{{ show.datetime|date("M j") }}</a>
                     </div>
                     <div class="col-xs-6 col-sm-8 hidden-xs"><a href="{{ show.facebook_rsvp_url }}">
                             <!--Cute way of adding an "I'm feeling lucky" link for the venue: <a href="http://www.google.com/search?q={{ show.venue.name|url_encode }}+{{ show.venue.city|url_encode }}+{{ show.venue.region|url_encode }}&btnI=1">-->
-                            <span class="venue_name">{{ show.venue.name }}</span><br/>{{ show.venue.city }}
-                            , {{ show.venue.region }}</a>
+                            <span class="venue_name">{{ show.venue.name }}</span><br/>{{ show.formatted_location }}</a>
                     </div>
                     <div class="col-xs-4 col-sm-2" style="padding-top:8px;">
                         <a href="{{ show.ticket_url|default(show.url) }}" class="no_underline">
