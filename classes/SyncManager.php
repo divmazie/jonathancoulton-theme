@@ -175,6 +175,7 @@ class SyncManager {
 
     private function loopTilDoneStaticArray(callable $loopFunction, $array, $finishedLoc, $loopXSec = 44) {
         $idx = intval(@$_GET['idx']);
+        $loopXSec = intval(@$_GET['xsec']) > 0 ? intval(@$_GET['xsec']) : $loopXSec;
 
         if($array && $idx < count($array)) {
             $params = $_GET;
@@ -676,7 +677,7 @@ class SyncManager {
         }
 
         if($create && !$chosenFile) {
-            if(!file_exists(static::getTempBaseDir())){
+            if(!file_exists(static::getTempBaseDir())) {
                 wp_mkdir_p(static::getTempBaseDir());
             }
             $chosenFile = tempnam(static::getTempBaseDir(), $uniqueFilePrefix);
