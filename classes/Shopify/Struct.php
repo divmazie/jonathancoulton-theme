@@ -79,7 +79,8 @@ abstract class Struct {
             if(property_exists(get_class($this), $propertyName)) {
                 $this->setProperty($propertyName, $property);
             } else {
-                throw new Exception("unanticipated property [$propertyName][$property] in response");
+                // allow new properties to be added to API without squawking
+                //throw new Exception("unanticipated property [$propertyName][$property] in response");
             }
         }
     }

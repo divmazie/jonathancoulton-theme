@@ -1,4 +1,4 @@
-FROM wordpress:4.7
+FROM wordpress:4.7-php7.1-apache
 
 
 # from https://github.com/docker-library/docs/blob/master/php/README.md#how-to-install-more-php-extensions
