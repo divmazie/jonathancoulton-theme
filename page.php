@@ -44,11 +44,18 @@ if($post->slug == 'news') {
     if(!isset($paged) || !$paged) {
         $paged = 1;
     }
-    $context['posts'] = Util::get_posts_cached([
-                                                   'post_type'      => 'post',
-                                                   'posts_per_page' => 4,
-                                                   'paged'          => $paged,
-                                               ], JCTPost::class);
+    $query_args = [
+        'post_type'      => 'post',
+        'posts_per_page' => 4,
+        'paged'          => $paged,
+    ];
+    $context['posts'] = Util::get_posts_cached($query_args, JCTPost::class);
+    // from https://github.com/timber/timber/wiki/Pagination
+    /* THIS LINE IS CRUCIAL */
+    /* in order for WordPress to know what to paginate */
+    /* your args have to be the defualt query */
+    query_posts($query_args);
+
     $context['pagination'] = Timber::get_pagination();
 }
 Timber::render(['page-' . $post->post_name . '.twig', 'page.twig'], $context);
