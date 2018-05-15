@@ -3,8 +3,6 @@
     "title": "Theme options",
     "fields": [
         {
-            "placement": "top",
-            "endpoint": 0,
             "key": "field_55df763b93c26",
             "label": "Displayed content",
             "name": "",
@@ -16,14 +14,11 @@
                 "width": "",
                 "class": "",
                 "id": ""
-            }
+            },
+            "placement": "top",
+            "endpoint": 0
         },
         {
-            "default_value": "",
-            "maxlength": "",
-            "placeholder": "",
-            "prepend": "",
-            "append": "",
             "key": "field_55df81190c8da",
             "label": "Front page blurb header",
             "name": "front_page_blurb_header",
@@ -36,15 +31,15 @@
                 "class": "",
                 "id": ""
             },
+            "default_value": "",
+            "maxlength": "",
+            "placeholder": "",
+            "prepend": "",
+            "append": "",
             "readonly": 0,
             "disabled": 0
         },
         {
-            "default_value": "",
-            "new_lines": "wpautop",
-            "maxlength": "",
-            "placeholder": "",
-            "rows": "",
             "key": "field_55df80e60c8d9",
             "label": "Front page blurb content",
             "name": "front_page_blurb_content",
@@ -57,15 +52,15 @@
                 "class": "",
                 "id": ""
             },
+            "default_value": "",
+            "new_lines": "wpautop",
+            "maxlength": "",
+            "placeholder": "",
+            "rows": "",
             "readonly": 0,
             "disabled": 0
         },
         {
-            "default_value": "Contact \/ Press",
-            "maxlength": "",
-            "placeholder": "",
-            "prepend": "",
-            "append": "",
             "key": "field_55aeca2c038c7",
             "label": "Footer left header",
             "name": "footer_left_header",
@@ -78,15 +73,15 @@
                 "class": "",
                 "id": ""
             },
-            "readonly": 0,
-            "disabled": 0
-        },
-        {
-            "default_value": "",
+            "default_value": "Contact \/ Press",
             "maxlength": "",
             "placeholder": "",
             "prepend": "",
             "append": "",
+            "readonly": 0,
+            "disabled": 0
+        },
+        {
             "key": "field_55aeca86038c8",
             "label": "Footer left text",
             "name": "footer_left_text",
@@ -99,15 +94,15 @@
                 "class": "",
                 "id": ""
             },
-            "readonly": 0,
-            "disabled": 0
-        },
-        {
-            "default_value": "Hey! Thanks for listening to so many songs! Why don't you buy them and then you'll have them forever!",
+            "default_value": "",
             "maxlength": "",
             "placeholder": "",
             "prepend": "",
             "append": "",
+            "readonly": 0,
+            "disabled": 0
+        },
+        {
             "key": "field_55aeca86038c9",
             "label": "Buy something modal text",
             "name": "buy_something_modal_text",
@@ -120,12 +115,15 @@
                 "class": "",
                 "id": ""
             },
+            "default_value": "Hey! Thanks for listening to so many songs! Why don't you buy them and then you'll have them forever!",
+            "maxlength": "",
+            "placeholder": "",
+            "prepend": "",
+            "append": "",
             "readonly": 0,
             "disabled": 0
         },
         {
-            "placement": "top",
-            "endpoint": 0,
             "key": "field_55df765a93c27",
             "label": "Social Media Connections",
             "name": "",
@@ -137,14 +135,11 @@
                 "width": "",
                 "class": "",
                 "id": ""
-            }
+            },
+            "placement": "top",
+            "endpoint": 0
         },
         {
-            "default_value": "jonathancoulton",
-            "maxlength": "",
-            "placeholder": "",
-            "prepend": "",
-            "append": "",
             "key": "field_55dcccc551829",
             "label": "Twitter handle",
             "name": "twitter_handle",
@@ -157,15 +152,15 @@
                 "class": "",
                 "id": ""
             },
-            "readonly": 0,
-            "disabled": 0
-        },
-        {
-            "default_value": "realjonathancoulton",
+            "default_value": "jonathancoulton",
             "maxlength": "",
             "placeholder": "",
             "prepend": "",
             "append": "",
+            "readonly": 0,
+            "disabled": 0
+        },
+        {
             "key": "field_55df773904cde",
             "label": "Instagram handle",
             "name": "instagram_handle",
@@ -178,12 +173,15 @@
                 "class": "",
                 "id": ""
             },
+            "default_value": "realjonathancoulton",
+            "maxlength": "",
+            "placeholder": "",
+            "prepend": "",
+            "append": "",
             "readonly": 0,
             "disabled": 0
         },
         {
-            "default_value": "https:\/\/www.facebook.com\/jonathancoultonofficial",
-            "placeholder": "",
             "key": "field_55df77d04a165",
             "label": "Facebook link",
             "name": "facebook_link",
@@ -195,14 +193,11 @@
                 "width": "",
                 "class": "",
                 "id": ""
-            }
+            },
+            "default_value": "https:\/\/www.facebook.com\/jonathancoultonofficial",
+            "placeholder": ""
         },
         {
-            "default_value": "http:\/\/www.jonathancoulton.com\/wiki\/",
-            "maxlength": "",
-            "placeholder": "",
-            "prepend": "",
-            "append": "",
             "key": "field_56142806b9042",
             "label": "JoCo Wiki base url",
             "name": "joco_wiki_base_url",
@@ -215,12 +210,15 @@
                 "class": "",
                 "id": ""
             },
+            "default_value": "http:\/\/www.jonathancoulton.com\/wiki\/",
+            "maxlength": "",
+            "placeholder": "",
+            "prepend": "",
+            "append": "",
             "readonly": 0,
             "disabled": 0
         },
         {
-            "placement": "top",
-            "endpoint": 0,
             "key": "field_56158acfcf277",
             "label": "Store",
             "name": "",
@@ -232,12 +230,11 @@
                 "width": "",
                 "class": "",
                 "id": ""
-            }
+            },
+            "placement": "top",
+            "endpoint": 0
         },
         {
-            "message": "After creating or editing albums or tracks, visit the <a href='\/custom_admin\/music_admin'>music admin page<\/a> to create the files that will be sold to customers and sync them to the store.\r\n\r\nClick this button after making any change to the store, including changing the categories below!\r\n\r\n<button onclick=\"window.location='\/custom_admin\/refresh_store'\">Refresh store!<\/button>",
-            "esc_html": 0,
-            "new_lines": "wpautop",
             "key": "field_564a43329651e",
             "label": "Store instructions",
             "name": "",
@@ -249,16 +246,12 @@
                 "width": "",
                 "class": "",
                 "id": ""
-            }
+            },
+            "message": "After creating or editing albums or tracks, visit the <a href='\/custom_admin\/music_admin'>music admin page<\/a> to create the files that will be sold to customers and sync them to the store.\r\n\r\nClick this button after making any change to the store, including changing the categories below!\r\n\r\n<button onclick=\"window.location='\/custom_admin\/refresh_store'\">Refresh store!<\/button>",
+            "esc_html": 0,
+            "new_lines": "wpautop"
         },
         {
-            "default_value": "",
-            "min": 0,
-            "max": "",
-            "step": "",
-            "placeholder": "",
-            "prepend": "",
-            "append": "",
             "key": "field_564cf548fe4c2",
             "label": "Everything price",
             "name": "everything_price",
@@ -271,15 +264,17 @@
                 "class": "",
                 "id": ""
             },
+            "default_value": "",
+            "min": 0,
+            "max": "",
+            "step": "",
+            "placeholder": "",
+            "prepend": "",
+            "append": "",
             "readonly": 0,
             "disabled": 0
         },
         {
-            "default_value": "",
-            "maxlength": "",
-            "placeholder": "",
-            "prepend": "",
-            "append": "",
             "key": "field_585b2ac5174872",
             "label": "Everything Title",
             "name": "everything_title",
@@ -291,14 +286,14 @@
                 "width": "",
                 "class": "",
                 "id": ""
-            }
+            },
+            "default_value": "",
+            "maxlength": "",
+            "placeholder": "",
+            "prepend": "",
+            "append": ""
         },
         {
-            "tabs": "all",
-            "toolbar": "full",
-            "media_upload": 1,
-            "default_value": "",
-            "delay": 0,
             "key": "field_585b2ac517487",
             "label": "Everything Copy",
             "name": "everything_copy",
@@ -310,16 +305,33 @@
                 "width": "",
                 "class": "",
                 "id": ""
-            }
+            },
+            "tabs": "all",
+            "toolbar": "full",
+            "media_upload": 1,
+            "default_value": "",
+            "delay": 0
         },
         {
+            "key": "field_561589023a077",
+            "label": "Store categories",
+            "name": "store_categories",
+            "type": "repeater",
+            "instructions": "These determine the tabs within the store part of the site and what Shopify product types they should display. The first category is the download store (only the display name is used, the rest is hardcoded).",
+            "required": 0,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "",
+                "class": "",
+                "id": ""
+            },
+            "min": 0,
+            "max": 0,
+            "layout": "table",
+            "button_label": "Add Category",
+            "collapsed": "",
             "sub_fields": [
                 {
-                    "default_value": "",
-                    "maxlength": "",
-                    "placeholder": "",
-                    "prepend": "",
-                    "append": "",
                     "key": "field_561589173a078",
                     "label": "Shopify type",
                     "name": "shopify_type",
@@ -332,15 +344,15 @@
                         "class": "",
                         "id": ""
                     },
-                    "readonly": 0,
-                    "disabled": 0
-                },
-                {
                     "default_value": "",
                     "maxlength": "",
                     "placeholder": "",
                     "prepend": "",
                     "append": "",
+                    "readonly": 0,
+                    "disabled": 0
+                },
+                {
                     "key": "field_561589843a079",
                     "label": "Display name",
                     "name": "display_name",
@@ -353,15 +365,15 @@
                         "class": "",
                         "id": ""
                     },
+                    "default_value": "",
+                    "maxlength": "",
+                    "placeholder": "",
+                    "prepend": "",
+                    "append": "",
                     "readonly": 0,
                     "disabled": 0
                 },
                 {
-                    "default_value": 0,
-                    "message": "",
-                    "ui": 0,
-                    "ui_on_text": "",
-                    "ui_off_text": "",
                     "key": "field_561589df3a07a2",
                     "label": "Allow Multiple In Cart",
                     "name": "allow_multiple",
@@ -373,14 +385,14 @@
                         "width": "",
                         "class": "",
                         "id": ""
-                    }
-                },
-                {
+                    },
                     "default_value": 0,
                     "message": "",
                     "ui": 0,
                     "ui_on_text": "",
-                    "ui_off_text": "",
+                    "ui_off_text": ""
+                },
+                {
                     "key": "field_561589df3a07a",
                     "label": "Display",
                     "name": "display",
@@ -392,57 +404,16 @@
                         "width": "",
                         "class": "",
                         "id": ""
-                    }
+                    },
+                    "default_value": 0,
+                    "message": "",
+                    "ui": 0,
+                    "ui_on_text": "",
+                    "ui_off_text": ""
                 }
-            ],
-            "min": 0,
-            "max": 0,
-            "layout": "table",
-            "button_label": "Add Category",
-            "collapsed": "",
-            "key": "field_561589023a077",
-            "label": "Store categories",
-            "name": "store_categories",
-            "type": "repeater",
-            "instructions": "These determine the tabs within the store part of the site and what Shopify product types they should display. The first category is the download store (only the display name is used, the rest is hardcoded).",
-            "required": 0,
-            "conditional_logic": 0,
-            "wrapper": {
-                "width": "",
-                "class": "",
-                "id": ""
-            }
+            ]
         },
         {
-            "sub_fields": [
-                {
-                    "post_type": [
-                        "album"
-                    ],
-                    "taxonomy": [],
-                    "allow_null": 0,
-                    "multiple": 0,
-                    "return_format": "id",
-                    "ui": 1,
-                    "key": "field_585acc5d3ab5c",
-                    "label": "Spotlight Album",
-                    "name": "spotlight_album",
-                    "type": "post_object",
-                    "instructions": "The first few of these will be displayed as spotlight albums on the home page.",
-                    "required": 0,
-                    "conditional_logic": 0,
-                    "wrapper": {
-                        "width": "",
-                        "class": "",
-                        "id": ""
-                    }
-                }
-            ],
-            "min": 0,
-            "max": 0,
-            "layout": "table",
-            "button_label": "Add Spotlight Album",
-            "collapsed": "",
             "key": "field_585acc3e3ab56",
             "label": "Spotlight Products",
             "name": "spotlight_albums",
@@ -454,11 +425,38 @@
                 "width": "",
                 "class": "",
                 "id": ""
-            }
+            },
+            "min": 0,
+            "max": 0,
+            "layout": "table",
+            "button_label": "Add Spotlight Album",
+            "collapsed": "",
+            "sub_fields": [
+                {
+                    "key": "field_585acc5d3ab5c",
+                    "label": "Spotlight Album",
+                    "name": "spotlight_album",
+                    "type": "post_object",
+                    "instructions": "The first few of these will be displayed as spotlight albums on the home page.",
+                    "required": 0,
+                    "conditional_logic": 0,
+                    "wrapper": {
+                        "width": "",
+                        "class": "",
+                        "id": ""
+                    },
+                    "post_type": [
+                        "album"
+                    ],
+                    "taxonomy": [],
+                    "allow_null": 0,
+                    "multiple": 0,
+                    "return_format": "id",
+                    "ui": 1
+                }
+            ]
         },
         {
-            "placement": "top",
-            "endpoint": 0,
             "key": "field_55df75c393c25",
             "label": "APIs",
             "name": "",
@@ -470,11 +468,11 @@
                 "width": "",
                 "class": "",
                 "id": ""
-            }
+            },
+            "placement": "top",
+            "endpoint": 0
         },
         {
-            "default_value": "",
-            "placeholder": "",
             "key": "field_55d24b8ab4685",
             "label": "Post encodes link",
             "name": "post_encodes_link",
@@ -486,14 +484,11 @@
                 "width": "",
                 "class": "",
                 "id": ""
-            }
+            },
+            "default_value": "",
+            "placeholder": ""
         },
         {
-            "default_value": "",
-            "maxlength": "",
-            "placeholder": "",
-            "prepend": "",
-            "append": "",
             "key": "field_55dccbc2edf9c",
             "label": "Twitter consumer secret",
             "name": "twitter_consumer_secret",
@@ -506,15 +501,15 @@
                 "class": "",
                 "id": ""
             },
-            "readonly": 0,
-            "disabled": 0
-        },
-        {
             "default_value": "",
             "maxlength": "",
             "placeholder": "",
             "prepend": "",
             "append": "",
+            "readonly": 0,
+            "disabled": 0
+        },
+        {
             "key": "field_55dccb46edf9b",
             "label": "Twitter consumer key",
             "name": "twitter_consumer_key",
@@ -527,15 +522,15 @@
                 "class": "",
                 "id": ""
             },
-            "readonly": 0,
-            "disabled": 0
-        },
-        {
             "default_value": "",
             "maxlength": "",
             "placeholder": "",
             "prepend": "",
             "append": "",
+            "readonly": 0,
+            "disabled": 0
+        },
+        {
             "key": "field_560055bf83468",
             "label": "Shopify Api Key",
             "name": "shopify_api_key",
@@ -548,15 +543,15 @@
                 "class": "",
                 "id": ""
             },
-            "readonly": 0,
-            "disabled": 0
-        },
-        {
             "default_value": "",
             "maxlength": "",
             "placeholder": "",
             "prepend": "",
             "append": "",
+            "readonly": 0,
+            "disabled": 0
+        },
+        {
             "key": "field_560055cd83469",
             "label": "Shopify Api Password",
             "name": "shopify_api_password",
@@ -569,15 +564,15 @@
                 "class": "",
                 "id": ""
             },
-            "readonly": 0,
-            "disabled": 0
-        },
-        {
             "default_value": "",
             "maxlength": "",
             "placeholder": "",
             "prepend": "",
             "append": "",
+            "readonly": 0,
+            "disabled": 0
+        },
+        {
             "key": "field_560055e98346a",
             "label": "Shopify Handle",
             "name": "shopify_handle",
@@ -590,15 +585,15 @@
                 "class": "",
                 "id": ""
             },
-            "readonly": 0,
-            "disabled": 0
-        },
-        {
             "default_value": "",
             "maxlength": "",
             "placeholder": "",
             "prepend": "",
             "append": "",
+            "readonly": 0,
+            "disabled": 0
+        },
+        {
             "key": "field_5601d5019d555",
             "label": "Fetch key",
             "name": "fetch_key",
@@ -611,15 +606,15 @@
                 "class": "",
                 "id": ""
             },
-            "readonly": 0,
-            "disabled": 0
-        },
-        {
             "default_value": "",
             "maxlength": "",
             "placeholder": "",
             "prepend": "",
             "append": "",
+            "readonly": 0,
+            "disabled": 0
+        },
+        {
             "key": "field_5601d51d9d556",
             "label": "Fetch token",
             "name": "fetch_token",
@@ -632,15 +627,15 @@
                 "class": "",
                 "id": ""
             },
-            "readonly": 0,
-            "disabled": 0
-        },
-        {
             "default_value": "",
             "maxlength": "",
             "placeholder": "",
             "prepend": "",
             "append": "",
+            "readonly": 0,
+            "disabled": 0
+        },
+        {
             "key": "field_575d8c6809239",
             "label": "AWS Access Key ID",
             "name": "aws_access_key_id",
@@ -653,15 +648,15 @@
                 "class": "",
                 "id": ""
             },
-            "readonly": 0,
-            "disabled": 0
-        },
-        {
             "default_value": "",
             "maxlength": "",
             "placeholder": "",
             "prepend": "",
             "append": "",
+            "readonly": 0,
+            "disabled": 0
+        },
+        {
             "key": "field_575d8c8c0923a",
             "label": "AWS Secret Access Key",
             "name": "aws_secret_access_key",
@@ -674,15 +669,15 @@
                 "class": "",
                 "id": ""
             },
-            "readonly": 0,
-            "disabled": 0
-        },
-        {
             "default_value": "",
             "maxlength": "",
             "placeholder": "",
             "prepend": "",
             "append": "",
+            "readonly": 0,
+            "disabled": 0
+        },
+        {
             "key": "field_5761c2e57b08a",
             "label": "AWS Bucket Name",
             "name": "aws_bucket_name",
@@ -695,27 +690,11 @@
                 "class": "",
                 "id": ""
             },
-            "readonly": 0,
-            "disabled": 0
-        },
-        {
-            "key": "field_56142806b9043",
-            "label": "Bandsintown app ID",
-            "name": "bandsintown_app_id",
-            "type": "text",
-            "instructions": "This doesn't seem to matter",
-            "required": 1,
-            "conditional_logic": 0,
-            "wrapper": {
-                "width": "",
-                "class": "",
-                "id": ""
-            },
-            "default_value": "joco",
+            "default_value": "",
+            "maxlength": "",
             "placeholder": "",
             "prepend": "",
             "append": "",
-            "maxlength": "",
             "readonly": 0,
             "disabled": 0
         },
