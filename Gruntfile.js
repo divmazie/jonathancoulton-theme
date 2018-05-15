@@ -70,7 +70,7 @@ module.exports = function (grunt) {
                 dest: 'wp-content/themes/jonathancoulton-theme/',
                 exclusions: ['./.ftppass', './.git', './.gitignore', './.idea', './Gruntfile.js', './node_modules',
                     './jct_docker', './docs', './.DS_Store', './sftpcache.json', './tmp/*', './bower.json',
-                    './package.json', './README.md', './custom_bootstrap', './tests', './phpinfo*',
+                    './package.json', './package-lock.json', './README.md', './custom_bootstrap', './tests', './phpinfo*',
                     './composer.*', './custom_bootstrap'],
                 serverSep: '/',
                 concurrency: 16,
