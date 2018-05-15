@@ -62,8 +62,16 @@ class WPAttachment extends JCTPost {
 
 
     public function getPath() {
-        /** @noinspection PhpUndefinedFunctionInspection */
-        return get_attached_file($this->ID);
+        $fsPath = get_attached_file($this->ID);
+        if(file_exists($fsPath)) {
+            return $fsPath;
+        }
+        if((function_exists('is_wpe') && is_wpe()) ||
+            (function_exists('is_wpe_snapshot') && is_wpe_snapshot())) {
+            $path = $this->getURL();
+        }
+
+        return "error";
     }
 
     public function getURL() {
@@ -71,8 +79,36 @@ class WPAttachment extends JCTPost {
         return wp_get_attachment_url($this->ID);
     }
 
+    private static $URL_CACHE = [];
+
+    public static function retrieve_remote_file_size($url) {
+        if(isset(self::$URL_CACHE[$url])) {
+            return $URL_CACHE[$url];
+        }
+
+        $ch = curl_init($url);
+
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, TRUE);
+        curl_setopt($ch, CURLOPT_HEADER, TRUE);
+        curl_setopt($ch, CURLOPT_NOBODY, TRUE);
+
+        $data = curl_exec($ch);
+        $size = curl_getinfo($ch, CURLINFO_CONTENT_LENGTH_DOWNLOAD);
+
+        curl_close($ch);
+        return (self::$URL_CACHE[$url] = $size);
+    }
+
+
     public function fileAssetExists() {
-        return $this->ID && file_exists($this->getPath()) && filesize($this->getPath());
+        if(($this->ID && file_exists($this->getPath()) && filesize($this->getPath()))
+            || (method_exists($this, 'isUploadedToS3') && $this->isUploadedToS3())) {
+            return true;
+        }
+        if(filter_var($this->getPath(), FILTER_VALIDATE_URL)) {
+            return self::retrieve_remote_file_size($this->getPath());
+        }
+        return false;
     }
 
     public function deleteAttachment($skipTrash = false) {

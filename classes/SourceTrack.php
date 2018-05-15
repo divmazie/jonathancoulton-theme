@@ -9,8 +9,8 @@ class SourceTrack extends WPAttachment {
     public function __construct($id) {
         parent::__construct($id);
 
-
-        if($this->fileAssetExists() && $this->parent()) {
+        // do not try to move this stuff if path is returning a url ... remember that it does that now... :(
+        if($this->fileAssetExists() && $this->parent() && !filter_var($this->getPath(), FILTER_VALIDATE_URL)) {
             $baseStoragePath = $desiredPath = wp_upload_dir()['basedir'] . '/' . self::SOURCE_UPLOADS_FOLDER;
             $desiredPath = $baseStoragePath . '/' . $this->getFilename();
             if($desiredPath !== $this->getPath()) {

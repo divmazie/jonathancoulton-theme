@@ -217,6 +217,7 @@ class SyncManager {
 
         echo "<pre>";
         print_r($r);
+        print_r((string)$r->getBody());
         die();
     }
 
