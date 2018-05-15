@@ -70,9 +70,10 @@ module.exports = function (grunt) {
                 dest: 'wp-content/themes/jonathancoulton-theme/',
                 exclusions: ['./.ftppass', './.git', './.gitignore', './.idea', './Gruntfile.js', './node_modules',
                     './jct_docker', './docs', './.DS_Store', './sftpcache.json', './tmp/*', './bower.json',
-                    './package.json', './README.md', './custom_bootstrap', './tests'],
+                    './package.json', './README.md', './custom_bootstrap', './tests', './phpinfo*',
+                    './composer.*', './custom_bootstrap'],
                 serverSep: '/',
-                concurrency: 4,
+                concurrency: 16,
                 progress: true
             }
         }
@@ -85,7 +86,6 @@ module.exports = function (grunt) {
     grunt.registerTask('buildbower', ['bower:install', 'bower_concat', 'uglify:bower']);
 
     grunt.registerTask('builddeps', ['buildbower', 'less:compile', 'composer:install']);
-
 
     grunt.registerTask('deploy', ['sftp-deploy']);
 };
